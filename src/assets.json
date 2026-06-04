@@ -1,0 +1,7 @@
+﻿{
+  "textures" : {
+    "oceanTile": "res://assets/water_hex.png",
+    "plainTile": "res://assets/ground_hex.png"
+  }
+          
+}
