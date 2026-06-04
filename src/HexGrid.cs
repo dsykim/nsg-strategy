@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class CubeCoord
 {
@@ -18,18 +19,32 @@ public class CubeCoord
 
 public partial class HexGrid : Node2D
 {
-	private int width, height;
-
-	private List<HexCell> grid;
+	public readonly int width, height;
+	private HexCell[] grid;
 
 	public HexGrid(int w, int h) {
 		width = w;
 		height = h;
-		grid = new List<HexCell>(w * h);
+		grid = new HexCell[w * h];
 	}
 	
 	public bool indexInGrid(int x, int y) {
-		return x > +0 && x < width && y >= 0 && y < height;
+		return x >= 0 && x < width && y >= 0 && y < height;
+	}
+
+	/**
+	 * Deletes any existing cells and sets the cell in this grid to be the provided cell.
+	 * Assumes the provided cell has been initialized with its grid position.
+	 */
+	public void setCell(HexCell c) {
+		if (!indexInGrid(c.x, c.y)) {
+			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
+		}
+
+		deleteCell(c.x, c.y);
+		
+		grid[c.y * width + c.x] = c;
+		AddChild(c);
 	}
 	
 	public HexCell getCell(int x, int y) {
@@ -38,6 +53,18 @@ public partial class HexGrid : Node2D
 		}
 		
 		return grid[y * width + x];
+	}
+
+	public void deleteCell(int x, int y) {
+		if (!indexInGrid(x, y)) {
+			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
+		}
+
+		HexCell target = grid[y * width + x];
+		if (target != null) {
+			RemoveChild(target);
+			target.QueueFree();
+		}
 	}
 
 	/** Coordinate conversion between axial (x,y) and cube (q, r, s) coordinates. */
