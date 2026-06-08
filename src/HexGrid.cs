@@ -26,6 +26,10 @@ public partial class HexGrid : Node2D
 		width = w;
 		height = h;
 		grid = new HexCell[w * h];
+		for (int i = 0; i < w * h; i++) {
+			HexCell c = new HexCell(i % w, i / w);
+			setCell(c);
+		}
 	}
 	
 	public bool indexInGrid(int x, int y) {
@@ -66,7 +70,7 @@ public partial class HexGrid : Node2D
 			target.QueueFree();
 		}
 	}
-
+	
 	/** Coordinate conversion between axial (x,y) and cube (q, r, s) coordinates. */
 	public static (int x, int y) cubeToOffset(CubeCoord c) {
 		var parity = c.r & 1;
@@ -112,18 +116,18 @@ public partial class HexGrid : Node2D
 		return neighbors;
 	}
 
-	public int hexDistance(CubeCoord c1, CubeCoord c2) {
+	public static int hexDistance(CubeCoord c1, CubeCoord c2) {
 		var vec = c1.sub(c2);
 		return (Math.Abs(vec.q) + Math.Abs(vec.r) + Math.Abs(vec.s)) / 2;
 	}
 
-	public int hexDistance(int x1, int y1, int x2, int y2) {
+	public static int hexDistance(int x1, int y1, int x2, int y2) {
 		CubeCoord c1 = offsetToCube(x1, y1);
 		CubeCoord c2 = offsetToCube(x2, y2);
 		return hexDistance(c1, c2);
 	}
 
-	public int hexDistance(HexCell cell1, HexCell cell2) {
+	public static int hexDistance(HexCell cell1, HexCell cell2) {
 		return hexDistance(cell1.x, cell1.y, cell2.x, cell2.y);
 	}
 }

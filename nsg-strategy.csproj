@@ -5,7 +5,4 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>nsgstrategy/src</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Include="src\assets.json" />
-  </ItemGroup>
 </Project>

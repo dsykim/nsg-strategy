@@ -1,10 +1,13 @@
 ﻿using Godot;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 public partial class HexCell : Sprite2D
 {
-	public int x, y;
+	public readonly int x, y;
 	public TerrainTypes terrainType;
+	private List<CellDecorator> decorators = new List<CellDecorator>();
 	
 	public HexCell(int x, int y) {
 		this.x = x;
@@ -27,6 +30,20 @@ public partial class HexCell : Sprite2D
 				
 			case TerrainTypes.EMPTY:
 				break;
+		}
+	}
+
+	public bool isDecoratorAllowed(CellDecorator dec) {
+		return true;
+	}
+	public List<CellDecorator> getDecorators() {
+		return decorators;
+	}
+	
+	public void addDecorator(CellDecorator dec) {
+		if (isDecoratorAllowed(dec)) {
+			decorators.Add(dec);
+			AddChild(dec);
 		}
 	}
 }
