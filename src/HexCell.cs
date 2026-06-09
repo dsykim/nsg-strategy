@@ -7,7 +7,10 @@ public partial class HexCell : Sprite2D
 {
 	public readonly int x, y;
 	public TerrainTypes terrainType;
-	private List<CellDecorator> decorators = new List<CellDecorator>();
+	public NaturalDecorator naturalDecorator = null;
+	public PlayerDecorator playerDecorator = null;
+	public City city = null;
+	public List<Unit> units = new List<Unit>();
 	
 	public HexCell(int x, int y) {
 		this.x = x;
@@ -32,19 +35,5 @@ public partial class HexCell : Sprite2D
 				break;
 		}
 	}
-
-	public bool isDecoratorAllowed(CellDecorator dec) {
-		return true;
-	}
-	public List<CellDecorator> getDecorators() {
-		return decorators;
-	}
-	
-	public void addDecorator(CellDecorator dec) {
-		if (isDecoratorAllowed(dec)) {
-			decorators.Add(dec);
-			AddChild(dec);
-		}
-	}
-}
+ }
 

@@ -59,6 +59,10 @@ public partial class HexGrid : Node2D
 		return grid[y * width + x];
 	}
 
+	public HexCell getCell(Vector2I pos) {
+		return getCell(pos.X, pos.Y);
+	}
+
 	public void deleteCell(int x, int y) {
 		if (!indexInGrid(x, y)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");

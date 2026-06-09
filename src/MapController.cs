@@ -3,17 +3,65 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class MapController
+public partial class MapController : Node2D
 {
+	public static MapController instance { get; private set; }
 	private HexGrid hexGrid;
 	private float hexSize;
 	
 	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/water_hex.png");
 	Texture2D landTile = ResourceLoader.Load<Texture2D>("res://assets/ground_hex.png");
 
-	public MapController(HexGrid hexGrid, float hexSize) {
-		this.hexGrid = hexGrid;
+	public MapController(int width, int height, float hexSize) {
+		hexGrid = new HexGrid(width, height);
+		AddChild(hexGrid);
 		this.hexSize = hexSize;
+		instance = this;
+	}
+
+	public void addUnit(Unit unit, int x, int y) {
+		HexCell c = hexGrid.getCell(x, y);
+		if (c.units.Count == 0) {
+			unit.SetPosition(getCellCenter(x, y));
+			unit.gridPosition = new Vector2I(x, y);
+			c.units.Add(unit);
+			if (unit.GetParent() == null) {
+				AddChild(unit);
+			}
+		}
+	}
+
+	public void removeUnit(Unit unit) {
+		HexCell c = hexGrid.getCell(unit.gridPosition.X, unit.gridPosition.Y);
+		c.units.Remove(unit);
+		RemoveChild(unit);
+	}
+
+	public void moveUnit(Unit unit, Vector2I target) {
+		HexCell currentCell = hexGrid.getCell(unit.gridPosition);
+		HexCell targetCell = hexGrid.getCell(target);
+		if (targetCell.units.Count == 0) {
+			currentCell.units.Remove(unit);
+			addUnit(unit, target.X, target.Y);
+		}
+	}
+
+	public void addCity(City city, int x, int y) {
+		HexCell c = hexGrid.getCell(x, y);
+		if (c.city == null) {
+			city.SetPosition(getCellCenter(x, y));
+			city.gridPosition = new Vector2I(x, y);
+			c.city = city;
+			AddChild(city);
+		}
+	}
+
+	public void addNaturalDecorator(NaturalDecorator dec, int x, int y) {
+		
+	}
+
+	public void addPlayerDecorator(PlayerDecorator dec, int x , int y) {
+		
 	}
 
 	public void generateMap() {
@@ -64,8 +112,7 @@ public class MapController
 	}
 
 	private HexCell createCell(int x, int y, TerrainTypes tType) {
-		float hexWidth = 2 * hexSize;
-		float hexHeight = (float)Math.Sqrt(3) * hexSize;
+		
 		HexCell cell = new HexCell(x, y, tType);
 		
 		Texture2D tex;
@@ -81,15 +128,22 @@ public class MapController
 				break;
 		}
 		cell.SetTexture(tex);
-		cell.SetScale(new Vector2(hexWidth, hexHeight) / tex.GetSize());
+		cell.SetScale(new Vector2(2*hexSize, (float)Math.Sqrt(3) * hexSize) / tex.GetSize());
 
+		Vector2 center = getCellCenter(x, y);
+		cell.SetPosition(center);
+		return cell;
+	}
+
+	public Vector2 getCellCenter(int x, int y) {
+		float hexWidth = 2 * hexSize;
+		float hexHeight = (float)Math.Sqrt(3) * hexSize;
 		float hOffset = hexWidth / 2f;
 		float vOffset = (x & 1) == 0 ? hexHeight : hexHeight / 2f;
 		float hStep = 3f / 4 * hexWidth;
 		float vStep = (float)Math.Sqrt(3) * hexSize;
-		
-		cell.SetPosition(new Vector2(hOffset + x*hStep, vOffset + y*vStep));
-		return cell;
+
+		return new Vector2(hOffset + x * hStep, vOffset + y * vStep);
 	}
 
 }
