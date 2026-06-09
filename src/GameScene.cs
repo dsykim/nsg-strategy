@@ -16,6 +16,10 @@ public partial class GameScene : Node
 		MapController mapController = new MapController(width, height, hexSize);
 		AddChild(mapController);
 		mapController.generateMap();
+
+		MeleeUnit unit1 = new MeleeUnit();
+		
+		mapController.addUnit(unit1, width/2, height/2);
 	}
 
 	public override void _Process(double delta) {

@@ -2,12 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 public partial class MapController : Node2D
 {
 	public static MapController instance { get; private set; }
 	private HexGrid hexGrid;
 	private float hexSize;
+	
+	public readonly TerrainTypes[] impassableTerrain = { 
+			TerrainTypes.EMPTY, 
+			TerrainTypes.OCEAN, 
+			TerrainTypes.MOUNTAIN 
+	};
 	
 	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/water_hex.png");
 	Texture2D landTile = ResourceLoader.Load<Texture2D>("res://assets/ground_hex.png");
@@ -37,12 +44,23 @@ public partial class MapController : Node2D
 		RemoveChild(unit);
 	}
 
+	public bool canMove(Unit unit, Vector2I target) {
+		HexCell targetCell = hexGrid.getCell(target);
+		int moveDist = HexGrid.hexDistance(unit.gridPosition.X, unit.gridPosition.Y, target.X, target.Y);
+
+		
+		return moveDist <= unit.currentAP && targetCell.units.Count == 0
+				&& !impassableTerrain.Contains(targetCell.terrainType);
+	}
+	
 	public void moveUnit(Unit unit, Vector2I target) {
 		HexCell currentCell = hexGrid.getCell(unit.gridPosition);
 		HexCell targetCell = hexGrid.getCell(target);
-		if (targetCell.units.Count == 0) {
+		if (canMove(unit, target)) {
 			currentCell.units.Remove(unit);
-			addUnit(unit, target.X, target.Y);
+			unit.move(target);
+			unit.SetPosition(getCellCenter(target));
+			targetCell.units.Add(unit);
 		}
 	}
 
@@ -144,6 +162,10 @@ public partial class MapController : Node2D
 		float vStep = (float)Math.Sqrt(3) * hexSize;
 
 		return new Vector2(hOffset + x * hStep, vOffset + y * vStep);
+	}
+	
+	public Vector2 getCellCenter(Vector2I v) {
+		return getCellCenter(v.X, v.Y);
 	}
 
 }

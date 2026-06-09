@@ -130,6 +130,12 @@ public partial class HexGrid : Node2D
 		CubeCoord c2 = offsetToCube(x2, y2);
 		return hexDistance(c1, c2);
 	}
+	
+	public static int hexDistance(Vector2I cell1, Vector2I cell2) {
+		CubeCoord c1 = offsetToCube(cell1.X, cell1.Y);
+		CubeCoord c2 = offsetToCube(cell2.X, cell2.Y);
+		return hexDistance(c1, c2);
+	}
 
 	public static int hexDistance(HexCell cell1, HexCell cell2) {
 		return hexDistance(cell1.x, cell1.y, cell2.x, cell2.y);

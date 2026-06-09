@@ -2,17 +2,19 @@
 		
 public abstract partial class Unit : Sprite2D
 {
-	private int hp;
-	private int actionPoints;
-	private int apUsed;
+	public int hp { get; protected set; }
+	public int actionPoints { get; protected set; }
+	public int currentAP { get; protected set; }
 	public Vector2I gridPosition;
 
 	public Unit() {
 		
-	}	
+	}
 
-	public void move() {
-		
+	
+	public void move(Vector2I target) {
+		currentAP -= HexGrid.hexDistance(gridPosition, target);
+		gridPosition = target;
 	}
 	
 }
