@@ -6,7 +6,7 @@ public partial class MeleeUnit : Unit
 	/**
 	 * Initializes a melee unit. Must be added to the game board with MapController.AddUnit.
 	 */
-	public MeleeUnit() {
+	public MeleeUnit(int owner) : base(owner) {
 		hp = 3;
 		actionPoints = 3;
 		currentAP = actionPoints;

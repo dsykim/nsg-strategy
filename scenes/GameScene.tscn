@@ -4,3 +4,16 @@
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1_vh257")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="NextTurnButton" type="Button" parent="UI"]
+layout_mode = 0
+offset_left = 1362.0
+offset_top = 734.0
+offset_right = 1411.0
+offset_bottom = 765.0
+scale = Vector2(4, 4)
+text = "NEXT"

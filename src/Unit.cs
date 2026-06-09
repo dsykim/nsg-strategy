@@ -7,8 +7,10 @@ public abstract partial class Unit : Sprite2D
 	public int currentAP { get; protected set; }
 	public Vector2I gridPosition;
 
-	public Unit() {
-		
+	public readonly int owner;
+
+	public Unit(int owner) {
+		this.owner = owner;
 	}
 
 	

@@ -16,6 +16,7 @@ public partial class HexGrid : Node2D
 			HexCell c = new HexCell(i % w, i / w);
 			setCell(c);
 		}
+		Name = "HexGrid";
 	}
 	
 	public bool indexInGrid(int x, int y) {

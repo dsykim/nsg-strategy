@@ -5,8 +5,7 @@ using System.Diagnostics;
 		
 public partial class GameScene : Node
 {
-	private PlayerController userPlayer;
-	private List<PlayerController> aiPlayers;
+	private TurnController turnController;
 	
 	private readonly int width = 20;
 	private readonly int height = 12;
@@ -17,11 +16,9 @@ public partial class GameScene : Node
 		AddChild(mapController);
 		mapController.generateMap();
 
-		MeleeUnit unit1 = new MeleeUnit();
-		mapController.addUnit(unit1, new Vector2I(width/2, height/2));
-
-		City city1 = new City();
-		mapController.addCity(city1, new Vector2I(width/2 + 1, height/2 + 1));
+		turnController = new TurnController();
+		AddChild(turnController);
+		turnController.init(4);
 	}
 
 	public override void _Process(double delta) {

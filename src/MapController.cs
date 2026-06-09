@@ -24,6 +24,7 @@ public partial class MapController : Node2D
 		AddChild(hexGrid);
 		this.hexSize = hexSize;
 		instance = this;
+		Name = "MapController";
 	}
 	public void addUnit(Unit unit, Vector2I target) {
 		HexCell c = hexGrid.getCell(target);
