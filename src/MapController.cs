@@ -93,9 +93,9 @@ public partial class MapController : Node2D
 		
 	}
 
-	private HexCell createCell(int x, int y, TerrainTypes tType) {
+	private HexCell createCell(Vector2I pos, TerrainTypes tType) {
 		
-		HexCell cell = new HexCell(x, y, tType);
+		HexCell cell = new HexCell(pos, tType);
 		
 		Texture2D tex;
 		switch (tType) {
@@ -112,8 +112,9 @@ public partial class MapController : Node2D
 		cell.SetTexture(tex);
 		cell.SetScale(new Vector2(2*hexSize, (float)Math.Sqrt(3) * hexSize) / tex.GetSize());
 
-		Vector2 center = getCellCenter(x, y);
+		Vector2 center = getCellCenter(pos);
 		cell.SetPosition(center);
+		cell.addHexCollision();
 		return cell;
 	}
 
@@ -140,7 +141,8 @@ public partial class MapController : Node2D
 
 		Queue<HexCell> frontier = new Queue<HexCell>();
 		
-		HexCell seed = createCell(hexGrid.width / 2, hexGrid.height / 2, TerrainTypes.PLAINS);
+		HexCell seed = createCell(new Vector2I(hexGrid.width / 2, hexGrid.height / 2), 
+				TerrainTypes.PLAINS);
 		hexGrid.setCell(seed);
 		foreach (HexCell c in hexGrid.getNeighbors(seed)) {
 			frontier.Enqueue(c);
@@ -149,8 +151,8 @@ public partial class MapController : Node2D
 		Random rand = new Random();
 		while (frontier.Count > 0) {
 			HexCell next = frontier.Dequeue();
-			bool isBorder = next.x == 0 || next.x == hexGrid.width - 1 || next.y == 0 || next.y == hexGrid.height - 1;
-			bool isBorderAdj = next.x == 1 || next.x == hexGrid.width - 2 || next.y == 1 || next.y == hexGrid.height - 2;
+			bool isBorder = next.pos.X == 0 || next.pos.X == hexGrid.width - 1 || next.pos.Y == 0 || next.pos.Y == hexGrid.height - 1;
+			bool isBorderAdj = next.pos.X == 1 || next.pos.X == hexGrid.width - 2 || next.pos.Y == 1 || next.pos.Y == hexGrid.height - 2;
 			int distToSeed = HexGrid.hexDistance(next, seed);
 			float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToSeed / hexGrid.width, 2), 0.25f);
 
@@ -158,7 +160,7 @@ public partial class MapController : Node2D
 			
 			if (!isBorder && rand.NextSingle() < threshold) {
 				// Make land
-				HexCell generated = createCell(next.x, next.y, TerrainTypes.PLAINS);
+				HexCell generated = createCell(next.pos, TerrainTypes.PLAINS);
 				hexGrid.setCell(generated);
 				foreach (HexCell c in hexGrid.getNeighbors(generated)) {
 					if (!frontier.Contains(c) && c.terrainType == TerrainTypes.EMPTY) {
@@ -167,7 +169,7 @@ public partial class MapController : Node2D
 				}
 			} else {
 				// Make ocean
-				HexCell generated = createCell(next.x, next.y, TerrainTypes.OCEAN);
+				HexCell generated = createCell(next.pos, TerrainTypes.OCEAN);
 				hexGrid.setCell(generated);
 			}
 		}
@@ -175,7 +177,7 @@ public partial class MapController : Node2D
 		for (int x = 0; x < hexGrid.width; x++) {
 			for (int y = 0; y < hexGrid.height; y++) {
 				if (hexGrid.getCell(x, y).terrainType == TerrainTypes.EMPTY) {
-					HexCell c = createCell(x, y, TerrainTypes.OCEAN);
+					HexCell c = createCell(new Vector2I(x, y), TerrainTypes.OCEAN);
 					hexGrid.setCell(c);
 				}
 			}

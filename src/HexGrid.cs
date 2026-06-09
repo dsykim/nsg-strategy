@@ -13,7 +13,7 @@ public partial class HexGrid : Node2D
 		height = h;
 		grid = new HexCell[w * h];
 		for (int i = 0; i < w * h; i++) {
-			HexCell c = new HexCell(i % w, i / w);
+			HexCell c = new HexCell(new Vector2I(i % w, i / w));
 			setCell(c);
 		}
 		Name = "HexGrid";
@@ -28,13 +28,13 @@ public partial class HexGrid : Node2D
 	 * Assumes the provided cell has been initialized with its grid position.
 	 */
 	public void setCell(HexCell c) {
-		if (!indexInGrid(c.x, c.y)) {
+		if (!indexInGrid(c.pos.X, c.pos.Y)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
 
-		deleteCell(c.x, c.y);
+		deleteCell(c.pos.X, c.pos.Y);
 		
-		grid[c.y * width + c.x] = c;
+		grid[c.pos.Y * width + c.pos.X] = c;
 		AddChild(c);
 	}
 	
@@ -79,23 +79,23 @@ public partial class HexGrid : Node2D
 	}
 
 	public List<HexCell> getNeighbors(HexCell cell) {
-		return getNeighbors(cell.x, cell.y);
+		return getNeighbors(cell.pos);
 	}
 	
-	public List<HexCell> getNeighbors(int x, int y) {
+	public List<HexCell> getNeighbors(Vector2I pos) {
 		List<HexCell> neighbors = new List<HexCell>();
 
 		for (int dx = -1; dx < 2; dx++) {
 			for (int dy = -1; dy < 2; dy++) {
-				int xi = x + dx;
-				int yi = y + dy;
+				int xi = pos.X + dx;
+				int yi = pos.Y + dy;
 
 				bool isSelf = dx == 0 && dy == 0;
 
 				// Mask non-adjacent cells in 3x3 sweep
 				bool isTopDiags = dx != 0 && dy == 1;
 				bool isBottomDiags = dx != 0 && dy == -1;
-				bool excludeDiags = (x % 2 == 0) ? isBottomDiags : isTopDiags;
+				bool excludeDiags = (pos.X % 2 == 0) ? isBottomDiags : isTopDiags;
 				
 				if (!indexInGrid(xi, yi) || isSelf || excludeDiags) {
 					continue;
@@ -125,6 +125,6 @@ public partial class HexGrid : Node2D
 	}
 
 	public static int hexDistance(HexCell cell1, HexCell cell2) {
-		return hexDistance(cell1.x, cell1.y, cell2.x, cell2.y);
+		return hexDistance(cell1.pos.X, cell1.pos.Y, cell2.pos.X, cell2.pos.Y);
 	}
 }

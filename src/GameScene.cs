@@ -23,6 +23,9 @@ public partial class GameScene : Node
 
 		uiController = (UIController)GetNode("UIController");
 		uiController.init();
+
+		Camera2D camera = GetViewport().GetCamera2D();
+		camera.SetPosition(GetViewport().GetVisibleRect().Size/2);
 	}
 
 	public override void _Process(double delta) {
