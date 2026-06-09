@@ -11,20 +11,19 @@ public partial class TurnController : Node
 
 	private Thread aiThread;
 	private Dictionary<string, string> aiResult = new Dictionary<string, string>();
-	private bool aiThinking = false;
-	
+	public bool aiThinking { get; private set; } = false;
+
 	private int currentPlayer;
 	private int playerCount;
 	
-	private Button nextTurnButton;
-
 	public TurnController() {
 		currentPlayer = 0;
+		Name = "TurnController";
 	}
 
 	public void init(int playerCount) {
 		setPlayerCount(playerCount);
-		nextTurnButton = GetNode<Button>("../UI/NextTurnButton");
+		Button nextTurnButton = GetNode<Button>("../UIController/NextTurnButton");
 		nextTurnButton.Pressed += nextTurn;
 	}
 
@@ -32,13 +31,19 @@ public partial class TurnController : Node
 		if (n > 1 && n <= MAX_PLAYER_COUNT) {
 			playerCount = n;
 			userPlayer = new PlayerController(0);
+			AddChild(userPlayer);
 			for (int i = 1; i < n; i++) {
 				PlayerController aiPlayer = new PlayerController(i);
 				aiPlayers.Add(aiPlayer);
+				AddChild(aiPlayer);
 			}
 		} else {
 			Debug.Print("Invalid player count");
 		}
+	}
+
+	public void beginUserTurn() {
+		userPlayer.turnUpkeep();
 	}
 
 	/* ==================== AI Controls ==================== */
@@ -78,6 +83,7 @@ public partial class TurnController : Node
 		{
 			// All AI players have gone, return control to user
 			aiThinking = false;
+			beginUserTurn();
 			Debug.Print("Returning control to user player");
 		}
 		else

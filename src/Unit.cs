@@ -2,9 +2,9 @@
 		
 public abstract partial class Unit : Sprite2D
 {
-	public int hp { get; protected set; }
-	public int actionPoints { get; protected set; }
-	public int currentAP { get; protected set; }
+	public int hp;
+	public int actionPoints;
+	public int currentAP;
 	public Vector2I gridPosition;
 
 	public readonly int owner;
@@ -18,5 +18,8 @@ public abstract partial class Unit : Sprite2D
 		currentAP -= HexGrid.hexDistance(gridPosition, target);
 		gridPosition = target;
 	}
-	
+
+	public void setCurrentAP(int val) {
+		currentAP = val;
+	}
 }

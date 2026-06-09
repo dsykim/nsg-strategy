@@ -6,6 +6,7 @@ using System.Diagnostics;
 public partial class GameScene : Node
 {
 	private TurnController turnController;
+	private UIController uiController;
 	
 	private readonly int width = 20;
 	private readonly int height = 12;
@@ -19,6 +20,9 @@ public partial class GameScene : Node
 		turnController = new TurnController();
 		AddChild(turnController);
 		turnController.init(4);
+
+		uiController = (UIController)GetNode("UIController");
+		uiController.init();
 	}
 
 	public override void _Process(double delta) {

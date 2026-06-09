@@ -1,15 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://bn1eteu33ytkc"]
+[gd_scene load_steps=3 format=3 uid="uid://bn1eteu33ytkc"]
 
 [ext_resource type="Script" uid="uid://101sgpxnjx65" path="res://src/GameScene.cs" id="1_vh257"]
+[ext_resource type="Script" uid="uid://egk0r212qscp" path="res://src/UIController.cs" id="2_xy3my"]
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1_vh257")
 
-[node name="UI" type="Control" parent="."]
+[node name="UIController" type="Control" parent="."]
+z_index = 999
 layout_mode = 3
 anchors_preset = 0
+script = ExtResource("2_xy3my")
 
-[node name="NextTurnButton" type="Button" parent="UI"]
+[node name="NextTurnButton" type="Button" parent="UIController"]
 layout_mode = 0
 offset_left = 1362.0
 offset_top = 734.0
@@ -17,3 +20,12 @@ offset_right = 1411.0
 offset_bottom = 765.0
 scale = Vector2(4, 4)
 text = "NEXT"
+
+[node name="StoneCounter" type="Label" parent="UIController"]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 18.0
+offset_right = 155.0
+offset_bottom = 85.0
+theme_override_font_sizes/font_size = 48
+text = "0"

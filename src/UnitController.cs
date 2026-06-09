@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Godot;
+using System.Collections.Generic;
 
-/**
- * This class manages the units for a single player.
- */
-public class UnitController
+
+public partial class UnitController : Node
 {
 	private List<Unit> units = new List<Unit>();
-
+	private int id;
+	
+	public UnitController(int id) {
+		this.id = id;
+		Name = "UnitController";
+	}
+	
 	public void addUnit(Unit unit) {
 		if (!units.Contains(unit) && unit != null) {
 			units.Add(unit);
-			
 		}
 	}
 
@@ -18,6 +22,12 @@ public class UnitController
 		if (units.Contains(unit)) {
 			units.Remove(unit);
 			unit.QueueFree();
+		}
+	}
+
+	public void unitUpkeep() {
+		foreach (Unit u in units) {
+			u.currentAP = u.actionPoints;
 		}
 	}
 }
