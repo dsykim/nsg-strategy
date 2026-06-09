@@ -3,20 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class CubeCoord
-{
-	public int q, r, s;
-
-	public CubeCoord(int q, int r, int s) {
-		this.q = q;
-		this.r = r;
-		this.s = s;
-	}
-	public CubeCoord sub(CubeCoord other) {
-		return new CubeCoord(q - other.q, r - other.r, s - other.s);
-	}
-}
-
 public partial class HexGrid : Node2D
 {
 	public readonly int width, height;
@@ -76,19 +62,19 @@ public partial class HexGrid : Node2D
 	}
 	
 	/** Coordinate conversion between axial (x,y) and cube (q, r, s) coordinates. */
-	public static (int x, int y) cubeToOffset(CubeCoord c) {
-		var parity = c.r & 1;
-		var col = c.q + (c.r + parity) / 2;
-		var row = c.r;
+	public static (int x, int y) cubeToOffset(Vector3I c) {
+		var parity = c.Y & 1;
+		var col = c.X + (c.Y + parity) / 2;
+		var row = c.Y;
 		return (col, row);
 	}
 	
 	/** Coordinate conversion between cube (q, r, s) and axial (x,y) coordinates. */
-	public static CubeCoord offsetToCube(int x, int y) {
+	public static Vector3I offsetToCube(int x, int y) {
 		var parity = y & 1;
 		var q = x - (y + parity) / 2;
 		var r = y;
-		return new CubeCoord(q, r, -q-r);
+		return new Vector3I(q, r, -q-r);
 	}
 
 	public List<HexCell> getNeighbors(HexCell cell) {
@@ -120,20 +106,20 @@ public partial class HexGrid : Node2D
 		return neighbors;
 	}
 
-	public static int hexDistance(CubeCoord c1, CubeCoord c2) {
-		var vec = c1.sub(c2);
-		return (Math.Abs(vec.q) + Math.Abs(vec.r) + Math.Abs(vec.s)) / 2;
+	public static int hexDistance(Vector3I c1, Vector3I c2) {
+		Vector3I vec = c1 - c2;
+		return (Math.Abs(vec.X) + Math.Abs(vec.Y) + Math.Abs(vec.Z)) / 2;
 	}
 
 	public static int hexDistance(int x1, int y1, int x2, int y2) {
-		CubeCoord c1 = offsetToCube(x1, y1);
-		CubeCoord c2 = offsetToCube(x2, y2);
+		Vector3I c1 = offsetToCube(x1, y1);
+		Vector3I c2 = offsetToCube(x2, y2);
 		return hexDistance(c1, c2);
 	}
 	
 	public static int hexDistance(Vector2I cell1, Vector2I cell2) {
-		CubeCoord c1 = offsetToCube(cell1.X, cell1.Y);
-		CubeCoord c2 = offsetToCube(cell2.X, cell2.Y);
+		Vector3I c1 = offsetToCube(cell1.X, cell1.Y);
+		Vector3I c2 = offsetToCube(cell2.X, cell2.Y);
 		return hexDistance(c1, c2);
 	}
 

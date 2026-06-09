@@ -8,8 +8,8 @@ public partial class MapController : Node2D
 {
 	public static MapController instance { get; private set; }
 	private HexGrid hexGrid;
-	private float hexSize;
-	
+	public float hexSize { get; private set; }
+
 	public readonly TerrainTypes[] impassableTerrain = { 
 			TerrainTypes.EMPTY, 
 			TerrainTypes.OCEAN, 
@@ -25,16 +25,17 @@ public partial class MapController : Node2D
 		this.hexSize = hexSize;
 		instance = this;
 	}
-
-	public void addUnit(Unit unit, int x, int y) {
-		HexCell c = hexGrid.getCell(x, y);
-		if (c.units.Count == 0) {
-			unit.SetPosition(getCellCenter(x, y));
-			unit.gridPosition = new Vector2I(x, y);
+	public void addUnit(Unit unit, Vector2I target) {
+		HexCell c = hexGrid.getCell(target);
+		if (canPlaceUnit(unit, target)) {
+			unit.SetPosition(getCellCenter(target));
+			unit.gridPosition = target;
 			c.units.Add(unit);
 			if (unit.GetParent() == null) {
 				AddChild(unit);
 			}
+		} else {
+			Debug.Print("Cannot place unit at "+ target);
 		}
 	}
 
@@ -44,44 +45,95 @@ public partial class MapController : Node2D
 		RemoveChild(unit);
 	}
 
-	public bool canMove(Unit unit, Vector2I target) {
+	public bool canPlaceUnit(Unit unit, Vector2I target) {
 		HexCell targetCell = hexGrid.getCell(target);
+		return !targetCell.hasUnit() && !impassableTerrain.Contains(targetCell.terrainType);
+	}
+	public bool canMoveUnit(Unit unit, Vector2I target) {
 		int moveDist = HexGrid.hexDistance(unit.gridPosition.X, unit.gridPosition.Y, target.X, target.Y);
-
-		
-		return moveDist <= unit.currentAP && targetCell.units.Count == 0
-				&& !impassableTerrain.Contains(targetCell.terrainType);
+		return moveDist <= unit.currentAP && canPlaceUnit(unit, target);
 	}
 	
 	public void moveUnit(Unit unit, Vector2I target) {
 		HexCell currentCell = hexGrid.getCell(unit.gridPosition);
 		HexCell targetCell = hexGrid.getCell(target);
-		if (canMove(unit, target)) {
+		if (canMoveUnit(unit, target)) {
 			currentCell.units.Remove(unit);
 			unit.move(target);
 			unit.SetPosition(getCellCenter(target));
 			targetCell.units.Add(unit);
+		} else {
+			Debug.Print("Cannot move unit to " + target);
 		}
 	}
 
-	public void addCity(City city, int x, int y) {
-		HexCell c = hexGrid.getCell(x, y);
-		if (c.city == null) {
-			city.SetPosition(getCellCenter(x, y));
-			city.gridPosition = new Vector2I(x, y);
+	public bool canPlaceCity(City c, Vector2I target) {
+		HexCell targetCell = hexGrid.getCell(target);
+		return !targetCell.hasCity() && !impassableTerrain.Contains(targetCell.terrainType);
+	}
+	
+	public void addCity(City city, Vector2I target) {
+		HexCell c = hexGrid.getCell(target);
+		if (canPlaceCity(city, target)) {
+			city.SetPosition(getCellCenter(target));
+			city.gridPosition = target;
 			c.city = city;
 			AddChild(city);
+		} else {
+			Debug.Print("Cannot place city at " + target);
 		}
 	}
 
-	public void addNaturalDecorator(NaturalDecorator dec, int x, int y) {
+	public void addNaturalDecorator(NaturalDecorator dec, Vector2I target) {
 		
 	}
 
-	public void addPlayerDecorator(PlayerDecorator dec, int x , int y) {
+	public void addPlayerDecorator(PlayerDecorator dec, Vector2I target) {
 		
 	}
 
+	private HexCell createCell(int x, int y, TerrainTypes tType) {
+		
+		HexCell cell = new HexCell(x, y, tType);
+		
+		Texture2D tex;
+		switch (tType) {
+			case TerrainTypes.OCEAN:
+				tex = oceanTile;
+				break;
+			case TerrainTypes.PLAINS:
+				tex = landTile;
+				break;
+			default:
+				tex = oceanTile;
+				break;
+		}
+		cell.SetTexture(tex);
+		cell.SetScale(new Vector2(2*hexSize, (float)Math.Sqrt(3) * hexSize) / tex.GetSize());
+
+		Vector2 center = getCellCenter(x, y);
+		cell.SetPosition(center);
+		return cell;
+	}
+
+	/**
+	 * Returns the world space coordinates of the center of the specified cell.
+	 */
+	public Vector2 getCellCenter(int x, int y) {
+		float hexWidth = 2 * hexSize;
+		float hexHeight = (float)Math.Sqrt(3) * hexSize;
+		float hOffset = hexWidth / 2f;
+		float vOffset = (x & 1) == 0 ? hexHeight : hexHeight / 2f;
+		float hStep = 3f / 4 * hexWidth;
+		float vStep = (float)Math.Sqrt(3) * hexSize;
+
+		return new Vector2(hOffset + x * hStep, vOffset + y * vStep);
+	}
+	
+	public Vector2 getCellCenter(Vector2I v) {
+		return getCellCenter(v.X, v.Y);
+	}
+	
 	public void generateMap() {
 		Debug.Print("Generating Map...");
 
@@ -127,45 +179,6 @@ public partial class MapController : Node2D
 				}
 			}
 		}
-	}
-
-	private HexCell createCell(int x, int y, TerrainTypes tType) {
-		
-		HexCell cell = new HexCell(x, y, tType);
-		
-		Texture2D tex;
-		switch (tType) {
-			case TerrainTypes.OCEAN:
-				tex = oceanTile;
-				break;
-			case TerrainTypes.PLAINS:
-				tex = landTile;
-				break;
-			default:
-				tex = oceanTile;
-				break;
-		}
-		cell.SetTexture(tex);
-		cell.SetScale(new Vector2(2*hexSize, (float)Math.Sqrt(3) * hexSize) / tex.GetSize());
-
-		Vector2 center = getCellCenter(x, y);
-		cell.SetPosition(center);
-		return cell;
-	}
-
-	public Vector2 getCellCenter(int x, int y) {
-		float hexWidth = 2 * hexSize;
-		float hexHeight = (float)Math.Sqrt(3) * hexSize;
-		float hOffset = hexWidth / 2f;
-		float vOffset = (x & 1) == 0 ? hexHeight : hexHeight / 2f;
-		float hStep = 3f / 4 * hexWidth;
-		float vStep = (float)Math.Sqrt(3) * hexSize;
-
-		return new Vector2(hOffset + x * hStep, vOffset + y * vStep);
-	}
-	
-	public Vector2 getCellCenter(Vector2I v) {
-		return getCellCenter(v.X, v.Y);
 	}
 
 }

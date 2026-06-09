@@ -35,5 +35,21 @@ public partial class HexCell : Sprite2D
 				break;
 		}
 	}
- }
+
+	public bool hasCity() {
+		return city != null;
+	}
+
+	public bool hasUnit() {
+		return units.Count > 0;
+	}
+
+	public bool hasNaturalDecorator() {
+		return naturalDecorator != null;
+	}
+
+	public bool hasPlayerDecorator() {
+		return playerDecorator != null;
+	}
+}
 
