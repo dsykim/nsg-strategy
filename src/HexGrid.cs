@@ -62,20 +62,16 @@ public partial class HexGrid : Node2D
 		}
 	}
 	
-	/** Coordinate conversion between axial (x,y) and cube (q, r, s) coordinates. */
-	public static (int x, int y) cubeToOffset(Vector3I c) {
-		var parity = c.Y & 1;
-		var col = c.X + (c.Y + parity) / 2;
-		var row = c.Y;
-		return (col, row);
-	}
-	
-	/** Coordinate conversion between cube (q, r, s) and axial (x,y) coordinates. */
 	public static Vector3I offsetToCube(int x, int y) {
-		var parity = y & 1;
-		var q = x - (y + parity) / 2;
-		var r = y;
-		return new Vector3I(q, r, -q-r);
+		int q = x;
+		int r = y - (x + (x & 1)) / 2;
+		return new Vector3I(q, r, -q - r);
+	}
+
+	public static (int x, int y) cubeToOffset(Vector3I c) {
+		int col = c.X;
+		int row = c.Y + (c.X + (c.X & 1)) / 2;
+		return (col, row);
 	}
 
 	public List<HexCell> getNeighbors(HexCell cell) {
@@ -126,5 +122,24 @@ public partial class HexGrid : Node2D
 
 	public static int hexDistance(HexCell cell1, HexCell cell2) {
 		return hexDistance(cell1.pos.X, cell1.pos.Y, cell2.pos.X, cell2.pos.Y);
+	}
+
+	public List<HexCell> getCellsInRadius(Vector2I center, int radius) {
+		List<HexCell> cells = new List<HexCell>();
+		Vector3I cubeCenter = offsetToCube(center.X, center.Y);
+
+		for (int dq = -radius; dq <= radius; dq++) {
+			for (int dr = Math.Max(-radius, -dq - radius); dr <= Math.Min(radius, -dq + radius); dr++) {
+				int ds = -dq - dr;
+				Vector3I cube = cubeCenter + new Vector3I(dq, dr, ds);
+				var (x, y) = cubeToOffset(cube);
+
+				if (indexInGrid(x, y)) {
+					cells.Add(getCell(x, y));
+				}
+			}
+		}
+
+		return cells;
 	}
 }

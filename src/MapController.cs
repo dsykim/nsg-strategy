@@ -54,6 +54,17 @@ public partial class MapController : Node2D
 		int moveDist = HexGrid.hexDistance(unit.gridPosition, target);
 		return moveDist <= unit.currentAP && canPlaceUnit(unit, target);
 	}
+
+	public List<HexCell> getMovableCells(Unit unit) {
+		List<HexCell> cells = hexGrid.getCellsInRadius(unit.gridPosition, unit.currentAP);
+		List<HexCell> moveableCells = new List<HexCell>();
+		foreach (HexCell c in cells) {
+			if (canMoveUnit(unit, c.pos)) {
+				moveableCells.Add(c);
+			}
+		}
+		return moveableCells;
+	}
 	
 	public void moveUnit(Unit unit, Vector2I target) {
 		HexCell currentCell = hexGrid.getCell(unit.gridPosition);
