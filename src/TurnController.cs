@@ -23,7 +23,7 @@ public partial class TurnController : Node
 
 	public void init(int playerCount) {
 		setPlayerCount(playerCount);
-		Button nextTurnButton = GetNode<Button>("../UIController/NextTurnButton");
+		Button nextTurnButton = GetNode<Button>("../UIController/UICanvas/NextTurnButton");
 		nextTurnButton.Pressed += nextTurn;
 	}
 

@@ -10,8 +10,8 @@ public partial class UIController : Control
 	private HexCell hoveredCell = null;
 
 	public void init() {
-		stoneCounter = GetNode<Label>("StoneCounter");
-		hexHighlight = GetNode<Sprite2D>("HexHighlight");
+		stoneCounter = GetNode<Label>("UICanvas/StoneCounter");
+		hexHighlight = GetNode<Sprite2D>("../HexHighlight");
 		float hexSize = MapController.instance.hexSize;
 		hexHighlight.SetScale(
 				new Vector2(2 * hexSize, (float)Math.Sqrt(3) * hexSize) / hexHighlight.Texture.GetSize());

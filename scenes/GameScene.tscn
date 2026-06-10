@@ -14,8 +14,9 @@ layout_mode = 3
 anchors_preset = 0
 script = ExtResource("2_xy3my")
 
-[node name="NextTurnButton" type="Button" parent="UIController"]
-layout_mode = 0
+[node name="UICanvas" type="CanvasLayer" parent="UIController"]
+
+[node name="NextTurnButton" type="Button" parent="UIController/UICanvas"]
 offset_left = 1362.0
 offset_top = 734.0
 offset_right = 1411.0
@@ -23,8 +24,7 @@ offset_bottom = 765.0
 scale = Vector2(4, 4)
 text = "NEXT"
 
-[node name="StoneCounter" type="Label" parent="UIController"]
-layout_mode = 0
+[node name="StoneCounter" type="Label" parent="UIController/UICanvas"]
 offset_left = 27.0
 offset_top = 18.0
 offset_right = 155.0
@@ -32,8 +32,8 @@ offset_bottom = 85.0
 theme_override_font_sizes/font_size = 48
 text = "0"
 
-[node name="HexHighlight" type="Sprite2D" parent="UIController"]
-texture = ExtResource("3_cxv17")
-
 [node name="MainCamera" type="Camera2D" parent="."]
 script = ExtResource("4_18ig4")
+
+[node name="HexHighlight" type="Sprite2D" parent="."]
+texture = ExtResource("3_cxv17")
