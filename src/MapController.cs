@@ -118,6 +118,10 @@ public partial class MapController : Node2D
 		return cell;
 	}
 
+	public Vector2I getGridSize() {
+		return new Vector2I(hexGrid.width, hexGrid.height);
+	}
+	
 	/**
 	 * Returns the world space coordinates of the center of the specified cell.
 	 */

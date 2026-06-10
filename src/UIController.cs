@@ -8,8 +8,6 @@ public partial class UIController : Control
 	private Label stoneCounter;
 	private Sprite2D hexHighlight;
 	private HexCell hoveredCell = null;
-	
-	
 
 	public void init() {
 		stoneCounter = GetNode<Label>("StoneCounter");
@@ -35,7 +33,6 @@ public partial class UIController : Control
 		var query = new PhysicsPointQueryParameters2D();
 		query.Position = mousePos;
 		query.CollideWithAreas = true;
-		query.CollisionMask = 0xFFFFFFFF;
 
 		var results = spaceState.IntersectPoint(query);
 	
@@ -49,11 +46,16 @@ public partial class UIController : Control
 				break;
 			}
 		}
-		if (newHover != hoveredCell && newHover != null)
-		{
+		if (newHover != hoveredCell && newHover != null) {
 			hexHighlight.SetPosition(MapController.instance.getCellCenter(newHover.pos));
+			hexHighlight.Visible = true;
 			hoveredCell = newHover;
+		} else if (newHover == null) {
+			hexHighlight.Visible = false;
+			hoveredCell = null;
 		}
+		
+
 	}
 
 	private void OnResourceUpdated(Dictionary<string, int> vals)

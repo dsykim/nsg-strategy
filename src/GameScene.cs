@@ -6,6 +6,7 @@ using System.Diagnostics;
 public partial class GameScene : Node
 {
 	private TurnController turnController;
+	private CameraController camera;
 	private UIController uiController;
 	
 	private readonly int width = 20;
@@ -24,8 +25,8 @@ public partial class GameScene : Node
 		uiController = (UIController)GetNode("UIController");
 		uiController.init();
 
-		Camera2D camera = GetViewport().GetCamera2D();
-		camera.SetPosition(GetViewport().GetVisibleRect().Size/2);
+		camera = (CameraController)GetNode("MainCamera");
+		camera.init();
 	}
 
 	public override void _Process(double delta) {
