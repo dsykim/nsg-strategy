@@ -3,7 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public enum HexDirection { N, NE, SE, S, SW, NW }
+public enum HexDirection
+{
+	N,
+	NE,
+	SE,
+	S,
+	SW,
+	NW
+}
 
 public partial class HexGrid : Node2D
 {
@@ -22,18 +30,20 @@ public partial class HexGrid : Node2D
 		Name = "HexGrid";
 	}
 
-	static readonly Vector2I[] evenColOffsets = {
-			new(0,-1), new(1, 0), new(1, 1), new(0, 1), new(-1, 1), new(-1, 0)
+	static readonly Vector2I[] evenColOffsets =
+	{
+			new(0, -1), new(1, 0), new(1, 1), new(0, 1), new(-1, 1), new(-1, 0)
 	};
-	static readonly Vector2I[] oddColOffsets = {
-			new(0,-1), new(1,-1), new(1, 0), new(0, 1), new(-1, 0), new(-1,-1)
+	static readonly Vector2I[] oddColOffsets =
+	{
+			new(0, -1), new(1, -1), new(1, 0), new(0, 1), new(-1, 0), new(-1, -1)
 	};
 
 	public static Vector2I neighbor(Vector2I pos, HexDirection dir) =>
 			pos + ((pos.X & 1) == 0 ? evenColOffsets : oddColOffsets)[(int)dir];
 
 	public static HexDirection opposite(HexDirection dir) => (HexDirection)(((int)dir + 3) % 6);
-	
+
 	public bool indexInGrid(Vector2I pos) {
 		return pos.X >= 0 && pos.X < width && pos.Y >= 0 && pos.Y < height;
 	}
@@ -48,19 +58,19 @@ public partial class HexGrid : Node2D
 		}
 
 		deleteCell(c.pos);
-		
+
 		grid[c.pos.Y * width + c.pos.X] = c;
 		AddChild(c);
 	}
-	
+
 	public HexCell getCell(Vector2I pos) {
 		if (!indexInGrid(pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
-		
+
 		return grid[pos.Y * width + pos.X];
 	}
-	
+
 	public HexEdge getEdge(Vector2I pos, HexDirection dir, bool create = true) {
 		var key = new EdgeKey(pos, neighbor(pos, dir));
 		if (edges.TryGetValue(key, out var e)) {
@@ -85,7 +95,7 @@ public partial class HexGrid : Node2D
 			target.QueueFree();
 		}
 	}
-	
+
 	public static Vector3I offsetToCube(int x, int y) {
 		int q = x;
 		int r = y - (x + (x & 1)) / 2;
@@ -101,7 +111,7 @@ public partial class HexGrid : Node2D
 	public List<HexCell> getNeighbors(HexCell cell) {
 		return getNeighbors(cell.pos);
 	}
-	
+
 	public List<HexCell> getNeighbors(Vector2I pos) {
 		List<HexCell> neighbors = new List<HexCell>();
 
@@ -119,20 +129,10 @@ public partial class HexGrid : Node2D
 		return (Math.Abs(vec.X) + Math.Abs(vec.Y) + Math.Abs(vec.Z)) / 2;
 	}
 
-	public static int hexDistance(int x1, int y1, int x2, int y2) {
-		Vector3I c1 = offsetToCube(x1, y1);
-		Vector3I c2 = offsetToCube(x2, y2);
-		return hexDistance(c1, c2);
-	}
-	
 	public static int hexDistance(Vector2I cell1, Vector2I cell2) {
 		Vector3I c1 = offsetToCube(cell1.X, cell1.Y);
 		Vector3I c2 = offsetToCube(cell2.X, cell2.Y);
 		return hexDistance(c1, c2);
-	}
-
-	public static int hexDistance(HexCell cell1, HexCell cell2) {
-		return hexDistance(cell1.pos.X, cell1.pos.Y, cell2.pos.X, cell2.pos.Y);
 	}
 
 	public List<HexCell> getCellsInRadius(Vector2I center, int radius) {

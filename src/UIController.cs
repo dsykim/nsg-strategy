@@ -9,8 +9,7 @@ public partial class UIController : Control
 	private Sprite2D hexHighlight;
 	private Sprite2D hexSelect;
 
-	public void init()
-	{
+	public void init() {
 		stoneCounter = GetNode<Label>("UICanvas/StoneCounter");
 		hexHighlight = GetNode<Sprite2D>("../HexHighlight");
 		hexSelect = GetNode<Sprite2D>("../HexSelect");
@@ -25,23 +24,18 @@ public partial class UIController : Control
 		resourceController.ResourceUpdated += onResourceUpdated;
 	}
 
-	public override void _Process(double delta)
-	{
+	public override void _Process(double delta) {
 		handleCellHighlight();
 		handleCellSelect();
 	}
 
-	private void handleCellHighlight()
-	{
+	private void handleCellHighlight() {
 		HexCell hovered = InputController.instance.hoveredCell;
 
-		if (hovered != null)
-		{
+		if (hovered != null) {
 			hexHighlight.SetPosition(MapController.instance.getCellCenter(hovered.pos));
 			hexHighlight.Visible = true;
-		}
-		else
-		{
+		} else {
 			hexHighlight.Visible = false;
 		}
 	}
@@ -57,8 +51,7 @@ public partial class UIController : Control
 		}
 	}
 
-	private void onResourceUpdated(Dictionary<string, int> vals)
-	{
+	private void onResourceUpdated(Dictionary<string, int> vals) {
 		stoneCounter.Text = vals["stone"].ToString();
 	}
 }

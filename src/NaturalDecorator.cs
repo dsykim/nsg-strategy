@@ -1,5 +1,4 @@
-﻿
-public partial class NaturalDecorator : CellDecorator
+﻿public partial class NaturalDecorator : CellDecorator
 {
-	
+
 }

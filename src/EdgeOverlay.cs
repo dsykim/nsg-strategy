@@ -22,7 +22,6 @@ public partial class EdgeOverlay : Node2D
 	public bool RoundCaps { get; set; } = true;
 
 	public EdgeOverlay() {
-		Name = "EdgeOverlay";
 		ZIndex = 20;
 	}
 

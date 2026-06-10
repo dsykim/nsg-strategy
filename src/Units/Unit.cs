@@ -19,12 +19,6 @@ public abstract partial class Unit : CellDecorator
 		this.owner = owner;
 	}
 
-	public void move(Vector2I target)
-	{
-		currentAP -= HexGrid.hexDistance(gridPosition, target);
-		gridPosition = target;
-	}
-
 	public void setCurrentAP(int val)
 	{
 		currentAP = val;

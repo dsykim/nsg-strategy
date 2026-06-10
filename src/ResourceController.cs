@@ -7,6 +7,7 @@ public partial class ResourceController : Node
 {
 	[Signal]
 	public delegate void ResourceUpdatedEventHandler(Dictionary<string, int> vals);
+
 	public int stone { get; private set; }
 	public int stoneRate;
 

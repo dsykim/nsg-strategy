@@ -7,7 +7,7 @@ public partial class HexCell : Sprite2D
 {
 	public readonly Vector2I pos;
 	public TerrainTypes terrainType;
-	
+
 	public NaturalDecorator naturalDecorator = null;
 	public PlayerDecorator playerDecorator = null;
 	public City city = null;
@@ -18,19 +18,18 @@ public partial class HexCell : Sprite2D
 		terrainType = TerrainTypes.EMPTY;
 		Name = $"Cell_{pos.X}_{pos.Y}";
 	}
-	
+
 	public HexCell(Vector2I pos, TerrainTypes tType) : this(pos) {
 		terrainType = tType;
-		switch (terrainType)
-		{
+		switch (terrainType) {
 			case TerrainTypes.OCEAN:
 				break;
 			case TerrainTypes.HILLS:
-				
+
 			case TerrainTypes.PLAINS:
-				
+
 			case TerrainTypes.MOUNTAIN:
-				
+
 			case TerrainTypes.EMPTY:
 				break;
 		}
@@ -51,21 +50,20 @@ public partial class HexCell : Sprite2D
 	public bool hasPlayerDecorator() {
 		return playerDecorator != null;
 	}
-	
-	public void addHexCollision()
-	{
+
+	public void addHexCollision() {
 		var size = Texture.GetSize();
 		float width = size.X / 2f;
 		float height = size.Y / 2f;
 
 		var hexPoints = new Vector2[]
 		{
-				new Vector2(width,        0),
-				new Vector2(width / 2f,   height),
-				new Vector2(-width / 2f,  height),
-				new Vector2(-width,       0),
+				new Vector2(width, 0),
+				new Vector2(width / 2f, height),
+				new Vector2(-width / 2f, height),
+				new Vector2(-width, 0),
 				new Vector2(-width / 2f, -height),
-				new Vector2(width / 2f,  -height),
+				new Vector2(width / 2f, -height),
 		};
 
 		var shape = new CollisionPolygon2D();

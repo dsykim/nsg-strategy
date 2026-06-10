@@ -5,20 +5,20 @@ public partial class CameraController : Camera2D
 {
 	private Rect2 bounds;
 	private float moveSpeed = 300f;
-	
+
 	private float zoomSpeed = 0.1f;
 	private float targetZoom;
 	private float minZoom = 0.5f;
 	private float maxZoom = 2f;
 
 	public void init() {
-		SetPosition(GetViewport().GetVisibleRect().Size/2);
+		SetPosition(GetViewport().GetVisibleRect().Size / 2);
 		targetZoom = Zoom.X;
-		
+
 		float hexSize = MapController.instance.hexSize;
 		Vector2I gridSize = MapController.instance.getGridSize();
-		float width =  hexSize * 2 * (((float)3 / 4) * (gridSize.X - 1) + 1);
-		float height = hexSize * (float) Math.Sqrt(3) * (gridSize.Y + (float)1 / 2);
+		float width = hexSize * 2 * (((float)3 / 4) * (gridSize.X - 1) + 1);
+		float height = hexSize * (float)Math.Sqrt(3) * (gridSize.Y + (float)1 / 2);
 		bounds = new Rect2(0, 0, new Vector2(width, height));
 	}
 

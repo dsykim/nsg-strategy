@@ -15,7 +15,7 @@ public partial class TurnController : Node
 
 	private int currentPlayer;
 	private int playerCount;
-	
+
 	public TurnController() {
 		currentPlayer = 0;
 		Name = "TurnController";
@@ -47,31 +47,27 @@ public partial class TurnController : Node
 	}
 
 	/* ==================== AI Controls ==================== */
-	
-	private void nextTurn()
-	{
+
+	private void nextTurn() {
 		Debug.Print("Ending player turn");
 		aiThinking = true;
 		currentPlayer = 1;
 		startAITurn();
 	}
 
-	private void startAITurn()
-	{
+	private void startAITurn() {
 		aiThread = new Thread(RunAI);
 		aiThread.Start();
 	}
 
-	private void RunAI()
-	{
+	private void RunAI() {
 		// TODO: Do AI decision making for currentPlayer
 		Debug.Print($"Running AI decision making for player {currentPlayer}");
 
 		CallDeferred(MethodName.OnAIFinish);
 	}
 
-	private void OnAIFinish()
-	{
+	private void OnAIFinish() {
 		aiThread.Join();
 
 		// TODO: Apply AI decisions for currentPlayer
@@ -79,15 +75,12 @@ public partial class TurnController : Node
 
 		currentPlayer = (currentPlayer + 1) % playerCount;
 
-		if (currentPlayer == 0)
-		{
+		if (currentPlayer == 0) {
 			// All AI players have gone, return control to user
 			aiThinking = false;
 			beginUserTurn();
 			Debug.Print("Returning control to user player");
-		}
-		else
-		{
+		} else {
 			// Pass turn to next AI player
 			startAITurn();
 		}
