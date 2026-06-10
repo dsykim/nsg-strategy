@@ -18,6 +18,10 @@ public partial class GameScene : Node
 		AddChild(mapController);
 		mapController.generateMap();
 
+		InputController input = new InputController();
+		input.init();
+		AddChild(input);
+		
 		turnController = new TurnController();
 		AddChild(turnController);
 		turnController.init(4);

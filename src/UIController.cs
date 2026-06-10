@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using Godot.Collections;
 using System;
 using System.Diagnostics;
@@ -7,58 +7,57 @@ public partial class UIController : Control
 {
 	private Label stoneCounter;
 	private Sprite2D hexHighlight;
-	private HexCell hoveredCell = null;
+	private Sprite2D hexSelect;
 
-	public void init() {
+	public void init()
+	{
 		stoneCounter = GetNode<Label>("UICanvas/StoneCounter");
 		hexHighlight = GetNode<Sprite2D>("../HexHighlight");
+		hexSelect = GetNode<Sprite2D>("../HexSelect");
 		float hexSize = MapController.instance.hexSize;
-		hexHighlight.SetScale(
-				new Vector2(2 * hexSize, (float)Math.Sqrt(3) * hexSize) / hexHighlight.Texture.GetSize());
-		
+		Vector2 hexScale = new Vector2(2 * hexSize, (float)Math.Sqrt(3) * hexSize) / hexHighlight.Texture.GetSize();
+		hexHighlight.SetScale(hexScale);
+		hexSelect.SetScale(hexScale);
+		hexHighlight.Visible = false;
+		hexSelect.Visible = false;
+
 		var resourceController = GetNode<ResourceController>("../TurnController/Player0/ResourceController");
-		resourceController.ResourceUpdated += OnResourceUpdated;
+		resourceController.ResourceUpdated += onResourceUpdated;
 	}
 
-	public override void _Process(double delta) {
+	public override void _Process(double delta)
+	{
 		handleCellHighlight();
+		handleCellSelect();
 	}
 
-	private void handleCellHighlight() {
-		var camera = GetViewport().GetCamera2D();
-		if (camera == null) return;
-		var mousePos = camera.GetGlobalMousePosition();
-		var spaceState = GetTree().Root.GetWorld2D().DirectSpaceState;
-		
-		var query = new PhysicsPointQueryParameters2D();
-		query.Position = mousePos;
-		query.CollideWithAreas = true;
+	private void handleCellHighlight()
+	{
+		HexCell hovered = InputController.instance.hoveredCell;
 
-		var results = spaceState.IntersectPoint(query);
-	
-		HexCell newHover = null;
-		foreach (var result in results)
+		if (hovered != null)
 		{
-			var collider = result["collider"].As<Area2D>();
-			if (collider?.GetParent() is HexCell cell)
-			{
-				newHover = cell;
-				break;
-			}
-		}
-		if (newHover != hoveredCell && newHover != null) {
-			hexHighlight.SetPosition(MapController.instance.getCellCenter(newHover.pos));
+			hexHighlight.SetPosition(MapController.instance.getCellCenter(hovered.pos));
 			hexHighlight.Visible = true;
-			hoveredCell = newHover;
-		} else if (newHover == null) {
-			hexHighlight.Visible = false;
-			hoveredCell = null;
 		}
-		
-
+		else
+		{
+			hexHighlight.Visible = false;
+		}
 	}
 
-	private void OnResourceUpdated(Dictionary<string, int> vals)
+	private void handleCellSelect() {
+		CellDecorator selected = InputController.instance.selectedDecorator;
+
+		if (selected != null) {
+			hexSelect.Visible = true;
+			hexSelect.SetPosition(MapController.instance.getCellCenter(selected.gridPosition));
+		} else {
+			hexSelect.Visible = false;
+		}
+	}
+
+	private void onResourceUpdated(Dictionary<string, int> vals)
 	{
 		stoneCounter.Text = vals["stone"].ToString();
 	}

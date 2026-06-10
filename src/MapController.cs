@@ -139,6 +139,20 @@ public partial class MapController : Node2D
 	public Vector2 getCellCenter(Vector2I v) {
 		return getCellCenter(v.X, v.Y);
 	}
+
+	public List<HexCell> getNeighbors(Vector2I target) {
+		return hexGrid.getNeighbors(target);
+	}
+
+	public List<Vector2I> getNeighborPositions(Vector2I target) {
+		List<HexCell> neighbors = hexGrid.getNeighbors(target);
+		List<Vector2I> positions = new List<Vector2I>();
+		foreach (HexCell c in neighbors) {
+			positions.Add(c.pos);
+		}
+
+		return positions;
+	}
 	
 	public void generateMap() {
 		Debug.Print("Generating Map...");

@@ -3,8 +3,6 @@
 
  public partial class City : PlayerDecorator
 {
-	public Vector2I gridPosition;
-
 	public City(int owner) : base(owner) {
 		Texture = ResourceLoader.Load<Texture2D>("res://assets/city.png");
 		float scale = (float)(MapController.instance.hexSize * Math.Sqrt(3)) / Texture.GetHeight();
