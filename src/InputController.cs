@@ -1,6 +1,7 @@
 ﻿using Godot;
 using Godot.Collections;
 using System;
+using System.Diagnostics;
 
 public partial class InputController : Node
 {
@@ -81,13 +82,13 @@ public partial class InputController : Node
             // Select unit first unless unit is already selected
             Unit unit = hoveredCell.units[0];
             selectedDecorator = unit;
-            selectedType = unit.GetType();
+            selectedType = typeof(Unit);
             EmitSignal(SignalName.unitSelected, unit);
         } else if (hoveredCell.hasCity()) {
             // If no unit or unit already selected, select playerDecorator
             City city = hoveredCell.city;
             selectedDecorator = city;
-            selectedType = city.GetType();
+            selectedType = typeof(City);
             EmitSignal(SignalName.citySelected, city);
         }
     }

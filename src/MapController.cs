@@ -51,7 +51,7 @@ public partial class MapController : Node2D
 		return !targetCell.hasUnit() && !impassableTerrain.Contains(targetCell.terrainType);
 	}
 	public bool canMoveUnit(Unit unit, Vector2I target) {
-		int moveDist = HexGrid.hexDistance(unit.gridPosition.X, unit.gridPosition.Y, target.X, target.Y);
+		int moveDist = HexGrid.hexDistance(unit.gridPosition, target);
 		return moveDist <= unit.currentAP && canPlaceUnit(unit, target);
 	}
 	
