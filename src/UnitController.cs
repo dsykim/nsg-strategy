@@ -1,7 +1,15 @@
 ﻿using Godot;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
+public class TargetRequest
+{
+	public Action<Vector2I> onConfirm;
+	public List<HexCell> validCells;
+	public Color highlightColor = Colors.White;
+}
 
 public partial class UnitController : Node
 {
@@ -40,7 +48,7 @@ public partial class UnitController : Node
 		}
 		checkAvailability();
 	}
-
+	
 	private void initActions(Unit unit)
 	{
 		UnitAction moveAction = new UnitAction
@@ -51,10 +59,15 @@ public partial class UnitController : Node
 				isAvailable = false,
 				onTrigger = () =>
 				{
-					InputController.instance.enterSelectTargetMode(target =>
+					InputController.instance.enterSelectTargetMode(new TargetRequest
 					{
-						MapController.instance.moveUnit(unit, target);
-						checkAvailability();
+							validCells = MapController.instance.getMovableCells(unit),
+							highlightColor = new Color(1f, 1f, 1f, 1f),
+							onConfirm = target =>
+							{
+								MapController.instance.moveUnit(unit, target);
+								checkAvailability();
+							}
 					});
 				}
 		};

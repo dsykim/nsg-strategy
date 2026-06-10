@@ -3,10 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+public enum HexDirection { N, NE, SE, S, SW, NW }
+
 public partial class HexGrid : Node2D
 {
 	public readonly int width, height;
 	private HexCell[] grid;
+	private Dictionary<EdgeKey, HexEdge> edges = new();
 
 	public HexGrid(int w, int h) {
 		width = w;
@@ -18,9 +21,21 @@ public partial class HexGrid : Node2D
 		}
 		Name = "HexGrid";
 	}
+
+	static readonly Vector2I[] evenColOffsets = {
+			new(0,-1), new(1, 0), new(1, 1), new(0, 1), new(-1, 1), new(-1, 0)
+	};
+	static readonly Vector2I[] oddColOffsets = {
+			new(0,-1), new(1,-1), new(1, 0), new(0, 1), new(-1, 0), new(-1,-1)
+	};
+
+	public static Vector2I neighbor(Vector2I pos, HexDirection dir) =>
+			pos + ((pos.X & 1) == 0 ? evenColOffsets : oddColOffsets)[(int)dir];
+
+	public static HexDirection opposite(HexDirection dir) => (HexDirection)(((int)dir + 3) % 6);
 	
-	public bool indexInGrid(int x, int y) {
-		return x >= 0 && x < width && y >= 0 && y < height;
+	public bool indexInGrid(Vector2I pos) {
+		return pos.X >= 0 && pos.X < width && pos.Y >= 0 && pos.Y < height;
 	}
 
 	/**
@@ -28,34 +43,43 @@ public partial class HexGrid : Node2D
 	 * Assumes the provided cell has been initialized with its grid position.
 	 */
 	public void setCell(HexCell c) {
-		if (!indexInGrid(c.pos.X, c.pos.Y)) {
+		if (!indexInGrid(c.pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
 
-		deleteCell(c.pos.X, c.pos.Y);
+		deleteCell(c.pos);
 		
 		grid[c.pos.Y * width + c.pos.X] = c;
 		AddChild(c);
 	}
 	
-	public HexCell getCell(int x, int y) {
-		if (!indexInGrid(x, y)) {
+	public HexCell getCell(Vector2I pos) {
+		if (!indexInGrid(pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
 		
-		return grid[y * width + x];
+		return grid[pos.Y * width + pos.X];
+	}
+	
+	public HexEdge getEdge(Vector2I pos, HexDirection dir, bool create = true) {
+		var key = new EdgeKey(pos, neighbor(pos, dir));
+		if (edges.TryGetValue(key, out var e)) {
+			return e;
+		}
+		if (!create) {
+			return null;
+		}
+		e = new HexEdge(key);
+		edges[key] = e;
+		return e;
 	}
 
-	public HexCell getCell(Vector2I pos) {
-		return getCell(pos.X, pos.Y);
-	}
-
-	public void deleteCell(int x, int y) {
-		if (!indexInGrid(x, y)) {
+	public void deleteCell(Vector2I pos) {
+		if (!indexInGrid(pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
 
-		HexCell target = grid[y * width + x];
+		HexCell target = grid[pos.Y * width + pos.X];
 		if (target != null) {
 			RemoveChild(target);
 			target.QueueFree();
@@ -68,10 +92,10 @@ public partial class HexGrid : Node2D
 		return new Vector3I(q, r, -q - r);
 	}
 
-	public static (int x, int y) cubeToOffset(Vector3I c) {
+	public static Vector2I cubeToOffset(Vector3I c) {
 		int col = c.X;
 		int row = c.Y + (c.X + (c.X & 1)) / 2;
-		return (col, row);
+		return new Vector2I(col, row);
 	}
 
 	public List<HexCell> getNeighbors(HexCell cell) {
@@ -81,23 +105,10 @@ public partial class HexGrid : Node2D
 	public List<HexCell> getNeighbors(Vector2I pos) {
 		List<HexCell> neighbors = new List<HexCell>();
 
-		for (int dx = -1; dx < 2; dx++) {
-			for (int dy = -1; dy < 2; dy++) {
-				int xi = pos.X + dx;
-				int yi = pos.Y + dy;
-
-				bool isSelf = dx == 0 && dy == 0;
-
-				// Mask non-adjacent cells in 3x3 sweep
-				bool isTopDiags = dx != 0 && dy == 1;
-				bool isBottomDiags = dx != 0 && dy == -1;
-				bool excludeDiags = (pos.X % 2 == 0) ? isBottomDiags : isTopDiags;
-				
-				if (!indexInGrid(xi, yi) || isSelf || excludeDiags) {
-					continue;
-				}
-				
-				neighbors.Add(getCell(xi, yi));
+		foreach (HexDirection dir in Enum.GetValues<HexDirection>()) {
+			Vector2I neighborPos = neighbor(pos, dir);
+			if (indexInGrid(neighborPos)) {
+				neighbors.Add(getCell(neighborPos));
 			}
 		}
 		return neighbors;
@@ -132,10 +143,10 @@ public partial class HexGrid : Node2D
 			for (int dr = Math.Max(-radius, -dq - radius); dr <= Math.Min(radius, -dq + radius); dr++) {
 				int ds = -dq - dr;
 				Vector3I cube = cubeCenter + new Vector3I(dq, dr, ds);
-				var (x, y) = cubeToOffset(cube);
+				var pos = cubeToOffset(cube);
 
-				if (indexInGrid(x, y)) {
-					cells.Add(getCell(x, y));
+				if (indexInGrid(pos)) {
+					cells.Add(getCell(pos));
 				}
 			}
 		}

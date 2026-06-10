@@ -4,12 +4,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+public enum TerrainTypes
+{
+	PLAINS,
+	HILLS,
+	MOUNTAIN,
+	OCEAN,
+	EMPTY
+}
+
 public partial class MapController : Node2D
 {
 	public static MapController instance { get; private set; }
 	private HexGrid hexGrid;
+	private EdgeOverlay targetOverlay;
 	public float hexSize { get; private set; }
-
+	
 	public readonly TerrainTypes[] impassableTerrain = { 
 			TerrainTypes.EMPTY, 
 			TerrainTypes.OCEAN, 
@@ -22,6 +32,9 @@ public partial class MapController : Node2D
 	public MapController(int width, int height, float hexSize) {
 		hexGrid = new HexGrid(width, height);
 		AddChild(hexGrid);
+		targetOverlay = new EdgeOverlay();
+		AddChild(targetOverlay);
+		
 		this.hexSize = hexSize;
 		instance = this;
 		Name = "MapController";
@@ -41,7 +54,7 @@ public partial class MapController : Node2D
 	}
 
 	public void removeUnit(Unit unit) {
-		HexCell c = hexGrid.getCell(unit.gridPosition.X, unit.gridPosition.Y);
+		HexCell c = hexGrid.getCell(unit.gridPosition);
 		c.units.Remove(unit);
 		RemoveChild(unit);
 	}
@@ -161,9 +174,52 @@ public partial class MapController : Node2D
 		foreach (HexCell c in neighbors) {
 			positions.Add(c.pos);
 		}
-
 		return positions;
 	}
+	
+	static readonly (int a, int b)[] edgeVerts = {
+			(4,5), // N
+			(5,0), // NE
+			(0,1), // SE
+			(1,2), // S
+			(2,3), // SW
+			(3,4), // NW
+	};
+
+	public Vector2[] getCellVertices(Vector2I pos) {
+		Vector2 c = getCellCenter(pos);
+		float s = hexSize, h = (float)Math.Sqrt(3) * hexSize / 2f;
+		return new[] {
+				c + new Vector2( s,   0), c + new Vector2( s/2, h), c + new Vector2(-s/2, h),
+				c + new Vector2(-s,   0), c + new Vector2(-s/2,-h), c + new Vector2( s/2,-h),
+		};
+	}
+
+	public (Vector2 p1, Vector2 p2) getEdgeEndpoints(Vector2I pos, HexDirection dir) {
+		Vector2[] v = getCellVertices(pos);
+		var (a, b) = edgeVerts[(int)dir];
+		return (v[a], v[b]);
+	}
+	
+	public List<(Vector2, Vector2)> getRegionOutline(IEnumerable<HexCell> region) {
+		var inSet = new HashSet<Vector2I>();
+		foreach (var c in region) inSet.Add(c.pos);
+
+		var segs = new List<(Vector2, Vector2)>();
+		foreach (var pos in inSet)
+		foreach (HexDirection d in Enum.GetValues<HexDirection>())
+			if (!inSet.Contains(HexGrid.neighbor(pos, d)))
+				segs.Add(getEdgeEndpoints(pos, d));
+		return segs;
+	}
+
+	public void showTargetRegion(IEnumerable<HexCell> cells, Color color)
+	{
+		targetOverlay.LineColor = color;
+		targetOverlay.SetSegments(getRegionOutline(cells));
+	}
+
+	public void clearTargetRegion() => targetOverlay.Clear();
 	
 	public void generateMap() {
 		Debug.Print("Generating Map...");
@@ -205,8 +261,9 @@ public partial class MapController : Node2D
 
 		for (int x = 0; x < hexGrid.width; x++) {
 			for (int y = 0; y < hexGrid.height; y++) {
-				if (hexGrid.getCell(x, y).terrainType == TerrainTypes.EMPTY) {
-					HexCell c = createCell(new Vector2I(x, y), TerrainTypes.OCEAN);
+				Vector2I pos = new Vector2I(x, y);
+				if (hexGrid.getCell(pos).terrainType == TerrainTypes.EMPTY) {
+					HexCell c = createCell(pos, TerrainTypes.OCEAN);
 					hexGrid.setCell(c);
 				}
 			}
