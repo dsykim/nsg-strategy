@@ -20,6 +20,7 @@ public abstract partial class Unit : CellDecorator
 	public Unit(int owner)
 	{
 		this.owner = owner;
+		ZIndex = 9;
 	}
 
 	public void setCurrentAP(int val)

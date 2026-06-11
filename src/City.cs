@@ -12,5 +12,6 @@ public partial class City : PlayerDecorator
 		float scale = (float)(MapController.instance.hexSize * Math.Sqrt(3)) / Texture.GetHeight();
 		SetScale(new Vector2(scale, scale));
 		gridPosition = pos;
+		ZIndex = 8;
 	}
 }
