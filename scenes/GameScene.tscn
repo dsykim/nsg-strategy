@@ -1,6 +1,45 @@
-[gd_scene load_steps=2 format=3 uid="uid://bn1eteu33ytkc"]
+[gd_scene load_steps=6 format=3 uid="uid://bn1eteu33ytkc"]
 
 [ext_resource type="Script" uid="uid://101sgpxnjx65" path="res://src/GameScene.cs" id="1_vh257"]
+[ext_resource type="Script" uid="uid://egk0r212qscp" path="res://src/UIController.cs" id="2_xy3my"]
+[ext_resource type="Texture2D" uid="uid://dagmh6y0qgiv" path="res://assets/hex_highlight.png" id="3_cxv17"]
+[ext_resource type="Script" uid="uid://ca45ock7rnyl3" path="res://src/CameraController.cs" id="4_18ig4"]
+[ext_resource type="Texture2D" uid="uid://clk35veck7a45" path="res://assets/hex_select.png" id="5_7s5hy"]
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1_vh257")
+
+[node name="UIController" type="Control" parent="."]
+z_index = 999
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("2_xy3my")
+
+[node name="UICanvas" type="CanvasLayer" parent="UIController"]
+
+[node name="NextTurnButton" type="Button" parent="UIController/UICanvas"]
+offset_left = 1362.0
+offset_top = 734.0
+offset_right = 1411.0
+offset_bottom = 765.0
+scale = Vector2(4, 4)
+text = "NEXT"
+
+[node name="StoneCounter" type="Label" parent="UIController/UICanvas"]
+offset_left = 27.0
+offset_top = 18.0
+offset_right = 155.0
+offset_bottom = 85.0
+theme_override_font_sizes/font_size = 48
+text = "0"
+
+[node name="MainCamera" type="Camera2D" parent="."]
+script = ExtResource("4_18ig4")
+
+[node name="HexHighlight" type="Sprite2D" parent="."]
+z_index = 10
+texture = ExtResource("3_cxv17")
+
+[node name="HexSelect" type="Sprite2D" parent="."]
+z_index = 11
+texture = ExtResource("5_7s5hy")
