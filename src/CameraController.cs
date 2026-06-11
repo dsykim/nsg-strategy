@@ -3,10 +3,13 @@ using System;
 
 public partial class CameraController : Camera2D
 {
+	/** Bounds on camera translation. */
 	private Rect2 bounds;
+	/** Translational speed of the camera. */
 	private float moveSpeed = 300f;
-
+	/** Change in zoom associated with a single mouse scroll. */
 	private float zoomSpeed = 0.1f;
+	/** Zoom value to which the camera is currently interpolating. */
 	private float targetZoom;
 	private float minZoom = 0.5f;
 	private float maxZoom = 2f;

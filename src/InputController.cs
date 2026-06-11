@@ -42,8 +42,8 @@ public partial class InputController : Node
 
 	public override void _UnhandledInput(InputEvent @event) {
 		if (@event is InputEventMouseButton mouseEvent &&
-		    mouseEvent.ButtonIndex == MouseButton.Left &&
-		    mouseEvent.Pressed) {
+			mouseEvent.ButtonIndex == MouseButton.Left &&
+			mouseEvent.Pressed) {
 			handleClick();
 			return;
 		}
@@ -60,7 +60,7 @@ public partial class InputController : Node
 	public void enterSelectTargetMode(TargetRequest request) {
 		state = InputState.SelectingTarget;
 		pendingRequest = request;
-		validTargets = new HashSet<Vector2I>(request.validCells.Select(c => c.pos));
+		validTargets = new HashSet<Vector2I>(request.validCells.Select(c => c));
 		MapController.instance.showTargetRegion(request.validCells, request.highlightColor);
 	}
 

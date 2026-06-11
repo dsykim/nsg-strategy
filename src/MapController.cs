@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,38 +41,29 @@ public partial class MapController : Node2D
 		Name = "MapController";
 	}
 
-	public void addUnit(Unit unit, Vector2I target) {
+	public void addUnit(Unit unit) {
+		Vector2I target = unit.gridPosition;
 		HexCell c = hexGrid.getCell(target);
-		if (canPlaceUnit(unit, target)) {
-			unit.SetPosition(getCellCenter(target));
-			unit.gridPosition = target;
-			c.units.Add(unit);
-			if (unit.GetParent() == null) {
-				AddChild(unit);
-			}
-		} else {
-			Debug.Print("Cannot place unit at " + target);
-		}
+		c.units.Add(unit);
 	}
 
 	public void removeUnit(Unit unit) {
 		HexCell c = hexGrid.getCell(unit.gridPosition);
 		c.units.Remove(unit);
-		RemoveChild(unit);
 	}
 
-	public bool canPlaceUnit(Unit unit, Vector2I target) {
+	public bool canPlaceUnit(Vector2I target) {
 		HexCell targetCell = hexGrid.getCell(target);
 		return !targetCell.hasUnit() && !impassableTerrain.Contains(targetCell.terrainType);
 	}
 
 	public bool canMoveUnit(Unit unit, Vector2I target) {
 		int moveDist = HexGrid.hexDistance(unit.gridPosition, target);
-		return moveDist <= unit.currentAP && canPlaceUnit(unit, target);
+		return moveDist <= unit.currentAP && canPlaceUnit(target);
 	}
 
-	public List<HexCell> getMovableCells(Unit unit) {
-		List<HexCell> reachable = new List<HexCell>();
+	public List<Vector2I> getMovableCells(Unit unit) {
+		List<Vector2I> reachable = new List<Vector2I>();
 
 		var visited = new HashSet<Vector2I> { unit.gridPosition };
 		var frontier = new Queue<(HexCell cell, int cost)>();
@@ -89,7 +80,7 @@ public partial class MapController : Node2D
 				bool canStop = !neighbor.hasUnit();
 				bool canTraverse = canStop || unit.owner == neighbor.units[0].owner;
 
-				if (canStop) reachable.Add(neighbor);
+				if (canStop) reachable.Add(neighbor.pos);
 				if (canTraverse) frontier.Enqueue((neighbor, cost + 1));
 			}
 		}
@@ -120,34 +111,40 @@ public partial class MapController : Node2D
 	}
 
 	public void moveUnit(Unit unit, Vector2I target) {
-		HexCell currentCell = hexGrid.getCell(unit.gridPosition);
-		HexCell targetCell = hexGrid.getCell(target);
 		if (canMoveUnit(unit, target)) {
-			currentCell.units.Remove(unit);
+			removeUnit(unit);
 			unit.currentAP -= pathDistance(unit.gridPosition, target);
 			unit.gridPosition = target;
 			unit.SetPosition(getCellCenter(target));
-			targetCell.units.Add(unit);
+			addUnit(unit);
 		} else {
 			Debug.Print("Cannot move unit to " + target);
 		}
 	}
 
-	public bool canPlaceCity(City c, Vector2I target) {
+	/**
+	 * Can place a city if the target is at least two tiles from another city, not in controlled territory,
+	 * and on passable terrain.
+	 */
+	public bool canPlaceCity(Vector2I target) {
 		HexCell targetCell = hexGrid.getCell(target);
-		return !targetCell.hasCity() && !impassableTerrain.Contains(targetCell.terrainType);
+		bool isNotControlled = !targetCell.hasController();
+		bool onPassableTerrain = !impassableTerrain.Contains(targetCell.terrainType);
+		bool withinRangeOfCity = false;
+		foreach (HexCell cell in hexGrid.getCellsInRadius(target, 2)) {
+			if (cell.hasCity()) {
+				withinRangeOfCity = true;
+				break;
+			}
+		}
+		
+		return isNotControlled && onPassableTerrain && !withinRangeOfCity;
 	}
 
-	public void addCity(City city, Vector2I target) {
-		HexCell c = hexGrid.getCell(target);
-		if (canPlaceCity(city, target)) {
-			city.SetPosition(getCellCenter(target));
-			city.gridPosition = target;
-			c.city = city;
-			AddChild(city);
-		} else {
-			Debug.Print("Cannot place city at " + target);
-		}
+	/** Adds a city to its cell and assigns control of all cells in the city to its controller. */
+	public void addCity(City city) {
+		HexCell c = hexGrid.getCell(city.gridPosition);
+		c.city = city;
 	}
 
 	public void addNaturalDecorator(NaturalDecorator dec, Vector2I target) {
@@ -205,8 +202,13 @@ public partial class MapController : Node2D
 		return getCellCenter(v.X, v.Y);
 	}
 
-	public List<HexCell> getNeighbors(Vector2I target) {
-		return hexGrid.getNeighbors(target);
+	/** Returns a list of cell positions that neighbor the target position. */
+	public List<Vector2I> getNeighbors(Vector2I target) {
+		List<Vector2I> neighbors = new List<Vector2I>();
+		foreach (HexCell c in hexGrid.getNeighbors(target)) {
+			neighbors.Add(c.pos);
+		}
+		return neighbors;
 	}
 
 	public List<Vector2I> getNeighborPositions(Vector2I target) {
@@ -244,9 +246,9 @@ public partial class MapController : Node2D
 		return (v[a], v[b]);
 	}
 
-	public List<(Vector2, Vector2)> getRegionOutline(IEnumerable<HexCell> region) {
+	public List<(Vector2, Vector2)> getRegionOutline(IEnumerable<Vector2I> region) {
 		var inSet = new HashSet<Vector2I>();
-		foreach (var c in region) inSet.Add(c.pos);
+		foreach (var c in region) inSet.Add(c);
 
 		var segs = new List<(Vector2, Vector2)>();
 		foreach (var pos in inSet)
@@ -256,7 +258,7 @@ public partial class MapController : Node2D
 		return segs;
 	}
 
-	public void showTargetRegion(IEnumerable<HexCell> cells, Color color) {
+	public void showTargetRegion(IEnumerable<Vector2I> cells, Color color) {
 		targetOverlay.LineColor = color;
 		targetOverlay.SetSegments(getRegionOutline(cells));
 	}
@@ -279,13 +281,13 @@ public partial class MapController : Node2D
 		while (frontier.Count > 0) {
 			HexCell next = frontier.Dequeue();
 			bool isBorder = next.pos.X == 0 ||
-			                next.pos.X == hexGrid.width - 1 ||
-			                next.pos.Y == 0 ||
-			                next.pos.Y == hexGrid.height - 1;
+							next.pos.X == hexGrid.width - 1 ||
+							next.pos.Y == 0 ||
+							next.pos.Y == hexGrid.height - 1;
 			bool isBorderAdj = next.pos.X == 1 ||
-			                   next.pos.X == hexGrid.width - 2 ||
-			                   next.pos.Y == 1 ||
-			                   next.pos.Y == hexGrid.height - 2;
+							   next.pos.X == hexGrid.width - 2 ||
+							   next.pos.Y == 1 ||
+							   next.pos.Y == hexGrid.height - 2;
 			int distToSeed = HexGrid.hexDistance(next.pos, seed.pos);
 			float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToSeed / hexGrid.width, 2), 0.25f);
 

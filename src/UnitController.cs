@@ -7,8 +7,13 @@ using System.Linq;
 public class TargetRequest
 {
 	public Action<Vector2I> onConfirm;
-	public List<HexCell> validCells;
+	public List<Vector2I> validCells;
 	public Color highlightColor = Colors.White;
+}
+
+public enum UnitType
+{
+	SETTLER
 }
 
 public partial class UnitController : Node
@@ -21,11 +26,28 @@ public partial class UnitController : Node
 		Name = "UnitController";
 	}
 
-	public void addUnit(Unit unit) {
-		if (!units.Contains(unit) && unit != null) {
-			units.Add(unit);
-			initActions(unit);
+	public void createUnit(UnitType uType, Vector2I pos) {
+		MapController mapController = MapController.instance;
+		if (!mapController.canPlaceUnit(pos)) {
+			Debug.Print("Cannot place unit at " + pos);
+			return;
 		}
+		Unit unit;
+		switch (uType) {
+			case UnitType.SETTLER:
+				unit = new SettlerUnit(id);
+				break;
+			default:
+				unit = new SettlerUnit(id);
+				break;
+		}
+		
+		units.Add(unit);
+		unit.gridPosition = pos;
+		unit.SetPosition(mapController.getCellCenter(pos));
+		mapController.addUnit(unit);
+		initActions(unit);
+		AddChild(unit);
 	}
 
 	public void deleteUnit(Unit unit) {

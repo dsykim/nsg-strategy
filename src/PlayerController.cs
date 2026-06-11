@@ -5,6 +5,7 @@ public partial class PlayerController : Node
 {
 	private UnitController unitController;
 	private ResourceController resourceController;
+	private CityController cityController;
 	public readonly int id;
 	private bool alive;
 
@@ -13,20 +14,22 @@ public partial class PlayerController : Node
 		alive = true;
 		unitController = new UnitController(id);
 		resourceController = new ResourceController(id);
+		cityController = new CityController(id);
 		AddChild(unitController);
 		AddChild(resourceController);
+		AddChild(cityController);
 		Name = "Player" + id;
 
 		// TEMP UNIT TEST
 		if (id == 0) {
-			SettlerUnit settler = new SettlerUnit(id);
-			MapController.instance.addUnit(settler, new Vector2I(10, 5));
-			unitController.addUnit(settler);
+			unitController.createUnit(UnitType.SETTLER, new Vector2I(10, 5));
+			unitController.createUnit(UnitType.SETTLER, new Vector2I(11, 6));
 		}
 	}
 
 	public void turnUpkeep() {
 		resourceController.resourceUpkeep();
 		unitController.unitUpkeep();
+		cityController.cityUpkeep();
 	}
 }

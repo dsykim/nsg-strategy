@@ -6,6 +6,7 @@ using System.Diagnostics;
 public partial class HexCell : Sprite2D
 {
 	public readonly Vector2I pos;
+	public int controllerID = -1;
 	public TerrainTypes terrainType;
 
 	public NaturalDecorator naturalDecorator = null;
@@ -49,6 +50,10 @@ public partial class HexCell : Sprite2D
 
 	public bool hasPlayerDecorator() {
 		return playerDecorator != null;
+	}
+
+	public bool hasController() {
+		return controllerID >= 0;
 	}
 
 	public void addHexCollision() {

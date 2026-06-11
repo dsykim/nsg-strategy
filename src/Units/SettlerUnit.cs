@@ -7,6 +7,7 @@ public partial class SettlerUnit : Unit
 		maxAP = 3;
 		currentAP = maxAP;
 		Texture = ResourceLoader.Load<Texture2D>("res://assets/meleeUnit.png");
+		Name = "SettlerUnit";
 	}
 	
 }
