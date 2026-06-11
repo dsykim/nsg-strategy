@@ -21,6 +21,9 @@ public partial class UnitController : Node
 	private List<Unit> units = new List<Unit>();
 	private int id;
 
+	[Signal]
+	public delegate void SettleEventHandler(SettlerUnit settler);
+
 	public UnitController(int id) {
 		this.id = id;
 		Name = "UnitController";
@@ -52,6 +55,7 @@ public partial class UnitController : Node
 
 	public void deleteUnit(Unit unit) {
 		if (units.Contains(unit)) {
+			MapController.instance.removeUnit(unit);
 			units.Remove(unit);
 			unit.QueueFree();
 		}
@@ -85,8 +89,26 @@ public partial class UnitController : Node
 					});
 				}
 		};
-
 		unit.addAction(moveAction);
+
+		
+		if (unit.GetType() == typeof(SettlerUnit)) {
+			UnitAction settleAction = new UnitAction
+			{
+					id = "settle",
+					label = "Settle",
+					keyBinding = "F",
+					isAvailable = false,
+					onTrigger = () =>
+					{
+						deleteUnit(unit);
+						EmitSignal(SignalName.Settle, unit);
+						checkAvailability();
+					}
+			};
+			unit.addAction(settleAction);
+		}
+
 		checkAvailability();
 	}
 
@@ -94,6 +116,11 @@ public partial class UnitController : Node
 		foreach (Unit unit in units) {
 			bool canMove = unit.currentAP > 0 && hasReachableNeighbor(unit);
 			unit.updateAvailability("move", canMove);
+
+			if (unit.GetType() == typeof(SettlerUnit)) {
+				bool canSettle = MapController.instance.canPlaceCity(unit.gridPosition) && unit.currentAP > 0;
+				unit.updateAvailability("settle", canSettle);
+			}
 		}
 	}
 

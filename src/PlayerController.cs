@@ -19,6 +19,9 @@ public partial class PlayerController : Node
 		AddChild(resourceController);
 		AddChild(cityController);
 		Name = "Player" + id;
+		
+		// Connect signals
+		unitController.Settle += cityController.handleSettleSignal;
 
 		// TEMP UNIT TEST
 		if (id == 0) {

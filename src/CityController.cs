@@ -4,11 +4,12 @@ using System.Diagnostics;
 
 public partial class CityController : Node
 {
-	private List<City> cities;
+	private List<City> cities = new List<City>();
 	private int id;
 
 	public CityController(int id) {
 		this.id = id;
+		Name = "CityController";
 	}
 	
 	public void upgradeCity(City city) {
@@ -22,9 +23,14 @@ public partial class CityController : Node
 			return;
 		}
 		City city = new City(id, pos);
+		city.SetPosition(mapController.getCellCenter(pos));
 		mapController.addCity(city);
 		cities.Add(city);
 		AddChild(city);
+	}
+
+	public void handleSettleSignal(SettlerUnit unit) {
+		createCity(unit.gridPosition);
 	}
 
 	public void cityUpkeep() {
