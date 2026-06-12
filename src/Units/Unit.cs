@@ -1,5 +1,22 @@
 ﻿using Godot;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
+
+public static class UnitDataLoader
+{
+	private static JsonObject _data;
+
+	public static JsonObject GetUnitData(string unitKey)
+	{
+		if (_data == null)
+		{
+			string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
+			_data = JsonNode.Parse(json)!.AsObject();
+		}
+
+		return _data[unitKey]!.AsObject();
+	}
+}
 
 public abstract partial class Unit : CellDecorator
 {
@@ -7,6 +24,9 @@ public abstract partial class Unit : CellDecorator
 	public int currentHP;
 	public int maxAP;
 	public int currentAP;
+
+	public int goldCost;
+	public int capacityCost;
 
 	/** ID of the player who owns this unit. */
 	public readonly int owner;
@@ -21,6 +41,18 @@ public abstract partial class Unit : CellDecorator
 	{
 		this.owner = owner;
 		ZIndex = 9;
+	}
+	
+	protected void LoadFromData(string unitKey)
+	{
+		JsonObject data = UnitDataLoader.GetUnitData(unitKey);
+
+		maxHP        = data["maxHP"]!.GetValue<int>();
+		maxAP        = data["maxAP"]!.GetValue<int>();
+		currentAP    = maxAP;
+		capacityCost = data["capacityCost"]!.GetValue<int>();
+		goldCost = data["goldCost"]!.GetValue<int>();
+		Texture      = ResourceLoader.Load<Texture2D>(data["texture"]!.GetValue<string>());
 	}
 
 	public void setCurrentAP(int val)

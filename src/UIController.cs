@@ -5,12 +5,12 @@ using System.Diagnostics;
 
 public partial class UIController : Control
 {
-	private Label stoneCounter;
+	private Label goldCounter;
 	private Sprite2D hexHighlight;
 	private Sprite2D hexSelect;
 
 	public void init() {
-		stoneCounter = GetNode<Label>("UICanvas/StoneCounter");
+		goldCounter = GetNode<Label>("UICanvas/GoldCounter");
 		hexHighlight = GetNode<Sprite2D>("../HexHighlight");
 		hexSelect = GetNode<Sprite2D>("../HexSelect");
 		float hexSize = MapController.instance.hexSize;
@@ -52,6 +52,6 @@ public partial class UIController : Control
 	}
 
 	private void onResourceUpdated(Dictionary<string, int> vals) {
-		stoneCounter.Text = vals["stone"].ToString();
+		goldCounter.Text = vals["gold"].ToString();
 	}
 }

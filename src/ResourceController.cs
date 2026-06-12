@@ -8,22 +8,36 @@ public partial class ResourceController : Node
 	[Signal]
 	public delegate void ResourceUpdatedEventHandler(Dictionary<string, int> vals);
 
-	public int stone { get; private set; }
-	public int stoneRate;
+	public int gold { get; private set; }
+	public int goldRate;
 
 	private int id;
 
 	public ResourceController(int id) {
-		stone = 0;
-		stoneRate = 1;
+		gold = 20;
+		goldRate = 0;
 		this.id = id;
 		Name = "ResourceController";
 	}
 
 	public void resourceUpkeep() {
-		stone = Math.Max(0, stone + stoneRate);
+		gold = Math.Max(0, gold + goldRate);
+		emitResourceUpdated();
+	}
+
+	public void handleUnitCreatedSignal(Unit unit) {
+		gold -= unit.goldCost;
+		emitResourceUpdated();
+	}
+
+	public void handleCityCreatedSignal(City city) {
+		goldRate += city.goldProduction;
+		emitResourceUpdated();
+	}
+
+	private void emitResourceUpdated() {
 		Dictionary<string, int> vals = new Dictionary<string, int>();
-		vals["stone"] = stone;
+		vals["gold"] = gold;
 		EmitSignal(SignalName.ResourceUpdated, vals);
 	}
 }

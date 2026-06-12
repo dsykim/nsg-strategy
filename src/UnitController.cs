@@ -19,14 +19,26 @@ public enum UnitType
 public partial class UnitController : Node
 {
 	private List<Unit> units = new List<Unit>();
+	private int totalCapacity;
+	private int usedCapacity;
 	private int id;
 
-	[Signal]
+	[Signal] 
 	public delegate void SettleEventHandler(SettlerUnit settler);
+
+	[Signal]
+	public delegate void UnitCreatedEventHandler(Unit unit);
 
 	public UnitController(int id) {
 		this.id = id;
+		totalCapacity = 5;
+		usedCapacity = 0;
 		Name = "UnitController";
+	}
+
+	public bool hasCapacityForUnit(Unit unit) {
+		// TODO: move constants to JSON so we can access unit values without needing to create the object.
+		return unit.capacityCost <= totalCapacity - usedCapacity;
 	}
 
 	public void createUnit(UnitType uType, Vector2I pos) {
@@ -44,13 +56,21 @@ public partial class UnitController : Node
 				unit = new SettlerUnit(id);
 				break;
 		}
-		
-		units.Add(unit);
+
+		if (!hasCapacityForUnit(unit)) {
+			Debug.Print("No capacity");
+			return;
+		}
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
-		mapController.addUnit(unit);
 		initActions(unit);
+		usedCapacity += unit.capacityCost;
+		
+		units.Add(unit);
+		mapController.addUnit(unit);
 		AddChild(unit);
+
+		EmitSignal(SignalName.UnitCreated, unit);
 	}
 
 	public void deleteUnit(Unit unit) {

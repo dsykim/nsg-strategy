@@ -5,4 +5,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>nsgstrategy/src</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="src\Units\Units.json" />
+  </ItemGroup>
 </Project>

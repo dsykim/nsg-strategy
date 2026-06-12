@@ -6,6 +6,7 @@ public partial class City : PlayerDecorator
 {
 	private List<Vector2I> ownedCells = new List<Vector2I>();
 	private int level = 1;
+	public int goldProduction = 5;
 	
 	public City(int owner, Vector2I pos) : base(owner) {
 		Texture = ResourceLoader.Load<Texture2D>("res://assets/city.png");

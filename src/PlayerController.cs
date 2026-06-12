@@ -22,6 +22,8 @@ public partial class PlayerController : Node
 		
 		// Connect signals
 		unitController.Settle += cityController.handleSettleSignal;
+		unitController.UnitCreated += resourceController.handleUnitCreatedSignal;
+		cityController.CityCreated += resourceController.handleCityCreatedSignal;
 
 		// TEMP UNIT TEST
 		if (id == 0) {

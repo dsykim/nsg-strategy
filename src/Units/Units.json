@@ -1,0 +1,16 @@
+﻿{
+  "settler": {
+    "maxHP" : 20,
+    "maxAP" : 3,
+    "capacityCost" : 0,
+    "goldCost" : 10,
+    "texture" : "res://assets/settlerUnit.png"
+  },
+  "melee": {
+    "maxHP" : 80,
+    "maxAP" : 3,
+    "capacityCost" : 2,
+    "goldCost" : 5,
+    "texture" : "res://assets/meleeUnit.png"
+  }
+}

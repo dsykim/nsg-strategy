@@ -25,7 +25,7 @@ offset_bottom = 765.0
 scale = Vector2(4, 4)
 text = "NEXT"
 
-[node name="StoneCounter" type="Label" parent="UIController/UICanvas"]
+[node name="GoldCounter" type="Label" parent="UIController/UICanvas"]
 offset_left = 27.0
 offset_top = 18.0
 offset_right = 155.0

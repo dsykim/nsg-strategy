@@ -7,6 +7,9 @@ public partial class CityController : Node
 	private List<City> cities = new List<City>();
 	private int id;
 
+	[Signal]
+	public delegate void CityCreatedEventHandler(City city);
+
 	public CityController(int id) {
 		this.id = id;
 		Name = "CityController";
@@ -27,6 +30,8 @@ public partial class CityController : Node
 		mapController.addCity(city);
 		cities.Add(city);
 		AddChild(city);
+
+		EmitSignal(SignalName.CityCreated, city);
 	}
 
 	public void handleSettleSignal(SettlerUnit unit) {
