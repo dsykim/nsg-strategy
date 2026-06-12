@@ -27,8 +27,10 @@ public partial class MapController : Node2D
 			TerrainTypes.MOUNTAIN
 	};
 
-	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/water_hex.png");
-	Texture2D landTile = ResourceLoader.Load<Texture2D>("res://assets/ground_hex.png");
+	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/waterHex.png");
+	Texture2D plainTile = ResourceLoader.Load<Texture2D>("res://assets/plainHex.png");
+	Texture2D hillTile = ResourceLoader.Load<Texture2D>("res://assets/hillHex.png");
+	Texture2D mountainTile = ResourceLoader.Load<Texture2D>("res://assets/mountainHex.png");
 
 	public MapController(int width, int height, float hexSize) {
 		hexGrid = new HexGrid(width, height);
@@ -165,7 +167,13 @@ public partial class MapController : Node2D
 				tex = oceanTile;
 				break;
 			case TerrainTypes.PLAINS:
-				tex = landTile;
+				tex = plainTile;
+				break;
+			case TerrainTypes.HILLS:
+				tex = hillTile;
+				break;
+			case TerrainTypes.MOUNTAIN:
+				tex = mountainTile;
 				break;
 			default:
 				tex = oceanTile;
@@ -295,7 +303,17 @@ public partial class MapController : Node2D
 
 			if (!isBorder && rand.NextSingle() < threshold) {
 				// Make land
-				HexCell generated = createCell(next.pos, TerrainTypes.PLAINS);
+				float randVal = rand.NextSingle();
+				TerrainTypes lType;
+				if (randVal < 0.6) {
+					lType = TerrainTypes.PLAINS;
+				} else if (randVal < 0.9) {
+					lType = TerrainTypes.HILLS;
+				} else {
+					lType = TerrainTypes.MOUNTAIN;
+				}
+				
+				HexCell generated = createCell(next.pos, lType);
 				hexGrid.setCell(generated);
 				foreach (HexCell c in hexGrid.getNeighbors(generated)) {
 					if (!frontier.Contains(c) && c.terrainType == TerrainTypes.EMPTY) {

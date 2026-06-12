@@ -63,12 +63,12 @@ public partial class UnitController : Node
 		}
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
-		initActions(unit);
 		usedCapacity += unit.capacityCost;
 		
 		units.Add(unit);
 		mapController.addUnit(unit);
 		AddChild(unit);
+		initActions(unit);
 
 		EmitSignal(SignalName.UnitCreated, unit);
 	}
