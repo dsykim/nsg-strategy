@@ -8,6 +8,7 @@ public partial class UIController : Control
 	private Label goldCounter;
 	private Sprite2D hexHighlight;
 	private Sprite2D hexSelect;
+	private ColorRect cityPanel;
 
 	public void init() {
 		goldCounter = GetNode<Label>("UICanvas/GoldCounter");
@@ -22,6 +23,18 @@ public partial class UIController : Control
 
 		var resourceController = GetNode<ResourceController>("../TurnController/Player0/ResourceController");
 		resourceController.ResourceUpdated += onResourceUpdated;
+
+		cityPanel = GetNode<ColorRect>("UICanvas/CityPanel");
+		cityPanel.Visible = false;
+		InputController.instance.citySelected += city =>
+		{
+			cityPanel.Visible = true;
+		};
+
+		InputController.instance.cityDeselected += () =>
+		{
+			cityPanel.Visible = false;
+		};
 	}
 
 	public override void _Process(double delta) {

@@ -10,6 +10,7 @@
 script = ExtResource("1_vh257")
 
 [node name="UIController" type="Control" parent="."]
+unique_name_in_owner = true
 z_index = 999
 layout_mode = 3
 anchors_preset = 0
@@ -32,6 +33,21 @@ offset_right = 155.0
 offset_bottom = 85.0
 theme_override_font_sizes/font_size = 48
 text = "0"
+
+[node name="CityPanel" type="ColorRect" parent="UIController/UICanvas"]
+offset_left = 1331.0
+offset_top = 205.0
+offset_right = 1546.0
+offset_bottom = 633.0
+color = Color(0.5855106, 0.68109727, 0.7798702, 1)
+
+[node name="SpawnUnitButton" type="Button" parent="UIController/UICanvas/CityPanel"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 44.0
+offset_right = 175.0
+offset_bottom = 106.0
+text = "Spawn Unit"
 
 [node name="MainCamera" type="Camera2D" parent="."]
 script = ExtResource("4_18ig4")

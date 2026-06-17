@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,8 @@ public class TargetRequest
 
 public enum UnitType
 {
-	SETTLER
+	SETTLER,
+	MELEE
 }
 
 public partial class UnitController : Node
@@ -36,6 +37,18 @@ public partial class UnitController : Node
 		Name = "UnitController";
 	}
 
+	public void init() {
+		if (id == 0) {
+			Button spawnUnitButton = GetNode<Button>("../../../UIController/UICanvas/CityPanel/SpawnUnitButton");
+			spawnUnitButton.Pressed += onSpawnButtonPressed;
+		}
+	}
+
+	public void onSpawnButtonPressed() {
+		var spawnPos = InputController.instance.selectedDecorator.gridPosition;
+		createUnit(UnitType.MELEE, spawnPos);
+	}
+	
 	public bool hasCapacityForUnit(Unit unit) {
 		// TODO: move constants to JSON so we can access unit values without needing to create the object.
 		return unit.capacityCost <= totalCapacity - usedCapacity;
@@ -51,6 +64,9 @@ public partial class UnitController : Node
 		switch (uType) {
 			case UnitType.SETTLER:
 				unit = new SettlerUnit(id);
+				break;
+			case UnitType.MELEE:
+				unit = new MeleeUnit(id);
 				break;
 			default:
 				unit = new SettlerUnit(id);

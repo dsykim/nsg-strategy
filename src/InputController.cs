@@ -12,7 +12,8 @@ public partial class InputController : Node
 	public enum InputState
 	{
 		Default,
-		SelectingTarget
+		SelectingTarget,
+		SelectingCityAction
 	}
 
 	private InputState state = InputState.Default;
@@ -25,11 +26,12 @@ public partial class InputController : Node
 	private TargetRequest pendingRequest = null;
 	private HashSet<Vector2I> validTargets = null;
 
-	[Signal]
-	public delegate void unitSelectedEventHandler(Unit unit);
+	[Signal] public delegate void unitSelectedEventHandler(Unit unit);
+	[Signal] public delegate void citySelectedEventHandler(City city);
 
 	[Signal]
-	public delegate void citySelectedEventHandler(City city);
+	public delegate void cityDeselectedEventHandler();
+	
 
 	public void init() {
 		instance = this;
@@ -69,6 +71,11 @@ public partial class InputController : Node
 		pendingRequest = null;
 		validTargets = null;
 		MapController.instance.clearTargetRegion();
+		EmitSignal(SignalName.cityDeselected);
+	}
+
+	public void enterCityActionSelectMode() {
+		state = InputState.SelectingCityAction;
 	}
 
 	private void handleClick() {
@@ -85,7 +92,6 @@ public partial class InputController : Node
 			request.onConfirm?.Invoke(hoveredCell.pos);
 			return;
 		}
-
 		selectedDecorator = null;
 		selectedType = null;
 		if (hoveredCell.hasUnit() && selectedDecorator != hoveredCell.units[0]) {
@@ -99,6 +105,7 @@ public partial class InputController : Node
 			City city = hoveredCell.city;
 			selectedDecorator = city;
 			selectedType = typeof(City);
+			enterCityActionSelectMode();
 			EmitSignal(SignalName.citySelected, city);
 		}
 	}

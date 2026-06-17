@@ -12,13 +12,17 @@ public partial class PlayerController : Node
 	public PlayerController(int id) {
 		this.id = id;
 		alive = true;
+		Name = "Player" + id;
+	}
+
+	public void init() {
 		unitController = new UnitController(id);
 		resourceController = new ResourceController(id);
 		cityController = new CityController(id);
 		AddChild(unitController);
 		AddChild(resourceController);
 		AddChild(cityController);
-		Name = "Player" + id;
+		unitController.init();
 		
 		// Connect signals
 		unitController.Settle += cityController.handleSettleSignal;
