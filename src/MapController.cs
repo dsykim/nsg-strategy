@@ -27,6 +27,13 @@ public partial class MapController : Node2D
 			TerrainTypes.MOUNTAIN
 	};
 
+	public readonly TerrainTypes[] landTerrain =
+	{
+			TerrainTypes.HILLS,
+			TerrainTypes.PLAINS,
+			TerrainTypes.MOUNTAIN
+	};
+	
 	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/waterHex.png");
 	Texture2D plainTile = ResourceLoader.Load<Texture2D>("res://assets/plainHex.png");
 	Texture2D hillTile = ResourceLoader.Load<Texture2D>("res://assets/hillHex.png");
@@ -88,6 +95,15 @@ public partial class MapController : Node2D
 		}
 
 		return reachable;
+	}
+
+	public List<Vector2I> getCellsInRadius(Vector2I target, int radius) {
+		var hexCellsInRadius = hexGrid.getCellsInRadius(target, radius);
+		var cellPosInRadius = new List<Vector2I>();
+		foreach (HexCell c in hexCellsInRadius) {
+			cellPosInRadius.Add(c.pos);
+		}
+		return cellPosInRadius;
 	}
 
 	public int pathDistance(Vector2I start, Vector2I goal) {
@@ -210,15 +226,6 @@ public partial class MapController : Node2D
 		return getCellCenter(v.X, v.Y);
 	}
 
-	/** Returns a list of cell positions that neighbor the target position. */
-	public List<Vector2I> getNeighbors(Vector2I target) {
-		List<Vector2I> neighbors = new List<Vector2I>();
-		foreach (HexCell c in hexGrid.getNeighbors(target)) {
-			neighbors.Add(c.pos);
-		}
-		return neighbors;
-	}
-
 	public List<Vector2I> getNeighborPositions(Vector2I target) {
 		List<HexCell> neighbors = hexGrid.getNeighbors(target);
 		List<Vector2I> positions = new List<Vector2I>();
@@ -246,6 +253,14 @@ public partial class MapController : Node2D
 				c + new Vector2(s, 0), c + new Vector2(s / 2, h), c + new Vector2(-s / 2, h),
 				c + new Vector2(-s, 0), c + new Vector2(-s / 2, -h), c + new Vector2(s / 2, -h),
 		};
+	}
+
+	public int getCellOwner(Vector2I pos) {
+		return hexGrid.getCell(pos).controllerID;
+	}
+
+	public void setCellOwner(Vector2I pos, int id) {
+		hexGrid.getCell(pos).controllerID = id;
 	}
 
 	public (Vector2 p1, Vector2 p2) getEdgeEndpoints(Vector2I pos, HexDirection dir) {

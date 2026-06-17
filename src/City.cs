@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public partial class City : PlayerDecorator
 {
-	private List<Vector2I> ownedCells = new List<Vector2I>();
+	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>();
 	private int level = 1;
 	public int goldProduction = 5;
 	
