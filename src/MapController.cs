@@ -112,6 +112,15 @@ public partial class MapController : Node2D
 		return attackable;
 	}
 
+	public (Unit, City) getCellDefender(Vector2I pos) {
+		HexCell cell = hexGrid.getCell(pos);
+		(Unit, City) defenders = (cell.units[0], cell.city);
+		if (defenders.Item1 == null && defenders.Item2 == null) {
+			Debug.Print("No defenders");
+		}
+		return defenders;
+	}
+
 	public List<Vector2I> getCellsInRadius(Vector2I target, int radius) {
 		// TODO: move to hexGrid, just have getCellsPosInRadius instead of looping twice
 		var hexCellsInRadius = hexGrid.getCellsInRadius(target, radius);

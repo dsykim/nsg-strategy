@@ -5,8 +5,10 @@
     "capacityCost" : 0,
     "goldCost" : 10,
     "range": 1,
-    "damage" : 2,
-    "texture" : "res://assets/settlerUnit.png"
+    "damage": 2,
+    "attackCost": 1,
+    "texture" : "res://assets/settlerUnit.png",
+    "enemyTexture" : "res://assets/settlerUnitEnemy.png"
   },
   "melee": {
     "maxHP" : 80,
@@ -15,6 +17,8 @@
     "goldCost" : 5,
     "range": 1,
     "damage" : 15,
-    "texture" : "res://assets/meleeUnit.png"
+    "attackCost": 1,
+    "texture" : "res://assets/meleeUnit.png",
+    "enemyTexture" : "res://assets/settlerUnitEnemy.png"
   }
 }

@@ -23,11 +23,12 @@ public partial class GameScene : Node
 		input.init();
 		AddChild(input);
 
+		combatController = new CombatController();
+		AddChild(combatController);
+		
 		turnController = new TurnController();
 		AddChild(turnController);
 		turnController.init(4);
-
-		combatController = new CombatController();
 
 		uiController = (UIController)GetNode("UIController");
 		uiController.init();

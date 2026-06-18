@@ -27,6 +27,7 @@ public abstract partial class Unit : CellDecorator
 
 	public int range;
 	public int damage;
+	public int attackCost;
 
 	public int goldCost;
 	public int capacityCost;
@@ -53,11 +54,16 @@ public abstract partial class Unit : CellDecorator
 		maxHP        = data["maxHP"]!.GetValue<int>();
 		maxAP        = data["maxAP"]!.GetValue<int>();
 		currentAP    = maxAP;
+		currentHP = maxHP;
 		capacityCost = data["capacityCost"]!.GetValue<int>();
 		goldCost     = data["goldCost"]!.GetValue<int>();
 		range        = data["range"]!.GetValue<int>();
 		damage       = data["damage"]!.GetValue<int>();
-		Texture      = ResourceLoader.Load<Texture2D>(data["texture"]!.GetValue<string>());
+		attackCost = data["attackCost"]!.GetValue<int>();
+		
+
+		string texString = (owner > 0) ? "enemyTexture" : "texture";
+		Texture = ResourceLoader.Load<Texture2D>(data[texString]!.GetValue<string>());
 	}
 
 	public void setCurrentAP(int val)

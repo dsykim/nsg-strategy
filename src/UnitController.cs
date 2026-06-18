@@ -42,11 +42,20 @@ public partial class UnitController : Node
 			Button spawnUnitButton = GetNode<Button>("../../../UIController/UICanvas/CityPanel/SpawnUnitButton");
 			spawnUnitButton.Pressed += onSpawnButtonPressed;
 		}
+
+		CombatController.instance.CombatResolved += onCombatResolved;
 	}
 
 	public void onSpawnButtonPressed() {
 		var spawnPos = InputController.instance.selectedDecorator.gridPosition;
 		createUnit(UnitType.MELEE, spawnPos);
+	}
+
+	public void onCombatResolved() {
+		List<Unit> deadUnits = units.Where(u => u.currentHP <= 0).ToList();
+		foreach (Unit u in deadUnits) {
+			deleteUnit(u);
+		}
 	}
 	
 	public bool hasCapacityForUnit(Unit unit) {
@@ -175,7 +184,7 @@ public partial class UnitController : Node
 			bool canMove = unit.currentAP > 0 && hasReachableNeighbor(unit);
 			unit.updateAvailability("move", canMove);
 
-			bool canAttack = unit.currentAP > 0;
+			bool canAttack = unit.currentAP >= unit.attackCost;
 			unit.updateAvailability("attack", canAttack);
 
 			if (unit.GetType() == typeof(SettlerUnit)) {
