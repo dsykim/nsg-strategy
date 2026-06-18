@@ -92,6 +92,7 @@ public partial class UnitController : Node
 	public void deleteUnit(Unit unit) {
 		if (units.Contains(unit)) {
 			MapController.instance.removeUnit(unit);
+			usedCapacity -= unit.capacityCost;
 			units.Remove(unit);
 			unit.QueueFree();
 		}
@@ -126,7 +127,28 @@ public partial class UnitController : Node
 				}
 		};
 		unit.addAction(moveAction);
-
+		
+		UnitAction attackAction = new UnitAction
+		{
+				id = "attack",
+				label = "Attack",
+				keyBinding = "E",
+				isAvailable = false,
+				onTrigger = () =>
+				{
+					InputController.instance.enterSelectTargetMode(new TargetRequest
+					{
+							validCells = MapController.instance.getAttackableCells(unit),
+							highlightColor = new Color(0.8f, .2f, 0.2f, 1f),
+							onConfirm = target =>
+							{
+								CombatController.instance.resolveCombat(unit, target);
+								checkAvailability();
+							}
+					});
+				}
+		};
+		unit.addAction(attackAction);
 		
 		if (unit.GetType() == typeof(SettlerUnit)) {
 			UnitAction settleAction = new UnitAction
@@ -152,6 +174,9 @@ public partial class UnitController : Node
 		foreach (Unit unit in units) {
 			bool canMove = unit.currentAP > 0 && hasReachableNeighbor(unit);
 			unit.updateAvailability("move", canMove);
+
+			bool canAttack = unit.currentAP > 0;
+			unit.updateAvailability("attack", canAttack);
 
 			if (unit.GetType() == typeof(SettlerUnit)) {
 				bool canSettle = MapController.instance.canPlaceCity(unit.gridPosition) && unit.currentAP > 0;

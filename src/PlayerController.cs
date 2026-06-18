@@ -34,6 +34,10 @@ public partial class PlayerController : Node
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(10, 5));
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(11, 6));
 		}
+		if (id == 1) {
+			unitController.createUnit(UnitType.SETTLER, new Vector2I(9, 5));
+			unitController.createUnit(UnitType.SETTLER, new Vector2I(12, 6));
+		}
 	}
 
 	public void turnUpkeep() {

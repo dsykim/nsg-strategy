@@ -96,8 +96,24 @@ public partial class MapController : Node2D
 
 		return reachable;
 	}
+	
+	public List<Vector2I> getAttackableCells(Unit unit) {
+		List<Vector2I> attackable = new List<Vector2I>();
+		int attackerID = unit.owner;
+		foreach (var pos in getCellsInRadius(unit.gridPosition, unit.range)) {
+			HexCell defenderCell = hexGrid.getCell(pos);
+			bool hasEnemyCity = defenderCell.hasCity() && defenderCell.city.owner != attackerID;
+			bool hasEnemyUnit = defenderCell.hasUnit() && defenderCell.units[0].owner != attackerID;
+			if (hasEnemyCity || hasEnemyUnit) {
+				attackable.Add(pos);
+			}
+		}
+
+		return attackable;
+	}
 
 	public List<Vector2I> getCellsInRadius(Vector2I target, int radius) {
+		// TODO: move to hexGrid, just have getCellsPosInRadius instead of looping twice
 		var hexCellsInRadius = hexGrid.getCellsInRadius(target, radius);
 		var cellPosInRadius = new List<Vector2I>();
 		foreach (HexCell c in hexCellsInRadius) {

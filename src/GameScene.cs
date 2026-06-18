@@ -6,6 +6,7 @@ using System.Diagnostics;
 public partial class GameScene : Node
 {
 	private TurnController turnController;
+	private CombatController combatController;
 	private CameraController camera;
 	private UIController uiController;
 
@@ -25,6 +26,8 @@ public partial class GameScene : Node
 		turnController = new TurnController();
 		AddChild(turnController);
 		turnController.init(4);
+
+		combatController = new CombatController();
 
 		uiController = (UIController)GetNode("UIController");
 		uiController.init();
