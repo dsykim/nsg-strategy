@@ -50,6 +50,7 @@ public partial class CityController : Node
 		updateCityCellControl(city, 1);
 
 		EmitSignal(SignalName.CityCreated, city);
+		checkAvailability();
 	}
 
 	private void initActions(City city) {

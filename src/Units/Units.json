@@ -21,6 +21,18 @@
     "damage" : 15,
     "attackCost": 1,
     "texture" : "res://assets/meleeUnit.png",
-    "enemyTexture" : "res://assets/settlerUnitEnemy.png"
+    "enemyTexture" : "res://assets/meleeUnitEnemy.png"
+  },
+  "ranged": {
+    "name": "Ranged",
+    "maxHP" : 40,
+    "maxAP" : 3,
+    "capacityCost" : 2,
+    "goldCost" : 5,
+    "range": 2,
+    "damage" : 12,
+    "attackCost": 1,
+    "texture" : "res://assets/rangedUnit.png",
+    "enemyTexture" : "res://assets/rangedUnitEnemy.png"
   }
 }

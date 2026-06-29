@@ -14,7 +14,8 @@ public class TargetRequest
 public enum UnitType
 {
 	SETTLER,
-	MELEE
+	MELEE,
+	RANGED
 }
 
 public partial class UnitController : Node
@@ -67,6 +68,9 @@ public partial class UnitController : Node
 				break;
 			case UnitType.MELEE:
 				unit = new MeleeUnit(id);
+				break;
+			case UnitType.RANGED:
+				unit = new RangedUnit(id);
 				break;
 			default:
 				unit = new SettlerUnit(id);
@@ -199,6 +203,8 @@ public partial class UnitController : Node
 				return UnitType.SETTLER;	
 			case "melee":
 				return UnitType.MELEE;
+			case "ranged":
+				return UnitType.RANGED;
 			default:
 				return UnitType.MELEE;
 		}
@@ -210,6 +216,8 @@ public partial class UnitController : Node
 				return "settler";	
 			case UnitType.MELEE:
 				return "melee";
+			case UnitType.RANGED:
+				return "ranged";
 			default:
 				return "";
 		}
