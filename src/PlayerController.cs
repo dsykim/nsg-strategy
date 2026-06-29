@@ -17,13 +17,17 @@ public partial class PlayerController : Node
 	}
 
 	public void init() {
-		unitController = new UnitController(id);
 		resourceController = new ResourceController(id);
-		cityController = new CityController(id);
-		AddChild(unitController);
 		AddChild(resourceController);
+		unitController = new UnitController(id);
+		AddChild(unitController);
+		cityController = new CityController(id);
 		AddChild(cityController);
+		
+		cityController.init();
 		unitController.init();
+		
+
 		
 		// Connect signals
 		unitController.Settle += cityController.handleSettleSignal;
@@ -51,7 +55,7 @@ public partial class PlayerController : Node
 	public bool canCreateUnit(JsonObject data) {
 		int capacityCost = data["capacityCost"]!.GetValue<int>();
 		int goldCost = data["goldCost"]!.GetValue<int>();
-		bool hasCapacity = unitController.hasCapacityForUnit(capacityCost);
+		bool hasCapacity = resourceController.hasCapacityForUnit(capacityCost);
 		bool hasGold = resourceController.canAfford(goldCost);
 		return hasGold && hasCapacity;
 	}

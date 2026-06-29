@@ -7,6 +7,7 @@ public partial class CityController : Node
 {
 	private List<City> cities = new List<City>();
 	private EdgeOverlay borders;
+	private ResourceController resourceController;
 	private int id;
 
 	[Signal]
@@ -21,6 +22,10 @@ public partial class CityController : Node
 		borders = new EdgeOverlay();
 		borders.LineColor = new Color(0.9f, 0.3f, 0.3f, 1f);
 		AddChild(borders);
+	}
+
+	public void init() {
+		resourceController = GetNode<ResourceController>("../ResourceController");
 	}
 	
 	public void upgradeCity(City city) {
@@ -39,6 +44,7 @@ public partial class CityController : Node
 		cities.Add(city);
 		AddChild(city);
 		initActions(city);
+		resourceController.addUnitCapacityTotal(10);
 		
 		// Assign control of tiles
 		updateCityCellControl(city, 1);

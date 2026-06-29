@@ -20,8 +20,8 @@ public enum UnitType
 public partial class UnitController : Node
 {
 	private List<Unit> units = new List<Unit>();
-	private int totalCapacity;
-	private int usedCapacity;
+	private ResourceController resourceController;
+
 	private int id;
 
 	[Signal] 
@@ -32,12 +32,11 @@ public partial class UnitController : Node
 
 	public UnitController(int id) {
 		this.id = id;
-		totalCapacity = 5;
-		usedCapacity = 0;
 		Name = "UnitController";
 	}
 
 	public void init() {
+		resourceController = GetNode<ResourceController>("../ResourceController");
 		CombatController.instance.CombatResolved += onCombatResolved;
 	}
 
@@ -48,14 +47,7 @@ public partial class UnitController : Node
 		}
 	}
 	
-	public bool hasCapacityForUnit(Unit unit) {
-		// TODO: move constants to JSON so we can access unit values without needing to create the object.
-		return unit.capacityCost <= totalCapacity - usedCapacity;
-	}
-
-	public bool hasCapacityForUnit(int capacityCost) {
-		return capacityCost <= totalCapacity - usedCapacity;
-	}
+	
 
 	public void handleSpawnUnitButtonSignal(string unitName, Vector2I pos) {
 		UnitType uType = stringToUnitType(unitName);
@@ -81,14 +73,14 @@ public partial class UnitController : Node
 				break;
 		}
 
-		if (!hasCapacityForUnit(unit)) {
+		if (!resourceController.hasCapacityForUnit(unit)) {
 			Debug.Print("No capacity");
 			return;
 		}
 		
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
-		usedCapacity += unit.capacityCost;
+		resourceController.addUnitCapacityUsed(unit.capacityCost);
 		
 		units.Add(unit);
 		mapController.addUnit(unit);
@@ -101,7 +93,7 @@ public partial class UnitController : Node
 	public void deleteUnit(Unit unit) {
 		if (units.Contains(unit)) {
 			MapController.instance.removeUnit(unit);
-			usedCapacity -= unit.capacityCost;
+			resourceController.addUnitCapacityUsed(-unit.capacityCost);
 			units.Remove(unit);
 			unit.QueueFree();
 		}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bn1eteu33ytkc"]
+[gd_scene load_steps=11 format=3 uid="uid://bn1eteu33ytkc"]
 
 [ext_resource type="Script" uid="uid://101sgpxnjx65" path="res://src/GameScene.cs" id="1_vh257"]
 [ext_resource type="Script" uid="uid://egk0r212qscp" path="res://src/UIController.cs" id="2_xy3my"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://dpc1a0k3t51kj" path="res://assets/rangedUnit.png" id="4_6ytau"]
 [ext_resource type="Script" uid="uid://ca45ock7rnyl3" path="res://src/CameraController.cs" id="4_18ig4"]
 [ext_resource type="Texture2D" uid="uid://clk35veck7a45" path="res://assets/hex_select.png" id="5_7s5hy"]
+[ext_resource type="Texture2D" uid="uid://d0vwva4a1yjkc" path="res://assets/rangedUnitEnemy.png" id="6_pynjx"]
+[ext_resource type="Script" uid="uid://cwo4cyy56k2ej" path="res://src/UI/ResourceBar.cs" id="6_yrli1"]
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1_vh257")
@@ -28,14 +30,6 @@ offset_right = 1411.0
 offset_bottom = 765.0
 scale = Vector2(4, 4)
 text = "NEXT"
-
-[node name="GoldCounter" type="Label" parent="UIController/UICanvas"]
-offset_left = 27.0
-offset_top = 18.0
-offset_right = 155.0
-offset_bottom = 85.0
-theme_override_font_sizes/font_size = 48
-text = "0"
 
 [node name="CityPanel" type="VBoxContainer" parent="UIController/UICanvas" node_paths=PackedStringArray("nameLabel", "hpLabel", "hpBar", "actionButtonContainer")]
 offset_left = 1331.0
@@ -100,6 +94,61 @@ layout_mode = 2
 
 [node name="UnitAPLabel" type="Label" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
 layout_mode = 2
+
+[node name="ResourceBar" type="Control" parent="UIController/UICanvas" node_paths=PackedStringArray("goldLabel", "capacityLabel")]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 106.0
+grow_horizontal = 2
+script = ExtResource("6_yrli1")
+goldLabel = NodePath("HBoxContainer/GoldContainer/HBoxContainer/GoldLabel")
+capacityLabel = NodePath("HBoxContainer/CapacityContainer/HBoxContainer/CapacityLabel")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UIController/UICanvas/ResourceBar"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+grow_vertical = 2
+
+[node name="GoldContainer" type="MarginContainer" parent="UIController/UICanvas/ResourceBar/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UIController/UICanvas/ResourceBar/HBoxContainer/GoldContainer"]
+layout_mode = 2
+
+[node name="GoldTexture" type="TextureRect" parent="UIController/UICanvas/ResourceBar/HBoxContainer/GoldContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("6_pynjx")
+
+[node name="GoldLabel" type="Label" parent="UIController/UICanvas/ResourceBar/HBoxContainer/GoldContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "0"
+
+[node name="CapacityContainer" type="MarginContainer" parent="UIController/UICanvas/ResourceBar/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UIController/UICanvas/ResourceBar/HBoxContainer/CapacityContainer"]
+layout_mode = 2
+
+[node name="CapacityTexture" type="TextureRect" parent="UIController/UICanvas/ResourceBar/HBoxContainer/CapacityContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("6_pynjx")
+
+[node name="CapacityLabel" type="Label" parent="UIController/UICanvas/ResourceBar/HBoxContainer/CapacityContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "0/5"
 
 [node name="MainCamera" type="Camera2D" parent="."]
 script = ExtResource("4_18ig4")
