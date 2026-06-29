@@ -1,5 +1,6 @@
 ﻿using Godot;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
 
 public partial class PlayerController : Node
 {
@@ -28,7 +29,8 @@ public partial class PlayerController : Node
 		unitController.Settle += cityController.handleSettleSignal;
 		unitController.UnitCreated += resourceController.handleUnitCreatedSignal;
 		cityController.CityCreated += resourceController.handleCityCreatedSignal;
-
+		cityController.SpawnButtonClicked += unitController.handleSpawnUnitButtonSignal;
+		
 		// TEMP UNIT TEST
 		if (id == 0) {
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(10, 5));
@@ -44,5 +46,13 @@ public partial class PlayerController : Node
 		resourceController.resourceUpkeep();
 		unitController.unitUpkeep();
 		cityController.cityUpkeep();
+	}
+
+	public bool canCreateUnit(JsonObject data) {
+		int capacityCost = data["capacityCost"]!.GetValue<int>();
+		int goldCost = data["goldCost"]!.GetValue<int>();
+		bool hasCapacity = unitController.hasCapacityForUnit(capacityCost);
+		bool hasGold = resourceController.canAfford(goldCost);
+		return hasGold && hasCapacity;
 	}
 }

@@ -27,6 +27,7 @@ public partial class InputController : Node
 	private HashSet<Vector2I> validTargets = null;
 
 	[Signal] public delegate void unitSelectedEventHandler(Unit unit);
+	[Signal] public delegate void unitDeselectedEventHandler();
 	[Signal] public delegate void citySelectedEventHandler(City city);
 
 	[Signal]
@@ -92,21 +93,32 @@ public partial class InputController : Node
 			request.onConfirm?.Invoke(hoveredCell.pos);
 			return;
 		}
-		selectedDecorator = null;
-		selectedType = null;
+		
 		if (hoveredCell.hasUnit() && selectedDecorator != hoveredCell.units[0]) {
 			// Select unit first unless unit is already selected
+			EmitSignal(SignalName.cityDeselected);
 			Unit unit = hoveredCell.units[0];
 			selectedDecorator = unit;
 			selectedType = typeof(Unit);
 			EmitSignal(SignalName.unitSelected, unit);
 		} else if (hoveredCell.hasCity()) {
 			// If no unit or unit already selected, select playerDecorator
+			EmitSignal(SignalName.unitDeselected);
 			City city = hoveredCell.city;
 			selectedDecorator = city;
 			selectedType = typeof(City);
 			enterCityActionSelectMode();
 			EmitSignal(SignalName.citySelected, city);
+			
+		} else {
+			// Empty select, deselect
+			if (selectedType == typeof(Unit)) {
+				EmitSignal(SignalName.unitDeselected);
+			} else if (selectedType == typeof(City)) {
+				EmitSignal(SignalName.cityDeselected);
+			}
+			selectedDecorator = null;
+			selectedType = null;
 		}
 	}
 

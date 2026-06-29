@@ -18,7 +18,7 @@ public partial class CombatController : Node
 		
 		// TODO: currently only handle combat with units
 		if (defenders.u != null) {
-			defenders.u.currentHP -= attacker.damage;
+			defenders.u.setCurrentHP(defenders.u.currentHP -= attacker.damage);
 		}
 
 		EmitSignal(SignalName.CombatResolved);

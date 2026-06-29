@@ -156,7 +156,7 @@ public partial class MapController : Node2D
 	public void moveUnit(Unit unit, Vector2I target) {
 		if (canMoveUnit(unit, target)) {
 			removeUnit(unit);
-			unit.currentAP -= pathDistance(unit.gridPosition, target);
+			unit.setCurrentAP(unit.currentAP - pathDistance(unit.gridPosition, target));
 			unit.gridPosition = target;
 			unit.SetPosition(getCellCenter(target));
 			addUnit(unit);

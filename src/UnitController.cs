@@ -38,17 +38,7 @@ public partial class UnitController : Node
 	}
 
 	public void init() {
-		if (id == 0) {
-			Button spawnUnitButton = GetNode<Button>("../../../UIController/UICanvas/CityPanel/SpawnUnitButton");
-			spawnUnitButton.Pressed += onSpawnButtonPressed;
-		}
-
 		CombatController.instance.CombatResolved += onCombatResolved;
-	}
-
-	public void onSpawnButtonPressed() {
-		var spawnPos = InputController.instance.selectedDecorator.gridPosition;
-		createUnit(UnitType.MELEE, spawnPos);
 	}
 
 	public void onCombatResolved() {
@@ -61,6 +51,15 @@ public partial class UnitController : Node
 	public bool hasCapacityForUnit(Unit unit) {
 		// TODO: move constants to JSON so we can access unit values without needing to create the object.
 		return unit.capacityCost <= totalCapacity - usedCapacity;
+	}
+
+	public bool hasCapacityForUnit(int capacityCost) {
+		return capacityCost <= totalCapacity - usedCapacity;
+	}
+
+	public void handleSpawnUnitButtonSignal(string unitName, Vector2I pos) {
+		UnitType uType = stringToUnitType(unitName);
+		createUnit(uType, pos);
 	}
 
 	public void createUnit(UnitType uType, Vector2I pos) {
@@ -86,6 +85,7 @@ public partial class UnitController : Node
 			Debug.Print("No capacity");
 			return;
 		}
+		
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
 		usedCapacity += unit.capacityCost;
@@ -109,7 +109,7 @@ public partial class UnitController : Node
 
 	public void unitUpkeep() {
 		foreach (Unit u in units) {
-			u.currentAP = u.maxAP;
+			u.setCurrentAP(u.maxAP);
 		}
 		checkAvailability();
 	}
@@ -198,5 +198,28 @@ public partial class UnitController : Node
 		// Check all 6 neighbors in hex grid offset coordinates
 		List<Vector2I> neighbors = MapController.instance.getNeighborPositions(unit.gridPosition);
 		return neighbors.Any(pos => MapController.instance.canMoveUnit(unit, pos));
+	}
+
+	public static UnitType stringToUnitType(string s) {
+		string lower = s.ToLower();
+		switch (lower) {
+			case "settler":
+				return UnitType.SETTLER;	
+			case "melee":
+				return UnitType.MELEE;
+			default:
+				return UnitType.MELEE;
+		}
+	}
+
+	public static string unitTypeToString(UnitType uType) {
+		switch (uType) {
+			case UnitType.SETTLER:
+				return "settler";	
+			case UnitType.MELEE:
+				return "melee";
+			default:
+				return "";
+		}
 	}
 }

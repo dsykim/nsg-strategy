@@ -1,22 +1,17 @@
 ﻿using Godot;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
 
-public static class UnitDataLoader
+public class UnitAction
 {
-	private static JsonObject _data;
-
-	public static JsonObject GetUnitData(string unitKey)
-	{
-		if (_data == null)
-		{
-			string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
-			_data = JsonNode.Parse(json)!.AsObject();
-		}
-
-		return _data[unitKey]!.AsObject();
-	}
+	public string id;
+	public string label;
+	public string keyBinding;
+	public bool isAvailable;
+	public Action onTrigger;
 }
+
 
 public abstract partial class Unit : CellDecorator
 {
@@ -35,11 +30,17 @@ public abstract partial class Unit : CellDecorator
 	/** ID of the player who owns this unit. */
 	public readonly int owner;
 
+	public string unitName;
+
 	/** A list of this unit's actions. */
 	public List<UnitAction> actions { get; private set; } = new List<UnitAction>();
 
 	/** Signal triggered when action availability is updated. */
 	[Signal] public delegate void actionsChangedEventHandler();
+
+	[Signal]
+	public delegate void statsChangedEventHandler();
+
 
 	public Unit(int owner)
 	{
@@ -49,18 +50,20 @@ public abstract partial class Unit : CellDecorator
 	
 	protected void LoadFromData(string unitKey)
 	{
-		JsonObject data = UnitDataLoader.GetUnitData(unitKey);
+		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
+		var _data = JsonNode.Parse(json)!.AsObject();
+		JsonObject data = _data[unitKey]!.AsObject();
 
-		maxHP        = data["maxHP"]!.GetValue<int>();
-		maxAP        = data["maxAP"]!.GetValue<int>();
-		currentAP    = maxAP;
+		unitName = data["name"]!.GetValue<string>();
+		maxHP = data["maxHP"]!.GetValue<int>();
+		maxAP = data["maxAP"]!.GetValue<int>();
+		currentAP = maxAP;
 		currentHP = maxHP;
 		capacityCost = data["capacityCost"]!.GetValue<int>();
-		goldCost     = data["goldCost"]!.GetValue<int>();
-		range        = data["range"]!.GetValue<int>();
-		damage       = data["damage"]!.GetValue<int>();
+		goldCost = data["goldCost"]!.GetValue<int>();
+		range = data["range"]!.GetValue<int>();
+		damage = data["damage"]!.GetValue<int>();
 		attackCost = data["attackCost"]!.GetValue<int>();
-		
 
 		string texString = (owner > 0) ? "enemyTexture" : "texture";
 		Texture = ResourceLoader.Load<Texture2D>(data[texString]!.GetValue<string>());
@@ -69,6 +72,18 @@ public abstract partial class Unit : CellDecorator
 	public void setCurrentAP(int val)
 	{
 		currentAP = val;
+		EmitSignal(SignalName.statsChanged);
+	}
+
+	public void setCurrentHP(int val)
+	{
+		currentHP = val;
+		EmitSignal(SignalName.statsChanged);
+	}
+
+	public void applyDamage(int amount)
+	{
+		setCurrentHP(currentHP - amount);
 	}
 
 	public void addAction(UnitAction action)

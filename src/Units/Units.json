@@ -1,5 +1,6 @@
 ﻿{
   "settler": {
+    "name": "Settler",
     "maxHP" : 20,
     "maxAP" : 3,
     "capacityCost" : 0,
@@ -11,6 +12,7 @@
     "enemyTexture" : "res://assets/settlerUnitEnemy.png"
   },
   "melee": {
+    "name": "Melee",
     "maxHP" : 80,
     "maxAP" : 3,
     "capacityCost" : 2,

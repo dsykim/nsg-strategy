@@ -20,6 +20,9 @@ public partial class ResourceController : Node
 		Name = "ResourceController";
 	}
 
+	public bool canAfford(int cost) {
+		return cost <= gold;
+	}
 	public void resourceUpkeep() {
 		gold = Math.Max(0, gold + goldRate);
 		emitResourceUpdated();
