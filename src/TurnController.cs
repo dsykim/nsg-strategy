@@ -32,10 +32,12 @@ public partial class TurnController : Node
 			playerCount = n;
 			userPlayer = new PlayerController(0);
 			AddChild(userPlayer);
+			userPlayer.init();
 			for (int i = 1; i < n; i++) {
 				PlayerController aiPlayer = new PlayerController(i);
 				aiPlayers.Add(aiPlayer);
 				AddChild(aiPlayer);
+				aiPlayer.init();
 			}
 		} else {
 			Debug.Print("Invalid player count");

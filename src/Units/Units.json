@@ -1,0 +1,38 @@
+﻿{
+  "settler": {
+    "name": "Settler",
+    "maxHP" : 20,
+    "maxAP" : 3,
+    "capacityCost" : 0,
+    "goldCost" : 10,
+    "range": 1,
+    "damage": 2,
+    "attackCost": 1,
+    "texture" : "res://assets/settlerUnit.png",
+    "enemyTexture" : "res://assets/settlerUnitEnemy.png"
+  },
+  "melee": {
+    "name": "Melee",
+    "maxHP" : 80,
+    "maxAP" : 3,
+    "capacityCost" : 2,
+    "goldCost" : 5,
+    "range": 1,
+    "damage" : 15,
+    "attackCost": 1,
+    "texture" : "res://assets/meleeUnit.png",
+    "enemyTexture" : "res://assets/meleeUnitEnemy.png"
+  },
+  "ranged": {
+    "name": "Ranged",
+    "maxHP" : 40,
+    "maxAP" : 3,
+    "capacityCost" : 2,
+    "goldCost" : 5,
+    "range": 2,
+    "damage" : 12,
+    "attackCost": 1,
+    "texture" : "res://assets/rangedUnit.png",
+    "enemyTexture" : "res://assets/rangedUnitEnemy.png"
+  }
+}

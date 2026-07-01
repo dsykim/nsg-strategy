@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dptjgue3pq4nh"
-path="res://.godot/imported/ground_hex.png-887d4410785fc7a947669cc13064119c.ctex"
+uid="uid://bvuidn57ye8qa"
+path="res://.godot/imported/settlerUnitEnemy.png-5dbd450ffa94395946d0f7d6603d9efc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ground_hex.png"
-dest_files=["res://.godot/imported/ground_hex.png-887d4410785fc7a947669cc13064119c.ctex"]
+source_file="res://assets/settlerUnitEnemy.png"
+dest_files=["res://.godot/imported/settlerUnitEnemy.png-5dbd450ffa94395946d0f7d6603d9efc.ctex"]
 
 [params]
 

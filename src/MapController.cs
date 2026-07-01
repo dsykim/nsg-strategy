@@ -27,8 +27,17 @@ public partial class MapController : Node2D
 			TerrainTypes.MOUNTAIN
 	};
 
-	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/water_hex.png");
-	Texture2D landTile = ResourceLoader.Load<Texture2D>("res://assets/ground_hex.png");
+	public readonly TerrainTypes[] landTerrain =
+	{
+			TerrainTypes.HILLS,
+			TerrainTypes.PLAINS,
+			TerrainTypes.MOUNTAIN
+	};
+	
+	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/waterHex.png");
+	Texture2D plainTile = ResourceLoader.Load<Texture2D>("res://assets/plainHex.png");
+	Texture2D hillTile = ResourceLoader.Load<Texture2D>("res://assets/hillHex.png");
+	Texture2D mountainTile = ResourceLoader.Load<Texture2D>("res://assets/mountainHex.png");
 
 	public MapController(int width, int height, float hexSize) {
 		hexGrid = new HexGrid(width, height);
@@ -87,6 +96,40 @@ public partial class MapController : Node2D
 
 		return reachable;
 	}
+	
+	public List<Vector2I> getAttackableCells(Unit unit) {
+		List<Vector2I> attackable = new List<Vector2I>();
+		int attackerID = unit.owner;
+		foreach (var pos in getCellsInRadius(unit.gridPosition, unit.range)) {
+			HexCell defenderCell = hexGrid.getCell(pos);
+			bool hasEnemyCity = defenderCell.hasCity() && defenderCell.city.owner != attackerID;
+			bool hasEnemyUnit = defenderCell.hasUnit() && defenderCell.units[0].owner != attackerID;
+			if (hasEnemyCity || hasEnemyUnit) {
+				attackable.Add(pos);
+			}
+		}
+
+		return attackable;
+	}
+
+	public (Unit, City) getCellDefender(Vector2I pos) {
+		HexCell cell = hexGrid.getCell(pos);
+		(Unit, City) defenders = (cell.units[0], cell.city);
+		if (defenders.Item1 == null && defenders.Item2 == null) {
+			Debug.Print("No defenders");
+		}
+		return defenders;
+	}
+
+	public List<Vector2I> getCellsInRadius(Vector2I target, int radius) {
+		// TODO: move to hexGrid, just have getCellsPosInRadius instead of looping twice
+		var hexCellsInRadius = hexGrid.getCellsInRadius(target, radius);
+		var cellPosInRadius = new List<Vector2I>();
+		foreach (HexCell c in hexCellsInRadius) {
+			cellPosInRadius.Add(c.pos);
+		}
+		return cellPosInRadius;
+	}
 
 	public int pathDistance(Vector2I start, Vector2I goal) {
 		if (start == goal) return 0;
@@ -113,7 +156,7 @@ public partial class MapController : Node2D
 	public void moveUnit(Unit unit, Vector2I target) {
 		if (canMoveUnit(unit, target)) {
 			removeUnit(unit);
-			unit.currentAP -= pathDistance(unit.gridPosition, target);
+			unit.setCurrentAP(unit.currentAP - pathDistance(unit.gridPosition, target));
 			unit.gridPosition = target;
 			unit.SetPosition(getCellCenter(target));
 			addUnit(unit);
@@ -165,7 +208,13 @@ public partial class MapController : Node2D
 				tex = oceanTile;
 				break;
 			case TerrainTypes.PLAINS:
-				tex = landTile;
+				tex = plainTile;
+				break;
+			case TerrainTypes.HILLS:
+				tex = hillTile;
+				break;
+			case TerrainTypes.MOUNTAIN:
+				tex = mountainTile;
 				break;
 			default:
 				tex = oceanTile;
@@ -202,15 +251,6 @@ public partial class MapController : Node2D
 		return getCellCenter(v.X, v.Y);
 	}
 
-	/** Returns a list of cell positions that neighbor the target position. */
-	public List<Vector2I> getNeighbors(Vector2I target) {
-		List<Vector2I> neighbors = new List<Vector2I>();
-		foreach (HexCell c in hexGrid.getNeighbors(target)) {
-			neighbors.Add(c.pos);
-		}
-		return neighbors;
-	}
-
 	public List<Vector2I> getNeighborPositions(Vector2I target) {
 		List<HexCell> neighbors = hexGrid.getNeighbors(target);
 		List<Vector2I> positions = new List<Vector2I>();
@@ -238,6 +278,14 @@ public partial class MapController : Node2D
 				c + new Vector2(s, 0), c + new Vector2(s / 2, h), c + new Vector2(-s / 2, h),
 				c + new Vector2(-s, 0), c + new Vector2(-s / 2, -h), c + new Vector2(s / 2, -h),
 		};
+	}
+
+	public int getCellOwner(Vector2I pos) {
+		return hexGrid.getCell(pos).controllerID;
+	}
+
+	public void setCellOwner(Vector2I pos, int id) {
+		hexGrid.getCell(pos).controllerID = id;
 	}
 
 	public (Vector2 p1, Vector2 p2) getEdgeEndpoints(Vector2I pos, HexDirection dir) {
@@ -295,7 +343,17 @@ public partial class MapController : Node2D
 
 			if (!isBorder && rand.NextSingle() < threshold) {
 				// Make land
-				HexCell generated = createCell(next.pos, TerrainTypes.PLAINS);
+				float randVal = rand.NextSingle();
+				TerrainTypes lType;
+				if (randVal < 0.6) {
+					lType = TerrainTypes.PLAINS;
+				} else if (randVal < 0.9) {
+					lType = TerrainTypes.HILLS;
+				} else {
+					lType = TerrainTypes.MOUNTAIN;
+				}
+				
+				HexCell generated = createCell(next.pos, lType);
 				hexGrid.setCell(generated);
 				foreach (HexCell c in hexGrid.getNeighbors(generated)) {
 					if (!frontier.Contains(c) && c.terrainType == TerrainTypes.EMPTY) {

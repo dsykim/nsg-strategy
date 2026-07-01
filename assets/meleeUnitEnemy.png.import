@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://485nbj5hq1ia"
-path="res://.godot/imported/water_hex.png-546de1be51f492afdaab20f8b9c03144.ctex"
+uid="uid://cmcigb03kdkls"
+path="res://.godot/imported/meleeUnitEnemy.png-3a44314a0d684937c418d1e2cb9f2a62.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/water_hex.png"
-dest_files=["res://.godot/imported/water_hex.png-546de1be51f492afdaab20f8b9c03144.ctex"]
+source_file="res://assets/meleeUnitEnemy.png"
+dest_files=["res://.godot/imported/meleeUnitEnemy.png-3a44314a0d684937c418d1e2cb9f2a62.ctex"]
 
 [params]
 

@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,20 +13,46 @@ public class TargetRequest
 
 public enum UnitType
 {
-	SETTLER
+	SETTLER,
+	MELEE,
+	RANGED
 }
 
 public partial class UnitController : Node
 {
 	private List<Unit> units = new List<Unit>();
+	private ResourceController resourceController;
+
 	private int id;
 
-	[Signal]
+	[Signal] 
 	public delegate void SettleEventHandler(SettlerUnit settler);
+
+	[Signal]
+	public delegate void UnitCreatedEventHandler(Unit unit);
 
 	public UnitController(int id) {
 		this.id = id;
 		Name = "UnitController";
+	}
+
+	public void init() {
+		resourceController = GetNode<ResourceController>("../ResourceController");
+		CombatController.instance.CombatResolved += onCombatResolved;
+	}
+
+	public void onCombatResolved() {
+		List<Unit> deadUnits = units.Where(u => u.currentHP <= 0).ToList();
+		foreach (Unit u in deadUnits) {
+			deleteUnit(u);
+		}
+	}
+	
+	
+
+	public void handleSpawnUnitButtonSignal(string unitName, Vector2I pos) {
+		UnitType uType = stringToUnitType(unitName);
+		createUnit(uType, pos);
 	}
 
 	public void createUnit(UnitType uType, Vector2I pos) {
@@ -40,22 +66,38 @@ public partial class UnitController : Node
 			case UnitType.SETTLER:
 				unit = new SettlerUnit(id);
 				break;
+			case UnitType.MELEE:
+				unit = new MeleeUnit(id);
+				break;
+			case UnitType.RANGED:
+				unit = new RangedUnit(id);
+				break;
 			default:
 				unit = new SettlerUnit(id);
 				break;
 		}
+
+		if (!resourceController.hasCapacityForUnit(unit)) {
+			Debug.Print("No capacity");
+			return;
+		}
 		
-		units.Add(unit);
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
+		resourceController.addUnitCapacityUsed(unit.capacityCost);
+		
+		units.Add(unit);
 		mapController.addUnit(unit);
-		initActions(unit);
 		AddChild(unit);
+		initActions(unit);
+
+		EmitSignal(SignalName.UnitCreated, unit);
 	}
 
 	public void deleteUnit(Unit unit) {
 		if (units.Contains(unit)) {
 			MapController.instance.removeUnit(unit);
+			resourceController.addUnitCapacityUsed(-unit.capacityCost);
 			units.Remove(unit);
 			unit.QueueFree();
 		}
@@ -63,7 +105,7 @@ public partial class UnitController : Node
 
 	public void unitUpkeep() {
 		foreach (Unit u in units) {
-			u.currentAP = u.maxAP;
+			u.setCurrentAP(u.maxAP);
 		}
 		checkAvailability();
 	}
@@ -90,7 +132,28 @@ public partial class UnitController : Node
 				}
 		};
 		unit.addAction(moveAction);
-
+		
+		UnitAction attackAction = new UnitAction
+		{
+				id = "attack",
+				label = "Attack",
+				keyBinding = "E",
+				isAvailable = false,
+				onTrigger = () =>
+				{
+					InputController.instance.enterSelectTargetMode(new TargetRequest
+					{
+							validCells = MapController.instance.getAttackableCells(unit),
+							highlightColor = new Color(0.8f, .2f, 0.2f, 1f),
+							onConfirm = target =>
+							{
+								CombatController.instance.resolveCombat(unit, target);
+								checkAvailability();
+							}
+					});
+				}
+		};
+		unit.addAction(attackAction);
 		
 		if (unit.GetType() == typeof(SettlerUnit)) {
 			UnitAction settleAction = new UnitAction
@@ -117,6 +180,9 @@ public partial class UnitController : Node
 			bool canMove = unit.currentAP > 0 && hasReachableNeighbor(unit);
 			unit.updateAvailability("move", canMove);
 
+			bool canAttack = unit.currentAP >= unit.attackCost;
+			unit.updateAvailability("attack", canAttack);
+
 			if (unit.GetType() == typeof(SettlerUnit)) {
 				bool canSettle = MapController.instance.canPlaceCity(unit.gridPosition) && unit.currentAP > 0;
 				unit.updateAvailability("settle", canSettle);
@@ -128,5 +194,32 @@ public partial class UnitController : Node
 		// Check all 6 neighbors in hex grid offset coordinates
 		List<Vector2I> neighbors = MapController.instance.getNeighborPositions(unit.gridPosition);
 		return neighbors.Any(pos => MapController.instance.canMoveUnit(unit, pos));
+	}
+
+	public static UnitType stringToUnitType(string s) {
+		string lower = s.ToLower();
+		switch (lower) {
+			case "settler":
+				return UnitType.SETTLER;	
+			case "melee":
+				return UnitType.MELEE;
+			case "ranged":
+				return UnitType.RANGED;
+			default:
+				return UnitType.MELEE;
+		}
+	}
+
+	public static string unitTypeToString(UnitType uType) {
+		switch (uType) {
+			case UnitType.SETTLER:
+				return "settler";	
+			case UnitType.MELEE:
+				return "melee";
+			case UnitType.RANGED:
+				return "ranged";
+			default:
+				return "";
+		}
 	}
 }
