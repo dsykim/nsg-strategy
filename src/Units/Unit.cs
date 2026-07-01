@@ -31,6 +31,8 @@ public abstract partial class Unit : CellDecorator
 	public readonly int owner;
 
 	public string unitName;
+	
+	public abstract UnitType type { get; }
 
 	/** A list of this unit's actions. */
 	public List<UnitAction> actions { get; private set; } = new List<UnitAction>();

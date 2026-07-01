@@ -153,7 +153,7 @@ public partial class UnitController : Node
 		};
 		unit.addAction(attackAction);
 		
-		if (unit.GetType() == typeof(SettlerUnit)) {
+		if (unit.type == UnitType.SETTLER) {
 			UnitAction settleAction = new UnitAction
 			{
 					id = "settle",
@@ -194,7 +194,7 @@ public partial class UnitController : Node
 			bool canAttack = unit.currentAP >= unit.attackCost;
 			unit.updateAvailability("attack", canAttack);
 
-			if (unit.GetType() == typeof(SettlerUnit)) {
+			if (unit.type == UnitType.SETTLER) {
 				bool canSettle = MapController.instance.canPlaceCity(unit.gridPosition) && unit.currentAP > 0;
 				unit.updateAvailability("settle", canSettle);
 			}
