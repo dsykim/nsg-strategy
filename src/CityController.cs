@@ -12,10 +12,7 @@ public partial class CityController : Node
 
 	[Signal]
 	public delegate void CityCreatedEventHandler(City city);
-
-	[Signal]
-	public delegate void SpawnButtonClickedEventHandler(string uType, Vector2I spawnPos);
-
+	
 	public CityController(int id) {
 		this.id = id;
 		Name = "CityController";
@@ -74,7 +71,9 @@ public partial class CityController : Node
 					isAvailable = false,
 					onTrigger = () =>
 					{
-						EmitSignal(SignalName.SpawnButtonClicked, unitName, city.gridPosition);
+						CommandExecutor.instance.submit(new SpawnUnitCommand {
+								actorId = id, subjectId = city.id, uType = UnitController.stringToUnitType(unitName)
+						});
 						checkAvailability();
 					}
 			};
@@ -88,12 +87,12 @@ public partial class CityController : Node
 		var _data = JsonNode.Parse(json)!.AsObject();
 
 		foreach (City city in cities) {
-			
 			foreach (var kvp in _data) {
 				// Check spawn action for each unit
 				JsonObject data = kvp.Value!.AsObject();
 				string unitName = data["name"]!.GetValue<string>();
-				bool canCreate = GetParent<PlayerController>().canCreateUnit(data);
+				UnitType uType = UnitController.stringToUnitType(unitName);
+				bool canCreate = GetParent<PlayerController>().canCreateUnit(uType);
 				
 				string actionID = "spawn" + unitName;
 				city.updateAvailability(actionID, canCreate);
@@ -110,11 +109,6 @@ public partial class CityController : Node
 				map.setCellOwner(cellPos, this.id);
 			}
 		}
-	}
-	
-	public void handleSettleSignal(SettlerUnit unit) {
-		createCity(unit.gridPosition);
-		updateBorders();
 	}
 
 	public void cityUpkeep() {

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 public class TargetRequest
 {
@@ -25,9 +26,6 @@ public partial class UnitController : Node
 
 	private int id;
 
-	[Signal] 
-	public delegate void SettleEventHandler(SettlerUnit settler);
-
 	[Signal]
 	public delegate void UnitCreatedEventHandler(Unit unit);
 
@@ -46,11 +44,6 @@ public partial class UnitController : Node
 		foreach (Unit u in deadUnits) {
 			deleteUnit(u);
 		}
-	}
-	
-	public void handleSpawnUnitButtonSignal(string unitName, Vector2I pos) {
-		UnitType uType = stringToUnitType(unitName);
-		createUnit(uType, pos);
 	}
 
 	public void createUnit(UnitType uType, Vector2I pos) {
@@ -126,7 +119,9 @@ public partial class UnitController : Node
 							highlightColor = new Color(1f, 1f, 1f, 1f),
 							onConfirm = target =>
 							{
-								MapController.instance.moveUnit(unit, target);
+								CommandExecutor.instance.submit(new MoveCommand {
+										actorId = id, subjectId = unit.id, target = target
+								});
 								checkAvailability();
 							}
 					});
@@ -148,7 +143,9 @@ public partial class UnitController : Node
 							highlightColor = new Color(0.8f, .2f, 0.2f, 1f),
 							onConfirm = target =>
 							{
-								CombatController.instance.resolveCombat(unit, target);
+								CommandExecutor.instance.submit(new AttackCommand {
+										actorId = id, subjectId = unit.id, target = target
+								});
 								checkAvailability();
 							}
 					});
@@ -165,8 +162,9 @@ public partial class UnitController : Node
 					isAvailable = false,
 					onTrigger = () =>
 					{
-						deleteUnit(unit);
-						EmitSignal(SignalName.Settle, unit);
+						CommandExecutor.instance.submit(new SettleCommand {
+								actorId = id, subjectId = unit.id
+						});
 						checkAvailability();
 					}
 			};
@@ -174,6 +172,18 @@ public partial class UnitController : Node
 		}
 
 		checkAvailability();
+	}
+	
+	public static (int goldCost, int capacityCost) getUnitCosts(UnitType uType) {
+		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
+		var data = JsonNode.Parse(json)!.AsObject();
+		foreach (var kvp in data) {
+			JsonObject entry = kvp.Value!.AsObject();
+			if (stringToUnitType(entry["name"]!.GetValue<string>()) == uType) {
+				return (entry["goldCost"]!.GetValue<int>(), entry["capacityCost"]!.GetValue<int>());
+			}
+		}
+		throw new ArgumentException($"No unit data for {uType}");
 	}
 
 	private void checkAvailability() {

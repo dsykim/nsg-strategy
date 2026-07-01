@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
 
@@ -28,10 +28,8 @@ public partial class PlayerController : Node
 		unitController.init();
 		
 		// Connect signals
-		unitController.Settle += cityController.handleSettleSignal;
 		unitController.UnitCreated += resourceController.handleUnitCreatedSignal;
 		cityController.CityCreated += resourceController.handleCityCreatedSignal;
-		cityController.SpawnButtonClicked += unitController.handleSpawnUnitButtonSignal;
 		
 		// TEMP UNIT TEST
 		if (playerID == 0) {
@@ -50,11 +48,24 @@ public partial class PlayerController : Node
 		cityController.cityUpkeep();
 	}
 
-	public bool canCreateUnit(JsonObject data) {
-		int capacityCost = data["capacityCost"]!.GetValue<int>();
-		int goldCost = data["goldCost"]!.GetValue<int>();
-		bool hasCapacity = resourceController.hasCapacityForUnit(capacityCost);
-		bool hasGold = resourceController.canAfford(goldCost);
-		return hasGold && hasCapacity;
+	public bool canCreateUnit(UnitType uType) {
+		var (goldCost, capacityCost) = UnitController.getUnitCosts(uType);
+		return resourceController.canAfford(goldCost)
+			   && resourceController.hasCapacityForUnit(capacityCost);
+	}
+	
+	public void executeSpawn(int cityId, UnitType uType) {
+		City c = EntityRegistry.instance.getCity(cityId);
+		if (c == null) return;
+		unitController.createUnit(uType, c.gridPosition);
+	}
+
+	public void executeSettle(int unitId) {
+		Unit u = EntityRegistry.instance.getUnit(unitId);
+		if (u == null) return;
+		Vector2I pos = u.gridPosition;
+		unitController.deleteUnit(u);
+		cityController.createCity(pos);
+		cityController.updateBorders();
 	}
 }

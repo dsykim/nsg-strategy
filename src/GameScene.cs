@@ -26,6 +26,9 @@ public partial class GameScene : Node
 		EntityRegistry entityRegistry = new EntityRegistry();
 		AddChild(entityRegistry);
 
+		CommandExecutor commandExecutor = new CommandExecutor();
+		AddChild(commandExecutor);
+
 		combatController = new CombatController();
 		AddChild(combatController);
 		

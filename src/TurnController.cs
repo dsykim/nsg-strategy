@@ -5,6 +5,7 @@ using System.Threading;
 
 public partial class TurnController : Node
 {
+	public static TurnController instance { get; private set; }
 	private readonly int MAX_PLAYER_COUNT = 4;
 	private PlayerController userPlayer;
 	private List<PlayerController> aiPlayers = new List<PlayerController>();
@@ -19,6 +20,7 @@ public partial class TurnController : Node
 	public TurnController() {
 		currentPlayer = 0;
 		Name = "TurnController";
+		instance = this;
 	}
 
 	public void init(int playerCount) {
@@ -42,6 +44,11 @@ public partial class TurnController : Node
 		} else {
 			Debug.Print("Invalid player count");
 		}
+	}
+	
+	public PlayerController getPlayer(int id) {
+		if (userPlayer != null && userPlayer.playerID == id) return userPlayer;
+		return aiPlayers.Find(p => p.playerID == id);
 	}
 
 	public void beginUserTurn() {
