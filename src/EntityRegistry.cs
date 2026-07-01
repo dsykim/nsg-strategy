@@ -7,7 +7,7 @@ public partial class EntityRegistry : Node
 	public static EntityRegistry instance { get; private set; }
 
 	private readonly Dictionary<int, CellDecorator> entities = new();
-	private int nextId = 1;   // 0 reserved as "unassigned"
+	private int nextId = 1; // 0 reserved as "unassigned"
 
 	public EntityRegistry() {
 		instance = this;
@@ -26,7 +26,7 @@ public partial class EntityRegistry : Node
 	public void registerExisting(CellDecorator e, int id) {
 		e.assignId(id);
 		entities[id] = e;
-		if (id >= nextId) nextId = id + 1;   // self-heal: never reissue a loaded id
+		if (id >= nextId) nextId = id + 1; // self-heal: never reissue a loaded id
 	}
 
 	public void unregister(int id) => entities.Remove(id);
@@ -35,12 +35,15 @@ public partial class EntityRegistry : Node
 			entities.TryGetValue(id, out var e) ? e : null;
 
 	public Unit getUnit(int id) => getEntity(id) as Unit;
+
 	public City getCity(int id) => getEntity(id) as City;
-	
+
 	public IEnumerable<Unit> allUnits() => entities.Values.OfType<Unit>();
+
 	public IEnumerable<City> allCities() => entities.Values.OfType<City>();
 
 	// Save/load hooks for the counter.
 	public int getNextId() => nextId;
+
 	public void setNextId(int n) => nextId = n;
 }

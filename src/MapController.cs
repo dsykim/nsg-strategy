@@ -33,7 +33,7 @@ public partial class MapController : Node2D
 			TerrainTypes.PLAINS,
 			TerrainTypes.MOUNTAIN
 	};
-	
+
 	Texture2D oceanTile = ResourceLoader.Load<Texture2D>("res://assets/waterHex.png");
 	Texture2D plainTile = ResourceLoader.Load<Texture2D>("res://assets/plainHex.png");
 	Texture2D hillTile = ResourceLoader.Load<Texture2D>("res://assets/hillHex.png");
@@ -96,7 +96,7 @@ public partial class MapController : Node2D
 
 		return reachable;
 	}
-	
+
 	public List<Vector2I> getAttackableCells(Unit unit) {
 		List<Vector2I> attackable = new List<Vector2I>();
 		int attackerID = unit.owner;
@@ -180,7 +180,7 @@ public partial class MapController : Node2D
 				break;
 			}
 		}
-		
+
 		return isNotControlled && onPassableTerrain && !withinRangeOfCity;
 	}
 
@@ -281,6 +281,7 @@ public partial class MapController : Node2D
 	}
 
 	public int getCellOwner(Vector2I pos) => hexGrid.getCell(pos).controllerID;
+
 	public TerrainTypes getTerrain(Vector2I pos) => hexGrid.getCell(pos).terrainType;
 
 	public void setCellOwner(Vector2I pos, int id) {
@@ -328,13 +329,13 @@ public partial class MapController : Node2D
 		while (frontier.Count > 0) {
 			HexCell next = frontier.Dequeue();
 			bool isBorder = next.pos.X == 0 ||
-							next.pos.X == hexGrid.width - 1 ||
-							next.pos.Y == 0 ||
-							next.pos.Y == hexGrid.height - 1;
+			                next.pos.X == hexGrid.width - 1 ||
+			                next.pos.Y == 0 ||
+			                next.pos.Y == hexGrid.height - 1;
 			bool isBorderAdj = next.pos.X == 1 ||
-							   next.pos.X == hexGrid.width - 2 ||
-							   next.pos.Y == 1 ||
-							   next.pos.Y == hexGrid.height - 2;
+			                   next.pos.X == hexGrid.width - 2 ||
+			                   next.pos.Y == 1 ||
+			                   next.pos.Y == hexGrid.height - 2;
 			int distToSeed = HexGrid.hexDistance(next.pos, seed.pos);
 			float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToSeed / hexGrid.width, 2), 0.25f);
 
@@ -351,7 +352,7 @@ public partial class MapController : Node2D
 				} else {
 					lType = TerrainTypes.MOUNTAIN;
 				}
-				
+
 				HexCell generated = createCell(next.pos, lType);
 				hexGrid.setCell(generated);
 				foreach (HexCell c in hexGrid.getNeighbors(generated)) {

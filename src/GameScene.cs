@@ -31,7 +31,7 @@ public partial class GameScene : Node
 
 		combatController = new CombatController();
 		AddChild(combatController);
-		
+
 		turnController = new TurnController();
 		AddChild(turnController);
 		turnController.init(4);

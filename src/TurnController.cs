@@ -24,13 +24,13 @@ public partial class TurnController : Node
 		instance = this;
 	}
 
-	public void init(int playerCount) {
-		setPlayerCount(playerCount);
+	public void init(int numPlayers) {
+		initPlayers(numPlayers);
 		Button nextTurnButton = GetNode<Button>("../UIController/UICanvas/NextTurnButton");
 		nextTurnButton.Pressed += nextTurn;
 	}
 
-	public void setPlayerCount(int n) {
+	public void initPlayers(int n) {
 		if (n > 1 && n <= MAX_PLAYER_COUNT) {
 			playerCount = n;
 			userPlayer = new PlayerController(0);
@@ -46,12 +46,12 @@ public partial class TurnController : Node
 			Debug.Print("Invalid player count");
 		}
 	}
-	
+
 	public PlayerController getPlayer(int id) {
 		if (userPlayer != null && userPlayer.playerID == id) return userPlayer;
 		return aiPlayers.Find(p => p.playerID == id);
 	}
-	
+
 	public IEnumerable<PlayerController> allPlayers() {
 		if (userPlayer != null) yield return userPlayer;
 		foreach (PlayerController p in aiPlayers) yield return p;

@@ -72,11 +72,11 @@ public partial class UnitController : Node
 			Debug.Print("No capacity");
 			return;
 		}
-		
+
 		unit.gridPosition = pos;
 		unit.SetPosition(mapController.getCellCenter(pos));
 		resourceController.addUnitCapacityUsed(unit.capacityCost);
-		
+
 		units.Add(unit);
 		mapController.addUnit(unit);
 		AddChild(unit);
@@ -119,7 +119,8 @@ public partial class UnitController : Node
 							highlightColor = new Color(1f, 1f, 1f, 1f),
 							onConfirm = target =>
 							{
-								CommandExecutor.instance.submit(new MoveCommand {
+								CommandExecutor.instance.submit(new MoveCommand
+								{
 										actorId = id, subjectId = unit.id, target = target
 								});
 								checkAvailability();
@@ -128,7 +129,7 @@ public partial class UnitController : Node
 				}
 		};
 		unit.addAction(moveAction);
-		
+
 		UnitAction attackAction = new UnitAction
 		{
 				id = "attack",
@@ -143,7 +144,8 @@ public partial class UnitController : Node
 							highlightColor = new Color(0.8f, .2f, 0.2f, 1f),
 							onConfirm = target =>
 							{
-								CommandExecutor.instance.submit(new AttackCommand {
+								CommandExecutor.instance.submit(new AttackCommand
+								{
 										actorId = id, subjectId = unit.id, target = target
 								});
 								checkAvailability();
@@ -152,7 +154,7 @@ public partial class UnitController : Node
 				}
 		};
 		unit.addAction(attackAction);
-		
+
 		if (unit.type == UnitType.SETTLER) {
 			UnitAction settleAction = new UnitAction
 			{
@@ -162,7 +164,8 @@ public partial class UnitController : Node
 					isAvailable = false,
 					onTrigger = () =>
 					{
-						CommandExecutor.instance.submit(new SettleCommand {
+						CommandExecutor.instance.submit(new SettleCommand
+						{
 								actorId = id, subjectId = unit.id
 						});
 						checkAvailability();
@@ -173,7 +176,7 @@ public partial class UnitController : Node
 
 		checkAvailability();
 	}
-	
+
 	public static (int goldCost, int capacityCost) getUnitCosts(UnitType uType) {
 		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
 		var data = JsonNode.Parse(json)!.AsObject();
@@ -211,7 +214,7 @@ public partial class UnitController : Node
 		string lower = s.ToLower();
 		switch (lower) {
 			case "settler":
-				return UnitType.SETTLER;	
+				return UnitType.SETTLER;
 			case "melee":
 				return UnitType.MELEE;
 			case "ranged":
@@ -224,7 +227,7 @@ public partial class UnitController : Node
 	public static string unitTypeToString(UnitType uType) {
 		switch (uType) {
 			case UnitType.SETTLER:
-				return "settler";	
+				return "settler";
 			case UnitType.MELEE:
 				return "melee";
 			case UnitType.RANGED:

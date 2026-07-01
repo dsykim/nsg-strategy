@@ -18,7 +18,7 @@ public partial class HexCell : Sprite2D
 		this.pos = pos;
 		terrainType = TerrainTypes.EMPTY;
 		Name = $"Cell_{pos.X}_{pos.Y}";
-	}	
+	}
 
 	public HexCell(Vector2I pos, TerrainTypes tType) : this(pos) {
 		terrainType = tType;

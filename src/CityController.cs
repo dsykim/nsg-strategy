@@ -12,7 +12,7 @@ public partial class CityController : Node
 
 	[Signal]
 	public delegate void CityCreatedEventHandler(City city);
-	
+
 	public CityController(int id) {
 		this.id = id;
 		Name = "CityController";
@@ -24,15 +24,15 @@ public partial class CityController : Node
 	public void init() {
 		resourceController = GetNode<ResourceController>("../ResourceController");
 	}
-	
+
 	public void upgradeCity(City city) {
-		
+
 	}
 
 	public void createCity(Vector2I pos) {
 		MapController mapController = MapController.instance;
 		if (!mapController.canPlaceCity(pos)) {
-			Debug.Print("Cannot place city at "+pos);
+			Debug.Print("Cannot place city at " + pos);
 			return;
 		}
 		City city = new City(id, pos);
@@ -43,7 +43,7 @@ public partial class CityController : Node
 		AddChild(city);
 		initActions(city);
 		resourceController.addUnitCapacityTotal(10);
-		
+
 		// Assign control of tiles
 		updateCityCellControl(city, 1);
 
@@ -57,9 +57,8 @@ public partial class CityController : Node
 		// availability of a unit spawn action is based on resource availability 
 		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
 		var _data = JsonNode.Parse(json)!.AsObject();
-		
-		foreach (var kvp in _data)
-		{
+
+		foreach (var kvp in _data) {
 			// Create a spawn action for each unit
 			// TODO: constrain to only add allowed units; add method to add more spawn actions later in game
 			JsonObject data = kvp.Value!.AsObject();
@@ -71,7 +70,8 @@ public partial class CityController : Node
 					isAvailable = false,
 					onTrigger = () =>
 					{
-						CommandExecutor.instance.submit(new SpawnUnitCommand {
+						CommandExecutor.instance.submit(new SpawnUnitCommand
+						{
 								actorId = id, subjectId = city.id, uType = UnitController.stringToUnitType(unitName)
 						});
 						checkAvailability();
@@ -79,9 +79,9 @@ public partial class CityController : Node
 			};
 			city.addAction(spawnUnitAction);
 		}
-		
+
 	}
-	
+
 	private void checkAvailability() {
 		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
 		var _data = JsonNode.Parse(json)!.AsObject();
@@ -93,7 +93,7 @@ public partial class CityController : Node
 				string unitName = data["name"]!.GetValue<string>();
 				UnitType uType = UnitController.stringToUnitType(unitName);
 				bool canCreate = GetParent<PlayerController>().canCreateUnit(uType);
-				
+
 				string actionID = "spawn" + unitName;
 				city.updateAvailability(actionID, canCreate);
 			}

@@ -26,7 +26,7 @@ public partial class City : PlayerDecorator
 
 	[Signal]
 	public delegate void actionsChangedEventHandler();
-	
+
 	public City(int owner, Vector2I pos) : base(owner) {
 		Texture = ResourceLoader.Load<Texture2D>("res://assets/city.png");
 		float scale = (float)(MapController.instance.hexSize * Math.Sqrt(3)) / Texture.GetHeight();
@@ -35,18 +35,15 @@ public partial class City : PlayerDecorator
 		ZIndex = 8;
 		currentHP = maxHP;
 	}
-	
-	public void addAction(CityAction action)
-	{
+
+	public void addAction(CityAction action) {
 		actions.Add(action);
 	}
-	
+
 	/** Updates the availability of this city's actions. */
-	public void updateAvailability(string id, bool available)
-	{
+	public void updateAvailability(string id, bool available) {
 		CityAction action = actions.Find(a => a.id == id);
-		if (action != null)
-		{
+		if (action != null) {
 			action.isAvailable = available;
 			EmitSignal(SignalName.actionsChanged);
 		}

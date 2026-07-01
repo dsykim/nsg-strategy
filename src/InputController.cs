@@ -26,13 +26,18 @@ public partial class InputController : Node
 	private TargetRequest pendingRequest = null;
 	private HashSet<Vector2I> validTargets = null;
 
-	[Signal] public delegate void unitSelectedEventHandler(Unit unit);
-	[Signal] public delegate void unitDeselectedEventHandler();
-	[Signal] public delegate void citySelectedEventHandler(City city);
+	[Signal]
+	public delegate void unitSelectedEventHandler(Unit unit);
+
+	[Signal]
+	public delegate void unitDeselectedEventHandler();
+
+	[Signal]
+	public delegate void citySelectedEventHandler(City city);
 
 	[Signal]
 	public delegate void cityDeselectedEventHandler();
-	
+
 
 	public void init() {
 		instance = this;
@@ -45,8 +50,8 @@ public partial class InputController : Node
 
 	public override void _UnhandledInput(InputEvent @event) {
 		if (@event is InputEventMouseButton mouseEvent &&
-			mouseEvent.ButtonIndex == MouseButton.Left &&
-			mouseEvent.Pressed) {
+		    mouseEvent.ButtonIndex == MouseButton.Left &&
+		    mouseEvent.Pressed) {
 			handleClick();
 			return;
 		}
@@ -93,7 +98,7 @@ public partial class InputController : Node
 			request.onConfirm?.Invoke(hoveredCell.pos);
 			return;
 		}
-		
+
 		if (hoveredCell.hasUnit() && selectedDecorator != hoveredCell.units[0]) {
 			// Select unit first unless unit is already selected
 			EmitSignal(SignalName.cityDeselected);
@@ -109,7 +114,7 @@ public partial class InputController : Node
 			selectedType = typeof(City);
 			enterCityActionSelectMode();
 			EmitSignal(SignalName.citySelected, city);
-			
+
 		} else {
 			// Empty select, deselect
 			if (selectedType == typeof(Unit)) {

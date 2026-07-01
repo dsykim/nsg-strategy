@@ -21,7 +21,7 @@ public partial class UIController : Control
 		ResourceBar resourceBar = GetNode<ResourceBar>("UICanvas/ResourceBar");
 		var resourceController = GetNode<ResourceController>("../TurnController/Player0/ResourceController");
 		resourceController.ResourceUpdated += resourceBar.handleResourceUpdateSignal;
-		
+
 		var unitPanel = GetNode<UnitPanel>("UICanvas/UnitPanel");
 		unitPanel.init();
 

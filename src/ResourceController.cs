@@ -33,7 +33,7 @@ public partial class ResourceController : Node
 		unitCapacityUsed += delta;
 		emitResourceUpdated();
 	}
-	
+
 	public void addUnitCapacityTotal(int delta) {
 		unitCapacityTotal += delta;
 		emitResourceUpdated();
@@ -42,6 +42,7 @@ public partial class ResourceController : Node
 	public bool canAfford(int cost) {
 		return cost <= gold;
 	}
+
 	public void resourceUpkeep() {
 		gold = Math.Max(0, gold + goldRate);
 		emitResourceUpdated();
@@ -56,7 +57,7 @@ public partial class ResourceController : Node
 		goldRate += city.goldProduction;
 		emitResourceUpdated();
 	}
-	
+
 	public bool hasCapacityForUnit(Unit unit) {
 		// TODO: move constants to JSON so we can access unit values without needing to create the object.
 		return unit.capacityCost <= unitCapacityTotal - unitCapacityUsed;

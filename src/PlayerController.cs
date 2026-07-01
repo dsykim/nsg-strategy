@@ -23,14 +23,14 @@ public partial class PlayerController : Node
 		AddChild(unitController);
 		cityController = new CityController(playerID);
 		AddChild(cityController);
-		
+
 		cityController.init();
 		unitController.init();
-		
+
 		// Connect signals
 		unitController.UnitCreated += resourceController.handleUnitCreatedSignal;
 		cityController.CityCreated += resourceController.handleCityCreatedSignal;
-		
+
 		// TEMP UNIT TEST
 		if (playerID == 0) {
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(10, 5));
@@ -50,10 +50,9 @@ public partial class PlayerController : Node
 
 	public bool canCreateUnit(UnitType uType) {
 		var (goldCost, capacityCost) = UnitController.getUnitCosts(uType);
-		return resourceController.canAfford(goldCost)
-			   && resourceController.hasCapacityForUnit(capacityCost);
+		return resourceController.canAfford(goldCost) && resourceController.hasCapacityForUnit(capacityCost);
 	}
-	
+
 	public void executeSpawn(int cityId, UnitType uType) {
 		City c = EntityRegistry.instance.getCity(cityId);
 		if (c == null) return;
@@ -68,12 +67,13 @@ public partial class PlayerController : Node
 		cityController.createCity(pos);
 		cityController.updateBorders();
 	}
-	
-	public PlayerSnapshot capturePlayer() => new PlayerSnapshot {
-			playerID          = playerID,
-			gold              = resourceController.gold,
-			goldRate          = resourceController.goldRate,
+
+	public PlayerSnapshot capturePlayer() => new PlayerSnapshot
+	{
+			playerID = playerID,
+			gold = resourceController.gold,
+			goldRate = resourceController.goldRate,
 			unitCapacityTotal = resourceController.unitCapacityTotal,
-			unitCapacityUsed  = resourceController.unitCapacityUsed,
+			unitCapacityUsed = resourceController.unitCapacityUsed,
 	};
 }

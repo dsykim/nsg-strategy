@@ -2,10 +2,11 @@
 
 public abstract class Command
 {
-	public int actorId;      // player issuing the command
-	public int subjectId;    // acted-on entity; 0 = none (future player-level actions)
+	public int actorId; // player issuing the command
+	public int subjectId; // acted-on entity; 0 = none (future player-level actions)
 
-	public abstract bool validate();   // re-check against LIVE state, right before applying
+	public abstract bool validate(); // re-check against LIVE state, right before applying
+
 	public abstract void execute();
 }
 
@@ -15,9 +16,7 @@ public class MoveCommand : Command
 
 	public override bool validate() {
 		Unit u = EntityRegistry.instance.getUnit(subjectId);
-		return u != null
-			&& u.owner == actorId
-			&& MapController.instance.canMoveUnit(u, target);
+		return u != null && u.owner == actorId && MapController.instance.canMoveUnit(u, target);
 	}
 
 	public override void execute() {
@@ -45,7 +44,7 @@ public class AttackCommand : Command
 
 public class SpawnUnitCommand : Command
 {
-	public UnitType uType;   // subjectId = spawning city
+	public UnitType uType; // subjectId = spawning city
 
 	public override bool validate() {
 		City c = EntityRegistry.instance.getCity(subjectId);
@@ -64,10 +63,10 @@ public class SettleCommand : Command
 	// subjectId = the settler
 	public override bool validate() {
 		Unit u = EntityRegistry.instance.getUnit(subjectId);
-		return u is SettlerUnit
-			&& u.owner == actorId
-			&& u.currentAP > 0
-			&& MapController.instance.canPlaceCity(u.gridPosition);
+		return u is SettlerUnit &&
+		       u.owner == actorId &&
+		       u.currentAP > 0 &&
+		       MapController.instance.canPlaceCity(u.gridPosition);
 	}
 
 	public override void execute() {

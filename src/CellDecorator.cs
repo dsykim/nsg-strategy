@@ -11,5 +11,5 @@ public abstract partial class CellDecorator : Sprite2D
 			return;
 		}
 		id = newId;
-}
+	}
 }
