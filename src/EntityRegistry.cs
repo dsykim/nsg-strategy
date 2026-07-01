@@ -1,5 +1,6 @@
 ﻿using Godot;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class EntityRegistry : Node
 {
@@ -35,6 +36,9 @@ public partial class EntityRegistry : Node
 
 	public Unit getUnit(int id) => getEntity(id) as Unit;
 	public City getCity(int id) => getEntity(id) as City;
+	
+	public IEnumerable<Unit> allUnits() => entities.Values.OfType<Unit>();
+	public IEnumerable<City> allCities() => entities.Values.OfType<City>();
 
 	// Save/load hooks for the counter.
 	public int getNextId() => nextId;

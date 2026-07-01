@@ -15,7 +15,6 @@ public partial class City : PlayerDecorator
 {
 	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>();
 	public List<CityAction> actions { get; private set; } = new List<CityAction>();
-	private int level = 1;
 	public int goldProduction = 5;
 	public string cityName = "City";
 

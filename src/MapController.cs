@@ -280,9 +280,8 @@ public partial class MapController : Node2D
 		};
 	}
 
-	public int getCellOwner(Vector2I pos) {
-		return hexGrid.getCell(pos).controllerID;
-	}
+	public int getCellOwner(Vector2I pos) => hexGrid.getCell(pos).controllerID;
+	public TerrainTypes getTerrain(Vector2I pos) => hexGrid.getCell(pos).terrainType;
 
 	public void setCellOwner(Vector2I pos, int id) {
 		hexGrid.getCell(pos).controllerID = id;

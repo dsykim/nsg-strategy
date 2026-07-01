@@ -9,6 +9,7 @@ public partial class TurnController : Node
 	private readonly int MAX_PLAYER_COUNT = 4;
 	private PlayerController userPlayer;
 	private List<PlayerController> aiPlayers = new List<PlayerController>();
+	private WorldSnapshot aiSnapshot;
 
 	private Thread aiThread;
 	private Dictionary<string, string> aiResult = new Dictionary<string, string>();
@@ -50,6 +51,11 @@ public partial class TurnController : Node
 		if (userPlayer != null && userPlayer.playerID == id) return userPlayer;
 		return aiPlayers.Find(p => p.playerID == id);
 	}
+	
+	public IEnumerable<PlayerController> allPlayers() {
+		if (userPlayer != null) yield return userPlayer;
+		foreach (PlayerController p in aiPlayers) yield return p;
+	}
 
 	public void beginUserTurn() {
 		userPlayer.turnUpkeep();
@@ -65,14 +71,15 @@ public partial class TurnController : Node
 	}
 
 	private void startAITurn() {
+		aiSnapshot = WorldSnapshot.capture();
 		aiThread = new Thread(RunAI);
 		aiThread.Start();
 	}
 
 	private void RunAI() {
-		// TODO: Do AI decision making for currentPlayer
+		WorldSnapshot snap = aiSnapshot;
 		Debug.Print($"Running AI decision making for player {currentPlayer}");
-
+		// TODO: planner(snap, currentPlayer) -> List<Command>
 		CallDeferred(MethodName.OnAIFinish);
 	}
 

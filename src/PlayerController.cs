@@ -68,4 +68,12 @@ public partial class PlayerController : Node
 		cityController.createCity(pos);
 		cityController.updateBorders();
 	}
+	
+	public PlayerSnapshot capturePlayer() => new PlayerSnapshot {
+			playerID          = playerID,
+			gold              = resourceController.gold,
+			goldRate          = resourceController.goldRate,
+			unitCapacityTotal = resourceController.unitCapacityTotal,
+			unitCapacityUsed  = resourceController.unitCapacityUsed,
+	};
 }
