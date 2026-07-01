@@ -23,6 +23,9 @@ public partial class GameScene : Node
 		input.init();
 		AddChild(input);
 
+		EntityRegistry entityRegistry = new EntityRegistry();
+		AddChild(entityRegistry);
+
 		combatController = new CombatController();
 		AddChild(combatController);
 		

@@ -7,27 +7,25 @@ public partial class PlayerController : Node
 	private UnitController unitController;
 	private ResourceController resourceController;
 	private CityController cityController;
-	public readonly int id;
+	public readonly int playerID;
 	private bool alive;
 
-	public PlayerController(int id) {
-		this.id = id;
+	public PlayerController(int playerID) {
+		this.playerID = playerID;
 		alive = true;
-		Name = "Player" + id;
+		Name = "Player" + playerID;
 	}
 
 	public void init() {
-		resourceController = new ResourceController(id);
+		resourceController = new ResourceController(playerID);
 		AddChild(resourceController);
-		unitController = new UnitController(id);
+		unitController = new UnitController(playerID);
 		AddChild(unitController);
-		cityController = new CityController(id);
+		cityController = new CityController(playerID);
 		AddChild(cityController);
 		
 		cityController.init();
 		unitController.init();
-		
-
 		
 		// Connect signals
 		unitController.Settle += cityController.handleSettleSignal;
@@ -36,11 +34,11 @@ public partial class PlayerController : Node
 		cityController.SpawnButtonClicked += unitController.handleSpawnUnitButtonSignal;
 		
 		// TEMP UNIT TEST
-		if (id == 0) {
+		if (playerID == 0) {
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(10, 5));
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(11, 6));
 		}
-		if (id == 1) {
+		if (playerID == 1) {
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(9, 5));
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(12, 6));
 		}

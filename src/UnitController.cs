@@ -48,8 +48,6 @@ public partial class UnitController : Node
 		}
 	}
 	
-	
-
 	public void handleSpawnUnitButtonSignal(string unitName, Vector2I pos) {
 		UnitType uType = stringToUnitType(unitName);
 		createUnit(uType, pos);
@@ -90,14 +88,17 @@ public partial class UnitController : Node
 		mapController.addUnit(unit);
 		AddChild(unit);
 		initActions(unit);
+		EntityRegistry.instance.register(unit);
 
 		EmitSignal(SignalName.UnitCreated, unit);
 	}
 
 	public void deleteUnit(Unit unit) {
 		if (units.Contains(unit)) {
-			MapController.instance.removeUnit(unit);
 			resourceController.addUnitCapacityUsed(-unit.capacityCost);
+
+			MapController.instance.removeUnit(unit);
+			EntityRegistry.instance.unregister(unit.id);
 			units.Remove(unit);
 			unit.QueueFree();
 		}

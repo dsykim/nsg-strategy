@@ -42,6 +42,7 @@ public partial class CityController : Node
 		city.SetPosition(mapController.getCellCenter(pos));
 		mapController.addCity(city);
 		cities.Add(city);
+		EntityRegistry.instance.register(city);
 		AddChild(city);
 		initActions(city);
 		resourceController.addUnitCapacityTotal(10);
