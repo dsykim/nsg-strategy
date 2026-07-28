@@ -14,12 +14,12 @@ public partial class ResourceController : Node
 	public int unitCapacityTotal { get; private set; }
 	public int unitCapacityUsed { get; private set; }
 
-	private int id;
+	private int owner;
 
-	public ResourceController(int id) {
+	public ResourceController(int owner) {
 		gold = 20;
 		goldRate = 0;
-		this.id = id;
+		this.owner = owner;
 		Name = "ResourceController";
 		emitResourceUpdated();
 	}

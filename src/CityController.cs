@@ -8,13 +8,13 @@ public partial class CityController : Node
 	private List<City> cities = new List<City>();
 	private EdgeOverlay borders;
 	private ResourceController resourceController;
-	private int id;
+	private int owner;
 
 	[Signal]
 	public delegate void CityCreatedEventHandler(City city);
 
-	public CityController(int id) {
-		this.id = id;
+	public CityController(int owner) {
+		this.owner = owner;
 		Name = "CityController";
 		borders = new EdgeOverlay();
 		borders.LineColor = new Color(0.9f, 0.3f, 0.3f, 1f);
@@ -35,7 +35,7 @@ public partial class CityController : Node
 			Debug.Print("Cannot place city at " + pos);
 			return;
 		}
-		City city = new City(id, pos);
+		City city = new City(owner, pos);
 		city.SetPosition(mapController.getCellCenter(pos));
 		mapController.addCity(city);
 		cities.Add(city);
@@ -65,14 +65,14 @@ public partial class CityController : Node
 			string unitName = data["name"]!.GetValue<string>();
 			CityAction spawnUnitAction = new CityAction
 			{
-					id = "spawn" + unitName,
+					actionID = "spawn" + unitName,
 					label = "Spawn " + unitName,
 					isAvailable = false,
 					onTrigger = () =>
 					{
 						CommandExecutor.instance.submit(new SpawnUnitCommand
 						{
-								actorId = id, subjectId = city.id, uType = UnitController.stringToUnitType(unitName)
+								actorID = owner, subjectID = city.id, uType = UnitController.stringToUnitType(unitName)
 						});
 						checkAvailability();
 					}
@@ -106,7 +106,7 @@ public partial class CityController : Node
 		foreach (var cellPos in inRangeCells) {
 			if (map.getCellOwner(cellPos) < 0) {
 				c.ownedCells.Add(cellPos);
-				map.setCellOwner(cellPos, this.id);
+				map.setCellOwner(cellPos, this.owner);
 			}
 		}
 	}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class CityAction
 {
-	public string id;
+	public string actionID;
 	public string label;
 	// public string keyBinding;
 	public bool isAvailable;
@@ -17,7 +17,6 @@ public partial class City : PlayerDecorator
 	public List<CityAction> actions { get; private set; } = new List<CityAction>();
 	public int goldProduction = 5;
 	public string cityName = "City";
-
 	public int maxHP = 100;
 	public int currentHP;
 
@@ -33,6 +32,7 @@ public partial class City : PlayerDecorator
 		SetScale(new Vector2(scale, scale));
 		gridPosition = pos;
 		ZIndex = 8;
+		
 		currentHP = maxHP;
 	}
 
@@ -41,8 +41,8 @@ public partial class City : PlayerDecorator
 	}
 
 	/** Updates the availability of this city's actions. */
-	public void updateAvailability(string id, bool available) {
-		CityAction action = actions.Find(a => a.id == id);
+	public void updateAvailability(string actionID, bool available) {
+		CityAction action = actions.Find(a => a.actionID == actionID);
 		if (action != null) {
 			action.isAvailable = available;
 			EmitSignal(SignalName.actionsChanged);

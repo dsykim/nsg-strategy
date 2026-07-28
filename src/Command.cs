@@ -2,8 +2,8 @@
 
 public abstract class Command
 {
-	public int actorId; // player issuing the command
-	public int subjectId; // acted-on entity; 0 = none (future player-level actions)
+	public int actorID; // player issuing the com
+	public int subjectID; // acted-on entity; 0 = none (future player-level actions)
 
 	public abstract bool validate(); // re-check against LIVE state, right before applying
 
@@ -15,12 +15,12 @@ public class MoveCommand : Command
 	public Vector2I target;
 
 	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectId);
-		return u != null && u.owner == actorId && MapController.instance.canMoveUnit(u, target);
+		Unit u = EntityRegistry.instance.getUnit(subjectID);
+		return u != null && u.owner == actorID && MapController.instance.canMoveUnit(u, target);
 	}
 
 	public override void execute() {
-		Unit u = EntityRegistry.instance.getUnit(subjectId);
+		Unit u = EntityRegistry.instance.getUnit(subjectID);
 		MapController.instance.moveUnit(u, target);
 	}
 }
@@ -30,46 +30,46 @@ public class AttackCommand : Command
 	public Vector2I target;
 
 	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectId);
-		if (u == null || u.owner != actorId) return false;
+		Unit u = EntityRegistry.instance.getUnit(subjectID);
+		if (u == null || u.owner != actorID) return false;
 		if (u.currentAP < u.attackCost) return false;
 		return MapController.instance.getAttackableCells(u).Contains(target);
 	}
 
 	public override void execute() {
-		Unit u = EntityRegistry.instance.getUnit(subjectId);
+		Unit u = EntityRegistry.instance.getUnit(subjectID);
 		CombatController.instance.resolveCombat(u, target);
 	}
 }
 
 public class SpawnUnitCommand : Command
 {
-	public UnitType uType; // subjectId = spawning city
+	public UnitType uType; // subjectID = spawning city
 
 	public override bool validate() {
-		City c = EntityRegistry.instance.getCity(subjectId);
-		if (c == null || c.owner != actorId) return false;
-		PlayerController p = TurnController.instance.getPlayer(actorId);
+		City c = EntityRegistry.instance.getCity(subjectID);
+		if (c == null || c.owner != actorID) return false;
+		PlayerController p = TurnController.instance.getPlayer(actorID);
 		return p != null && p.canCreateUnit(uType);
 	}
 
 	public override void execute() {
-		TurnController.instance.getPlayer(actorId).executeSpawn(subjectId, uType);
+		TurnController.instance.getPlayer(actorID).executeSpawn(subjectID, uType);
 	}
 }
 
 public class SettleCommand : Command
 {
-	// subjectId = the settler
+	// subjectID = the settler
 	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectId);
+		Unit u = EntityRegistry.instance.getUnit(subjectID);
 		return u is SettlerUnit &&
-		       u.owner == actorId &&
+		       u.owner == actorID &&
 		       u.currentAP > 0 &&
 		       MapController.instance.canPlaceCity(u.gridPosition);
 	}
 
 	public override void execute() {
-		TurnController.instance.getPlayer(actorId).executeSettle(subjectId);
+		TurnController.instance.getPlayer(actorID).executeSettle(subjectID);
 	}
 }

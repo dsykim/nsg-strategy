@@ -23,14 +23,13 @@ public partial class UnitController : Node
 {
 	private List<Unit> units = new List<Unit>();
 	private ResourceController resourceController;
-
-	private int id;
+	private int owner;
 
 	[Signal]
 	public delegate void UnitCreatedEventHandler(Unit unit);
 
-	public UnitController(int id) {
-		this.id = id;
+	public UnitController(int owner) {
+		this.owner = owner;
 		Name = "UnitController";
 	}
 
@@ -55,16 +54,16 @@ public partial class UnitController : Node
 		Unit unit;
 		switch (uType) {
 			case UnitType.SETTLER:
-				unit = new SettlerUnit(id);
+				unit = new SettlerUnit(owner);
 				break;
 			case UnitType.MELEE:
-				unit = new MeleeUnit(id);
+				unit = new MeleeUnit(owner);
 				break;
 			case UnitType.RANGED:
-				unit = new RangedUnit(id);
+				unit = new RangedUnit(owner);
 				break;
 			default:
-				unit = new SettlerUnit(id);
+				unit = new SettlerUnit(owner);
 				break;
 		}
 
@@ -107,7 +106,7 @@ public partial class UnitController : Node
 	private void initActions(Unit unit) {
 		UnitAction moveAction = new UnitAction
 		{
-				id = "move",
+				actionID = "move",
 				label = "Move",
 				keyBinding = "M",
 				isAvailable = false,
@@ -121,7 +120,7 @@ public partial class UnitController : Node
 							{
 								CommandExecutor.instance.submit(new MoveCommand
 								{
-										actorId = id, subjectId = unit.id, target = target
+										actorID = owner, subjectID = unit.id, target = target
 								});
 								checkAvailability();
 							}
@@ -132,7 +131,7 @@ public partial class UnitController : Node
 
 		UnitAction attackAction = new UnitAction
 		{
-				id = "attack",
+				actionID = "attack",
 				label = "Attack",
 				keyBinding = "E",
 				isAvailable = false,
@@ -146,7 +145,7 @@ public partial class UnitController : Node
 							{
 								CommandExecutor.instance.submit(new AttackCommand
 								{
-										actorId = id, subjectId = unit.id, target = target
+										actorID = owner, subjectID = unit.id, target = target
 								});
 								checkAvailability();
 							}
@@ -158,7 +157,7 @@ public partial class UnitController : Node
 		if (unit.type == UnitType.SETTLER) {
 			UnitAction settleAction = new UnitAction
 			{
-					id = "settle",
+					actionID = "settle",
 					label = "Settle",
 					keyBinding = "F",
 					isAvailable = false,
@@ -166,7 +165,7 @@ public partial class UnitController : Node
 					{
 						CommandExecutor.instance.submit(new SettleCommand
 						{
-								actorId = id, subjectId = unit.id
+								actorID = owner, subjectID = unit.id
 						});
 						checkAvailability();
 					}

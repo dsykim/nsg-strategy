@@ -80,4 +80,9 @@ public partial class HexCell : Sprite2D
 		area.AddChild(shape);
 		AddChild(area);
 	}
+
+	public override void _Draw() {
+		base._Draw();
+		
+	}
 }

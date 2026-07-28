@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using 
 
 public enum TerrainTypes
 {
@@ -313,69 +314,83 @@ public partial class MapController : Node2D
 
 	public void clearTargetRegion() => targetOverlay.Clear();
 
+	// MAP GENERATION
+
 	public void generateMap() {
-		Debug.Print("Generating Map...");
+		// PASS 1: Generate land/water
+		var noise = new FastNoiseLite();
+		noise.NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex;
+		noise.FractalOctaves = 2;
+		noise.FractalType = FastNoiseLite.FractalTypeEnum.Fbm;
+		noise.Seed = 0;
+		// noise.GetNoise2D();
 
-		Queue<HexCell> frontier = new Queue<HexCell>();
-
-		HexCell seed = createCell(new Vector2I(hexGrid.width / 2, hexGrid.height / 2),
-				TerrainTypes.PLAINS);
-		hexGrid.setCell(seed);
-		foreach (HexCell c in hexGrid.getNeighbors(seed)) {
-			frontier.Enqueue(c);
-		}
-
-		Random rand = new Random();
-		while (frontier.Count > 0) {
-			HexCell next = frontier.Dequeue();
-			bool isBorder = next.pos.X == 0 ||
-			                next.pos.X == hexGrid.width - 1 ||
-			                next.pos.Y == 0 ||
-			                next.pos.Y == hexGrid.height - 1;
-			bool isBorderAdj = next.pos.X == 1 ||
-			                   next.pos.X == hexGrid.width - 2 ||
-			                   next.pos.Y == 1 ||
-			                   next.pos.Y == hexGrid.height - 2;
-			int distToSeed = HexGrid.hexDistance(next.pos, seed.pos);
-			float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToSeed / hexGrid.width, 2), 0.25f);
-
-			if (isBorderAdj) threshold = 0.2f;
-
-			if (!isBorder && rand.NextSingle() < threshold) {
-				// Make land
-				float randVal = rand.NextSingle();
-				TerrainTypes lType;
-				if (randVal < 0.6) {
-					lType = TerrainTypes.PLAINS;
-				} else if (randVal < 0.9) {
-					lType = TerrainTypes.HILLS;
-				} else {
-					lType = TerrainTypes.MOUNTAIN;
-				}
-
-				HexCell generated = createCell(next.pos, lType);
-				hexGrid.setCell(generated);
-				foreach (HexCell c in hexGrid.getNeighbors(generated)) {
-					if (!frontier.Contains(c) && c.terrainType == TerrainTypes.EMPTY) {
-						frontier.Enqueue(c);
-					}
-				}
-			} else {
-				// Make ocean
-				HexCell generated = createCell(next.pos, TerrainTypes.OCEAN);
-				hexGrid.setCell(generated);
-			}
-		}
-
-		for (int x = 0; x < hexGrid.width; x++) {
-			for (int y = 0; y < hexGrid.height; y++) {
-				Vector2I pos = new Vector2I(x, y);
-				if (hexGrid.getCell(pos).terrainType == TerrainTypes.EMPTY) {
-					HexCell c = createCell(pos, TerrainTypes.OCEAN);
-					hexGrid.setCell(c);
-				}
-			}
-		}
+		// PASS 2: Generate mountains
 	}
+	
+	// public void generateMap() {
+	// 	Debug.Print("Generating Map...");
+	//
+	// 	Queue<HexCell> frontier = new Queue<HexCell>();
+	//
+	// 	HexCell seed = createCell(new Vector2I(hexGrid.width / 2, hexGrid.height / 2),
+	// 			TerrainTypes.PLAINS);
+	// 	hexGrid.setCell(seed);
+	// 	foreach (HexCell c in hexGrid.getNeighbors(seed)) {
+	// 		frontier.Enqueue(c);
+	// 	}
+	//
+	// 	Random rand = new Random();
+	// 	while (frontier.Count > 0) {
+	// 		HexCell next = frontier.Dequeue();
+	// 		bool isBorder = next.pos.X == 0 ||
+	// 						next.pos.X == hexGrid.width - 1 ||
+	// 						next.pos.Y == 0 ||
+	// 						next.pos.Y == hexGrid.height - 1;
+	// 		bool isBorderAdj = next.pos.X == 1 ||
+	// 						   next.pos.X == hexGrid.width - 2 ||
+	// 						   next.pos.Y == 1 ||
+	// 						   next.pos.Y == hexGrid.height - 2;
+	// 		int distToSeed = HexGrid.hexDistance(next.pos, seed.pos);
+	// 		float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToSeed / hexGrid.width, 2), 0.25f);
+	//
+	// 		if (isBorderAdj) threshold = 0.2f;
+	//
+	// 		if (!isBorder && rand.NextSingle() < threshold) {
+	// 			// Make land
+	// 			float randVal = rand.NextSingle();
+	// 			TerrainTypes lType;
+	// 			if (randVal < 0.6) {
+	// 				lType = TerrainTypes.PLAINS;
+	// 			} else if (randVal < 0.9) {
+	// 				lType = TerrainTypes.HILLS;
+	// 			} else {
+	// 				lType = TerrainTypes.MOUNTAIN;
+	// 			}
+	//
+	// 			HexCell generated = createCell(next.pos, lType);
+	// 			hexGrid.setCell(generated);
+	// 			foreach (HexCell c in hexGrid.getNeighbors(generated)) {
+	// 				if (!frontier.Contains(c) && c.terrainType == TerrainTypes.EMPTY) {
+	// 					frontier.Enqueue(c);
+	// 				}
+	// 			}
+	// 		} else {
+	// 			// Make ocean
+	// 			HexCell generated = createCell(next.pos, TerrainTypes.OCEAN);
+	// 			hexGrid.setCell(generated);
+	// 		}
+	// 	}
+	//
+	// 	for (int x = 0; x < hexGrid.width; x++) {
+	// 		for (int y = 0; y < hexGrid.height; y++) {
+	// 			Vector2I pos = new Vector2I(x, y);
+	// 			if (hexGrid.getCell(pos).terrainType == TerrainTypes.EMPTY) {
+	// 				HexCell c = createCell(pos, TerrainTypes.OCEAN);
+	// 				hexGrid.setCell(c);
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }

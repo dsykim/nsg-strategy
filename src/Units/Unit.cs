@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 
 public class UnitAction
 {
-	public string id;
+	public string actionID;
 	public string label;
 	public string keyBinding;
 	public bool isAvailable;
@@ -94,9 +94,9 @@ public abstract partial class Unit : CellDecorator
 	}
 
 	/** Updates the availability of this unit's actions. */
-	public void updateAvailability(string id, bool available)
+	public void updateAvailability(string actionID, bool available)
 	{
-		UnitAction action = actions.Find(a => a.id == id);
+		UnitAction action = actions.Find(a => a.actionID == actionID);
 		if (action != null)
 		{
 			action.isAvailable = available;

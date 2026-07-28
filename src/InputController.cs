@@ -50,8 +50,8 @@ public partial class InputController : Node
 
 	public override void _UnhandledInput(InputEvent @event) {
 		if (@event is InputEventMouseButton mouseEvent &&
-		    mouseEvent.ButtonIndex == MouseButton.Left &&
-		    mouseEvent.Pressed) {
+			mouseEvent.ButtonIndex == MouseButton.Left &&
+			mouseEvent.Pressed) {
 			handleClick();
 			return;
 		}
