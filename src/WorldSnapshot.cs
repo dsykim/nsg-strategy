@@ -66,7 +66,7 @@ public class UnitSnapshot
 	public UnitType type;
 	public Vector2I pos;
 	public int currentHP, maxHP, currentAP, maxAP;
-	public int range, damage, attackCost, goldCost, capacityCost;
+	public int minRange, maxRange, damage, attackCost, goldCost, capacityCost;
 
 	public UnitSnapshot clone() => (UnitSnapshot)MemberwiseClone();
 
@@ -75,7 +75,7 @@ public class UnitSnapshot
 			id = u.id, owner = u.owner, type = u.type, pos = u.gridPosition,
 			currentHP = u.currentHP, maxHP = u.maxHP,
 			currentAP = u.currentAP, maxAP = u.maxAP,
-			range = u.range, damage = u.damage, attackCost = u.attackCost,
+			minRange = u.minRange, maxRange = u.maxRange, damage = u.damage, attackCost = u.attackCost,
 			goldCost = u.goldCost, capacityCost = u.capacityCost,
 	};
 }

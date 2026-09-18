@@ -1,15 +1,34 @@
-[gd_scene load_steps=11 format=3 uid="uid://bn1eteu33ytkc"]
+[gd_scene load_steps=22 format=3 uid="uid://bn1eteu33ytkc"]
 
 [ext_resource type="Script" uid="uid://101sgpxnjx65" path="res://src/GameScene.cs" id="1_vh257"]
 [ext_resource type="Script" uid="uid://egk0r212qscp" path="res://src/UIController.cs" id="2_xy3my"]
+[ext_resource type="Texture2D" uid="uid://bcvgon4ttui1s" path="res://assets/Unpressed.png" id="3_6pl24"]
 [ext_resource type="Texture2D" uid="uid://dagmh6y0qgiv" path="res://assets/hex_highlight.png" id="3_cxv17"]
 [ext_resource type="Script" uid="uid://bcoyty0mh6uxb" path="res://src/UI/CityPanel.cs" id="3_vijgj"]
 [ext_resource type="Script" uid="uid://ctqjjtonpsdgf" path="res://src/UI/UnitPanel.cs" id="3_xs4ih"]
-[ext_resource type="Texture2D" uid="uid://dpc1a0k3t51kj" path="res://assets/rangedUnit.png" id="4_6ytau"]
 [ext_resource type="Script" uid="uid://ca45ock7rnyl3" path="res://src/CameraController.cs" id="4_18ig4"]
+[ext_resource type="Texture2D" uid="uid://budee0qk7xwg7" path="res://assets/Pressed.png" id="4_w22tq"]
 [ext_resource type="Texture2D" uid="uid://clk35veck7a45" path="res://assets/hex_select.png" id="5_7s5hy"]
+[ext_resource type="Texture2D" uid="uid://bbiddkt0kiqxg" path="res://assets/unitpanel_base.png" id="6_6pl24"]
 [ext_resource type="Texture2D" uid="uid://d0vwva4a1yjkc" path="res://assets/rangedUnitEnemy.png" id="6_pynjx"]
 [ext_resource type="Script" uid="uid://cwo4cyy56k2ej" path="res://src/UI/ResourceBar.cs" id="6_yrli1"]
+[ext_resource type="Texture2D" uid="uid://dpc1a0k3t51kj" path="res://assets/rangedUnit.png" id="8_w22tq"]
+[ext_resource type="FontFile" uid="uid://12b5dtmoyygi" path="res://resources/Alagard.ttf" id="9_e8rlm"]
+[ext_resource type="Texture2D" uid="uid://d3uwdblj0omud" path="res://assets/hpbar_under.png" id="10_kxqg4"]
+[ext_resource type="Texture2D" uid="uid://dbby8ver346ii" path="res://assets/hpbar_top.png" id="11_21xg8"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e8rlm"]
+texture = ExtResource("3_6pl24")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qitmq"]
+texture = ExtResource("4_w22tq")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6pl24"]
+texture = ExtResource("4_w22tq")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6pl24"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w22tq"]
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1_vh257")
@@ -24,18 +43,30 @@ script = ExtResource("2_xy3my")
 [node name="UICanvas" type="CanvasLayer" parent="UIController"]
 
 [node name="NextTurnButton" type="Button" parent="UIController/UICanvas"]
-offset_left = 1362.0
-offset_top = 734.0
-offset_right = 1411.0
-offset_bottom = 765.0
-scale = Vector2(4, 4)
-text = "NEXT"
+texture_filter = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -206.0
+offset_top = -201.0
+offset_right = -142.0
+offset_bottom = -137.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(3, 3)
+theme_override_styles/normal = SubResource("StyleBoxTexture_e8rlm")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_qitmq")
+theme_override_styles/hover = SubResource("StyleBoxTexture_6pl24")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_6pl24")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_w22tq")
 
 [node name="CityPanel" type="VBoxContainer" parent="UIController/UICanvas" node_paths=PackedStringArray("nameLabel", "hpLabel", "hpBar", "actionButtonContainer")]
-offset_left = 1331.0
-offset_top = 205.0
-offset_right = 1546.0
-offset_bottom = 633.0
+offset_left = 1664.0
+offset_top = 315.0
+offset_right = 1879.0
+offset_bottom = 743.0
 script = ExtResource("3_vijgj")
 nameLabel = NodePath("CityName")
 hpLabel = NodePath("HPContainer/CityHPLabel")
@@ -57,43 +88,80 @@ layout_mode = 2
 [node name="ActionButtonContainer" type="VBoxContainer" parent="UIController/UICanvas/CityPanel"]
 layout_mode = 2
 
-[node name="UnitPanel" type="HBoxContainer" parent="UIController/UICanvas" node_paths=PackedStringArray("unitImage", "nameLabel", "hpLabel", "hpBar", "apLabel", "actionButtonContainer")]
+[node name="UnitPanel" type="TextureRect" parent="UIController/UICanvas" node_paths=PackedStringArray("unitImage", "nameLabel", "hpLabel", "hpBar", "apLabel", "actionButtonContainer")]
+texture_filter = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -86.0
-offset_right = 50.0
+offset_left = 20.0
+offset_top = -216.0
+offset_right = 473.0
+offset_bottom = -15.0
 grow_vertical = 0
+texture = ExtResource("6_6pl24")
 script = ExtResource("3_xs4ih")
 unitImage = NodePath("UnitImage")
 nameLabel = NodePath("UnitPanelRight/UnitName")
 hpLabel = NodePath("UnitPanelRight/UnitHPLabel")
 hpBar = NodePath("UnitPanelRight/UnitHPBar")
 apLabel = NodePath("UnitPanelRight/UnitAPLabel")
-actionButtonContainer = NodePath("UnitPanelRight/ActionButtonContainer")
+actionButtonContainer = NodePath("ActionButtonContainer")
 
 [node name="UnitImage" type="TextureRect" parent="UIController/UICanvas/UnitPanel"]
-layout_mode = 2
-texture = ExtResource("4_6ytau")
+layout_mode = 0
+offset_top = 26.0
+offset_right = 45.0
+offset_bottom = 71.0
+scale = Vector2(3, 3)
+size_flags_vertical = 4
+texture = ExtResource("8_w22tq")
 stretch_mode = 2
 
-[node name="UnitPanelRight" type="VBoxContainer" parent="UIController/UICanvas/UnitPanel"]
-layout_mode = 2
+[node name="ActionButtonContainer" type="VBoxContainer" parent="UIController/UICanvas/UnitPanel"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -68.5
+offset_bottom = 51.5
+grow_horizontal = 0
+grow_vertical = 2
 
-[node name="ActionButtonContainer" type="HBoxContainer" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
-layout_mode = 2
+[node name="UnitPanelRight" type="VBoxContainer" parent="UIController/UICanvas/UnitPanel"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 20.0
+offset_right = 258.0
+offset_bottom = 170.0
 
 [node name="UnitName" type="Label" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
+texture_filter = 1
 layout_mode = 2
+theme_override_fonts/font = ExtResource("9_e8rlm")
+theme_override_font_sizes/font_size = 24
+text = "Settler"
 
 [node name="UnitHPLabel" type="Label" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("9_e8rlm")
+theme_override_font_sizes/font_size = 24
+text = "0/0 HP"
 
 [node name="UnitHPBar" type="TextureProgressBar" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
+custom_minimum_size = Vector2(108, 30)
 layout_mode = 2
+nine_patch_stretch = true
+texture_under = ExtResource("10_kxqg4")
+texture_progress = ExtResource("11_21xg8")
 
 [node name="UnitAPLabel" type="Label" parent="UIController/UICanvas/UnitPanel/UnitPanelRight"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("9_e8rlm")
+theme_override_font_sizes/font_size = 24
+text = "0/0 AP"
 
 [node name="ResourceBar" type="Control" parent="UIController/UICanvas" node_paths=PackedStringArray("goldLabel", "capacityLabel")]
 layout_mode = 3

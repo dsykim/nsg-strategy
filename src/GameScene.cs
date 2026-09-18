@@ -10,8 +10,8 @@ public partial class GameScene : Node
 	private CameraController camera;
 	private UIController uiController;
 
-	private readonly int width = 20;
-	private readonly int height = 12;
+	private readonly int width = 40;
+	private readonly int height = 24;
 	private readonly float hexSize = 40f;
 
 	public override void _Ready() {

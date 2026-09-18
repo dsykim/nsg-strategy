@@ -20,7 +20,8 @@ public abstract partial class Unit : CellDecorator
 	public int maxAP;
 	public int currentAP;
 
-	public int range;
+	public int minRange;
+	public int maxRange;
 	public int damage;
 	public int attackCost;
 
@@ -63,7 +64,8 @@ public abstract partial class Unit : CellDecorator
 		currentHP = maxHP;
 		capacityCost = data["capacityCost"]!.GetValue<int>();
 		goldCost = data["goldCost"]!.GetValue<int>();
-		range = data["range"]!.GetValue<int>();
+		minRange = data["minRange"]!.GetValue<int>();
+		maxRange = data["maxRange"]!.GetValue<int>();
 		damage = data["damage"]!.GetValue<int>();
 		attackCost = data["attackCost"]!.GetValue<int>();
 

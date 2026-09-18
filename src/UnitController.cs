@@ -16,7 +16,8 @@ public enum UnitType
 {
 	SETTLER,
 	MELEE,
-	RANGED
+	RANGED,
+	SNIPER
 }
 
 public partial class UnitController : Node
@@ -61,6 +62,9 @@ public partial class UnitController : Node
 				break;
 			case UnitType.RANGED:
 				unit = new RangedUnit(owner);
+				break;
+			case UnitType.SNIPER:
+				unit = new SniperUnit(owner);
 				break;
 			default:
 				unit = new SettlerUnit(owner);
@@ -218,6 +222,8 @@ public partial class UnitController : Node
 				return UnitType.MELEE;
 			case "ranged":
 				return UnitType.RANGED;
+			case "sniper":
+				return UnitType.SNIPER;
 			default:
 				return UnitType.MELEE;
 		}
@@ -231,6 +237,8 @@ public partial class UnitController : Node
 				return "melee";
 			case UnitType.RANGED:
 				return "ranged";
+			case UnitType.SNIPER:
+				return "sniper";
 			default:
 				return "";
 		}

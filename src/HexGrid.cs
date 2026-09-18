@@ -16,7 +16,7 @@ public enum HexDirection
 public partial class HexGrid : Node2D
 {
 	public readonly int width, height;
-	private HexCell[] grid;
+	public HexCell[] grid { get; private set; }
 	private Dictionary<EdgeKey, HexEdge> edges = new();
 
 	public HexGrid(int w, int h) {
@@ -153,4 +153,70 @@ public partial class HexGrid : Node2D
 
 		return cells;
 	}
+	
+	public List<Vector2I> getCellsPosInRadius(Vector2I center, int radius) {
+		List<Vector2I> cells = new List<Vector2I>();
+		Vector3I cubeCenter = offsetToCube(center.X, center.Y);
+
+		for (int dq = -radius; dq <= radius; dq++) {
+			for (int dr = Math.Max(-radius, -dq - radius); dr <= Math.Min(radius, -dq + radius); dr++) {
+				int ds = -dq - dr;
+				Vector3I cube = cubeCenter + new Vector3I(dq, dr, ds);
+				var pos = cubeToOffset(cube);
+
+				if (indexInGrid(pos)) {
+					cells.Add(pos);
+				}
+			}
+		}
+
+		return cells;
+	}
+
+	private float lerp(int a, int b, float t) {
+		return a + (b - a) * t;
+	}
+	
+	public Vector3 cubeLerp(Vector3I c1, Vector3I c2, float t) {
+		return new Vector3(
+				lerp(c1.X, c2.X, t),
+				lerp(c1.Y, c2.Y, t),
+				lerp(c1.Z, c2.Z, t)
+		);
+	}
+
+	public Vector3I cubeRound(Vector3 coord) {
+		int q = (int) Math.Round(coord.X);
+		int r = (int)Math.Round(coord.Y);
+		int s = (int)Math.Round(coord.Z);
+
+		float qDiff = Math.Abs(q - coord.X);
+		float rDiff = Math.Abs(r - coord.Y);
+		float sDiff = Math.Abs(s - coord.Z);
+
+		if (qDiff > rDiff && qDiff > sDiff) {
+			q = -r - s;
+		} else if (rDiff > sDiff) {
+			r = -q - s;
+		} else {
+			s = -q - r;
+		}
+
+		return new Vector3I(q, s, r);
+	}
+	
+	
+	public List<Vector2I> getCellsInLine(Vector2I p1, Vector2I p2) {
+		Vector3I c1 = offsetToCube(p1.X, p1.Y);
+		Vector3I c2 = offsetToCube(p2.X, p2.Y);
+
+		int N = hexDistance(c1, c2);
+		List<Vector2I> results = new List<Vector2I>();
+		for (int i = 0; i < N + 1; i++) {
+			results.Add(cubeToOffset(cubeRound(cubeLerp(c1, c2, 1f / N * i))));
+		}
+
+		return results;
+	}
+	
 }

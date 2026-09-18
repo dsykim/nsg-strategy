@@ -6,7 +6,7 @@ public partial class PlayerController : Node
 {
 	private UnitController unitController;
 	private ResourceController resourceController;
-	private CityController cityController;
+	public CityController cityController { get; private set; }
 	public readonly int playerID;
 	private bool alive;
 
@@ -29,7 +29,7 @@ public partial class PlayerController : Node
 
 		// Connect signals
 		unitController.UnitCreated += resourceController.handleUnitCreatedSignal;
-		cityController.CityCreated += resourceController.handleCityCreatedSignal;
+		cityController.CityCreated += handleCityCreatedSignal;
 
 		// TEMP UNIT TEST
 		if (playerID == 0) {
@@ -41,7 +41,7 @@ public partial class PlayerController : Node
 			unitController.createUnit(UnitType.SETTLER, new Vector2I(12, 6));
 		}
 	}
-
+	
 	public void turnUpkeep() {
 		resourceController.resourceUpkeep();
 		unitController.unitUpkeep();
@@ -76,4 +76,12 @@ public partial class PlayerController : Node
 			unitCapacityTotal = resourceController.unitCapacityTotal,
 			unitCapacityUsed = resourceController.unitCapacityUsed,
 	};
+
+	public void handleCityCreatedSignal(City city) {
+		resourceController.handleCityCreatedSignal(city);
+		if (playerID == 0) {
+			// unit panel hide
+			UnitPanel.instance.clear();
+		}
+	}
 }

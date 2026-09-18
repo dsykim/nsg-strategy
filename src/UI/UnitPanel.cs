@@ -1,8 +1,10 @@
 using Godot;
 using System.Collections.Generic;
+using System.Diagnostics;
 
-public partial class UnitPanel : HBoxContainer
+public partial class UnitPanel : Control
 {
+	public static UnitPanel instance { get; private set; }
 	[Export] private TextureRect unitImage;
 	[Export] private Label nameLabel;
 	[Export] private Label hpLabel;
@@ -13,9 +15,10 @@ public partial class UnitPanel : HBoxContainer
 	private const int playerId = 0;
 
 	private Unit boundUnit;
-	private readonly Dictionary<UnitAction, Button> actionButtons = new Dictionary<UnitAction, Button>();
+	private readonly Dictionary<UnitAction, TextureButton> actionButtons = new Dictionary<UnitAction, TextureButton>();
 
 	public void init() {
+		instance = this;
 		Visible = false;
 		InputController.instance.unitSelected += bind;
 		InputController.instance.unitDeselected += clear;
@@ -34,7 +37,9 @@ public partial class UnitPanel : HBoxContainer
 		unit.actionsChanged += refreshActions;
 
 		nameLabel.Text = capitalize(unit.unitName);
-		// unitImage.Texture = unit.Texture;   // swap in when ready
+		hpLabel.Text = unit.currentHP + "/" + unit.maxHP + " HP";
+		apLabel.Text = unit.currentAP + "/" + unit.maxAP + " AP";
+ 		// unitImage.Texture = unit.Texture;   // swap in when ready
 
 		buildActionButtons();
 		refreshStats();
@@ -73,8 +78,35 @@ public partial class UnitPanel : HBoxContainer
 
 		foreach (UnitAction action in boundUnit.actions) {
 			UnitAction captured = action;
-			Button button = new Button();
-			button.Text = $"{action.label} ({action.keyBinding})";
+			TextureButton button = new TextureButton();
+			// button.Size = new Vector2(63, 54);
+			Texture2D pressed, unpressed;
+			switch (action.actionID) {
+				case "attack":
+					unpressed = ResourceLoader.Load<Texture2D>("res://assets/unitattack_unpressed.png");
+					pressed = ResourceLoader.Load<Texture2D>("res://assets/unitattack_pressed.png");
+					break;
+				case "move":
+					unpressed = ResourceLoader.Load<Texture2D>("res://assets/unitmove_unpressed.png");
+					pressed = ResourceLoader.Load<Texture2D>("res://assets/unitmove_pressed.png");
+					break;
+				case "settle":
+					unpressed = ResourceLoader.Load<Texture2D>("res://assets/unitsettle_unpressed.png");
+					pressed = ResourceLoader.Load<Texture2D>("res://assets/unitsettle_pressed.png");
+					break;
+				default:
+					unpressed = ResourceLoader.Load<Texture2D>("res://assets/unitsettle_unpressed.png");
+					pressed = ResourceLoader.Load<Texture2D>("res://assets/unitsettle_pressed.png");
+					break;
+			}
+			
+			button.SetTextureNormal(unpressed);
+			button.SetTextureHover(pressed);
+			button.SetTextureFocused(unpressed);
+			button.SetTexturePressed(pressed);
+			button.StretchMode = TextureButton.StretchModeEnum.KeepAspectCentered;
+			button.CustomMinimumSize = new Vector2(63, 54);
+			
 			button.Pressed += () => captured.onTrigger?.Invoke();
 			actionButtonContainer.AddChild(button);
 			actionButtons[action] = button;

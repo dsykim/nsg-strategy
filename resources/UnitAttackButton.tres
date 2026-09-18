@@ -1,0 +1,22 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://bki7hbnfm0ikv"]
+
+[ext_resource type="Texture2D" uid="uid://cfmfhsq6vj1up" path="res://assets/unitattack_pressed.png" id="1_iecl0"]
+[ext_resource type="Texture2D" uid="uid://ehrep4vj35ua" path="res://assets/unitattack_unpressed.png" id="2_aux1l"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_iecl0"]
+texture = ExtResource("2_aux1l")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_aux1l"]
+texture = ExtResource("2_aux1l")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o1q3s"]
+texture = ExtResource("2_aux1l")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qm4vy"]
+texture = ExtResource("1_iecl0")
+
+[resource]
+Button/styles/focus = SubResource("StyleBoxTexture_iecl0")
+Button/styles/hover = SubResource("StyleBoxTexture_aux1l")
+Button/styles/normal = SubResource("StyleBoxTexture_o1q3s")
+Button/styles/pressed = SubResource("StyleBoxTexture_qm4vy")
