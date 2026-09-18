@@ -422,4 +422,17 @@ public partial class MapController : Node2D
 		}
 	}
 
+	public void generateMirrored() {
+		generateMap();
+		int halfWidth = (hexGrid.width % 2 == 0) ? hexGrid.width / 2 - 1 : hexGrid.width / 2;
+		for (int x = hexGrid.width - 1; x > halfWidth; x--) {
+			for (int y = 0; y < hexGrid.height; y++) {
+				Vector2I pos = new Vector2I(x, y);
+				Vector2I mirroredPos = new Vector2I(hexGrid.width - x - 1, y);
+				HexCell c = createCell(pos, hexGrid.getCell(mirroredPos).terrainType);
+				hexGrid.setCell(c);
+			}
+		}
+	}
+
 }

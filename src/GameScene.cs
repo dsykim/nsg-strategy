@@ -10,15 +10,16 @@ public partial class GameScene : Node
 	private CameraController camera;
 	private UIController uiController;
 
-	private readonly int width = 40;
+	private readonly int width = 41;
 	private readonly int height = 24;
 	private readonly float hexSize = 40f;
 
 	public override void _Ready() {
 		MapController mapController = new MapController(width, height, hexSize);
 		AddChild(mapController);
-		mapController.generateMap();
-
+		// mapController.generateMap();
+		mapController.generateMirrored();
+		
 		InputController input = new InputController();
 		input.init();
 		AddChild(input);
