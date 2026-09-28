@@ -202,11 +202,14 @@ public partial class HexGrid : Node2D
 			s = -q - r;
 		}
 
-		return new Vector3I(q, s, r);
+		return new Vector3I(q, r, s);
 	}
 	
 	
 	public List<Vector2I> getCellsInLine(Vector2I p1, Vector2I p2) {
+		if (p1 == p2) {
+			throw new Exception("Line endpoints must be different");
+		}
 		Vector3I c1 = offsetToCube(p1.X, p1.Y);
 		Vector3I c2 = offsetToCube(p2.X, p2.Y);
 
