@@ -3,17 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public enum HexDirection
-{
-	N,
-	NE,
-	SE,
-	S,
-	SW,
-	NW
-}
-
-public partial class HexGrid : Node2D
+public class HexGrid
 {
 	public readonly int width, height;
 	public HexCell[] grid { get; private set; }
@@ -24,43 +14,37 @@ public partial class HexGrid : Node2D
 		height = h;
 		grid = new HexCell[w * h];
 		for (int i = 0; i < w * h; i++) {
-			HexCell c = new HexCell(new Vector2I(i % w, i / w));
-			setCell(c);
+			Vector2I pos = new Vector2I(i % w, i / w);
+			HexCell c = new HexCell(pos);
+			grid[i] = c;
 		}
-		Name = "HexGrid";
 	}
 
-	static readonly Vector2I[] evenColOffsets =
-	{
-			new(0, -1), new(1, 0), new(1, 1), new(0, 1), new(-1, 1), new(-1, 0)
-	};
-	static readonly Vector2I[] oddColOffsets =
-	{
-			new(0, -1), new(1, -1), new(1, 0), new(0, 1), new(-1, 0), new(-1, -1)
-	};
+	private HexGrid(HexGrid other) {
+		width = other.width;
+		height = other.height;
 
-	public static Vector2I neighbor(Vector2I pos, HexDirection dir) =>
-			pos + ((pos.X & 1) == 0 ? evenColOffsets : oddColOffsets)[(int)dir];
+		grid = new HexCell[other.grid.Length];
+		for (int i = 0; i < grid.Length; i++)
+			grid[i] = other.grid[i].clone();
 
-	public static HexDirection opposite(HexDirection dir) => (HexDirection)(((int)dir + 3) % 6);
+		edges = new Dictionary<EdgeKey, HexEdge>(other.edges.Count);
+		foreach (var (key, edge) in other.edges)
+			edges[key] = edge.clone();
+	}
 
+	public HexGrid clone() => new HexGrid(this);
+	
 	public bool indexInGrid(Vector2I pos) {
 		return pos.X >= 0 && pos.X < width && pos.Y >= 0 && pos.Y < height;
 	}
 
-	/**
-	 * Deletes any existing cells and sets the cell in this grid to be the provided cell.
-	 * Assumes the provided cell has been initialized with its grid position.
-	 */
-	public void setCell(HexCell c) {
-		if (!indexInGrid(c.pos)) {
+	public void setCell(Vector2I pos, TerrainTypes tType = TerrainTypes.EMPTY) {
+		if (!indexInGrid(pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}
-
-		deleteCell(c.pos);
-
-		grid[c.pos.Y * width + c.pos.X] = c;
-		AddChild(c);
+		
+		grid[pos.X + pos.Y * width].terrainType = tType;
 	}
 
 	public HexCell getCell(Vector2I pos) {
@@ -71,52 +55,11 @@ public partial class HexGrid : Node2D
 		return grid[pos.Y * width + pos.X];
 	}
 
-	public HexEdge getEdge(Vector2I pos, HexDirection dir, bool create = true) {
-		var key = new EdgeKey(pos, neighbor(pos, dir));
-		if (edges.TryGetValue(key, out var e)) {
-			return e;
-		}
-		if (!create) {
-			return null;
-		}
-		e = new HexEdge(key);
-		edges[key] = e;
-		return e;
-	}
-
-	public void deleteCell(Vector2I pos) {
-		if (!indexInGrid(pos)) {
-			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
-		}
-
-		HexCell target = grid[pos.Y * width + pos.X];
-		if (target != null) {
-			RemoveChild(target);
-			target.QueueFree();
-		}
-	}
-
-	public static Vector3I offsetToCube(int x, int y) {
-		int q = x;
-		int r = y - (x + (x & 1)) / 2;
-		return new Vector3I(q, r, -q - r);
-	}
-
-	public static Vector2I cubeToOffset(Vector3I c) {
-		int col = c.X;
-		int row = c.Y + (c.X + (c.X & 1)) / 2;
-		return new Vector2I(col, row);
-	}
-
-	public List<HexCell> getNeighbors(HexCell cell) {
-		return getNeighbors(cell.pos);
-	}
-
 	public List<HexCell> getNeighbors(Vector2I pos) {
 		List<HexCell> neighbors = new List<HexCell>();
 
 		foreach (HexDirection dir in Enum.GetValues<HexDirection>()) {
-			Vector2I neighborPos = neighbor(pos, dir);
+			Vector2I neighborPos = HexUtils.neighbor(pos, dir);
 			if (indexInGrid(neighborPos)) {
 				neighbors.Add(getCell(neighborPos));
 			}
@@ -124,26 +67,27 @@ public partial class HexGrid : Node2D
 		return neighbors;
 	}
 
-	public static int hexDistance(Vector3I c1, Vector3I c2) {
-		Vector3I vec = c1 - c2;
-		return (Math.Abs(vec.X) + Math.Abs(vec.Y) + Math.Abs(vec.Z)) / 2;
-	}
+	public List<Vector2I> getNeighborPositions(Vector2I pos) {
+		List<Vector2I> neighbors = new List<Vector2I>();
 
-	public static int hexDistance(Vector2I cell1, Vector2I cell2) {
-		Vector3I c1 = offsetToCube(cell1.X, cell1.Y);
-		Vector3I c2 = offsetToCube(cell2.X, cell2.Y);
-		return hexDistance(c1, c2);
+		foreach (HexDirection dir in Enum.GetValues<HexDirection>()) {
+			Vector2I neighborPos = HexUtils.neighbor(pos, dir);
+			if (indexInGrid(neighborPos)) {
+				neighbors.Add(neighborPos);
+			}
+		}
+		return neighbors;
 	}
-
+	
 	public List<HexCell> getCellsInRadius(Vector2I center, int radius) {
 		List<HexCell> cells = new List<HexCell>();
-		Vector3I cubeCenter = offsetToCube(center.X, center.Y);
+		Vector3I cubeCenter = HexUtils.offsetToCube(center.X, center.Y);
 
 		for (int dq = -radius; dq <= radius; dq++) {
 			for (int dr = Math.Max(-radius, -dq - radius); dr <= Math.Min(radius, -dq + radius); dr++) {
 				int ds = -dq - dr;
 				Vector3I cube = cubeCenter + new Vector3I(dq, dr, ds);
-				var pos = cubeToOffset(cube);
+				var pos = HexUtils.cubeToOffset(cube);
 
 				if (indexInGrid(pos)) {
 					cells.Add(getCell(pos));
@@ -156,13 +100,13 @@ public partial class HexGrid : Node2D
 	
 	public List<Vector2I> getCellsPosInRadius(Vector2I center, int radius) {
 		List<Vector2I> cells = new List<Vector2I>();
-		Vector3I cubeCenter = offsetToCube(center.X, center.Y);
+		Vector3I cubeCenter = HexUtils.offsetToCube(center.X, center.Y);
 
 		for (int dq = -radius; dq <= radius; dq++) {
 			for (int dr = Math.Max(-radius, -dq - radius); dr <= Math.Min(radius, -dq + radius); dr++) {
 				int ds = -dq - dr;
 				Vector3I cube = cubeCenter + new Vector3I(dq, dr, ds);
-				var pos = cubeToOffset(cube);
+				var pos = HexUtils.cubeToOffset(cube);
 
 				if (indexInGrid(pos)) {
 					cells.Add(pos);
@@ -172,54 +116,47 @@ public partial class HexGrid : Node2D
 
 		return cells;
 	}
-
-	private float lerp(int a, int b, float t) {
-		return a + (b - a) * t;
-	}
-	
-	public Vector3 cubeLerp(Vector3I c1, Vector3I c2, float t) {
-		return new Vector3(
-				lerp(c1.X, c2.X, t),
-				lerp(c1.Y, c2.Y, t),
-				lerp(c1.Z, c2.Z, t)
-		);
-	}
-
-	public Vector3I cubeRound(Vector3 coord) {
-		int q = (int) Math.Round(coord.X);
-		int r = (int)Math.Round(coord.Y);
-		int s = (int)Math.Round(coord.Z);
-
-		float qDiff = Math.Abs(q - coord.X);
-		float rDiff = Math.Abs(r - coord.Y);
-		float sDiff = Math.Abs(s - coord.Z);
-
-		if (qDiff > rDiff && qDiff > sDiff) {
-			q = -r - s;
-		} else if (rDiff > sDiff) {
-			r = -q - s;
-		} else {
-			s = -q - r;
-		}
-
-		return new Vector3I(q, r, s);
-	}
-	
 	
 	public List<Vector2I> getCellsInLine(Vector2I p1, Vector2I p2) {
 		if (p1 == p2) {
 			throw new Exception("Line endpoints must be different");
 		}
-		Vector3I c1 = offsetToCube(p1.X, p1.Y);
-		Vector3I c2 = offsetToCube(p2.X, p2.Y);
+		Vector3I c1 = HexUtils.offsetToCube(p1.X, p1.Y);
+		Vector3I c2 = HexUtils.offsetToCube(p2.X, p2.Y);
 
-		int N = hexDistance(c1, c2);
+		int N = HexUtils.hexDistance(c1, c2);
 		List<Vector2I> results = new List<Vector2I>();
 		for (int i = 0; i < N + 1; i++) {
-			results.Add(cubeToOffset(cubeRound(cubeLerp(c1, c2, 1f / N * i))));
+			results.Add(HexUtils.cubeToOffset(HexUtils.cubeRound(HexUtils.cubeLerp(c1, c2, 1f / N * i))));
 		}
 
 		return results;
 	}
+	public HexEdge getEdge(Vector2I pos, HexDirection dir, bool create = true) {
+		var key = new EdgeKey(pos, HexUtils.neighbor(pos, dir));
+		if (edges.TryGetValue(key, out var e)) {
+			return e;
+		}
+		if (!create) {
+			return null;
+		}
+		e = new HexEdge(key);
+		edges[key] = e;
+		return e;
+	}
 	
+	public List<Vector2I> getCellsInRadiusRange(Vector2I target, int minRadius, int maxRadius) {
+		if (minRadius > maxRadius || minRadius < 1) {
+			throw new Exception("Illegal radius");
+		}
+
+		List<Vector2I> cellsInRadius = getCellsPosInRadius(target, maxRadius);
+		List<Vector2I> included = new List<Vector2I>();
+		foreach (var cell in cellsInRadius) {
+			if (HexUtils.hexDistance(target, cell) >= minRadius) {
+				included.Add(cell);
+			}
+		}
+		return included;
+	}
 }

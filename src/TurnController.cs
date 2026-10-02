@@ -1,105 +1,99 @@
-﻿using Godot;
+using Godot;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 
+/**
+ * Orchestrates the turn loop: waits for human input, runs AI planning off the main
+ * thread, and submits every state change through the CommandExecutor.
+ *
+ * Holds no game rules and no game data. Whose turn it is lives in GameState;
+ * this class only knows which players are controlled by a human.
+ */
 public partial class TurnController : Node
 {
 	public static TurnController instance { get; private set; }
-	private readonly int MAX_PLAYER_COUNT = 4;
-	private PlayerController userPlayer;
-	private List<PlayerController> aiPlayers = new List<PlayerController>();
-	private WorldSnapshot aiSnapshot;
 
-	private Thread aiThread;
-	private Dictionary<string, string> aiResult = new Dictionary<string, string>();
-	public bool aiThinking { get; private set; } = false;
+	private GameState state;
+	private CommandExecutor executor;
+	private readonly HashSet<int> humanPlayers = new();
 
-	private int currentPlayer;
-	private int playerCount;
+	public bool aiThinking { get; private set; }
+
+	/** True when the game is waiting for a human to act. UI can gate input on this. */
+	public bool awaitingHuman => !aiThinking && humanPlayers.Contains(state.currentPlayer);
 
 	public TurnController() {
-		currentPlayer = 0;
 		Name = "TurnController";
 		instance = this;
 	}
 
-	public void init(int numPlayers) {
-		initPlayers(numPlayers);
-		Button nextTurnButton = GetNode<Button>("../UIController/UICanvas/NextTurnButton");
-		nextTurnButton.Pressed += nextTurn;
+	public void init(GameState state, CommandExecutor executor, IEnumerable<int> humanPlayerIDs) {
+		this.state = state;
+		this.executor = executor;
+		humanPlayers.Clear();
+		humanPlayers.UnionWith(humanPlayerIDs);
 	}
 
-	public void initPlayers(int n) {
-		if (n > 1 && n <= MAX_PLAYER_COUNT) {
-			playerCount = n;
-			userPlayer = new PlayerController(0);
-			AddChild(userPlayer);
-			userPlayer.init();
-			for (int i = 1; i < n; i++) {
-				PlayerController aiPlayer = new PlayerController(i);
-				aiPlayers.Add(aiPlayer);
-				AddChild(aiPlayer);
-				aiPlayer.init();
-			}
-		} else {
-			Debug.Print("Invalid player count");
-		}
+	/** Call once after setup; the initial player's beginTurn upkeep is setup's job. */
+	public void startGame() => runCurrentTurn();
+
+	/** Called by the UI (end turn button). Ignored when it isn't a human's turn. */
+	public void endHumanTurn() {
+		if (!awaitingHuman) return;
+		endTurn(state.currentPlayer);
 	}
 
-	public PlayerController getPlayer(int id) {
-		if (userPlayer != null && userPlayer.playerID == id) return userPlayer;
-		return aiPlayers.Find(p => p.playerID == id);
-	}
+	/* ==================== Turn loop ==================== */
 
-	public IEnumerable<PlayerController> allPlayers() {
-		if (userPlayer != null) yield return userPlayer;
-		foreach (PlayerController p in aiPlayers) yield return p;
-	}
+	private void runCurrentTurn() {
+		int playerID = state.currentPlayer;
 
-	public void beginUserTurn() {
-		userPlayer.turnUpkeep();
-	}
-
-	/* ==================== AI Controls ==================== */
-
-	private void nextTurn() {
-		Debug.Print("Ending player turn");
-		aiThinking = true;
-		currentPlayer = 1;
-		startAITurn();
-	}
-
-	private void startAITurn() {
-		aiSnapshot = WorldSnapshot.capture();
-		aiThread = new Thread(RunAI);
-		aiThread.Start();
-	}
-
-	private void RunAI() {
-		WorldSnapshot snap = aiSnapshot;
-		Debug.Print($"Running AI decision making for player {currentPlayer}");
-		// TODO: planner(snap, currentPlayer) -> List<Command>
-		CallDeferred(MethodName.OnAIFinish);
-	}
-
-	private void OnAIFinish() {
-		aiThread.Join();
-
-		// TODO: Apply AI decisions for currentPlayer
-		Debug.Print($"Applying AI decisions for player {currentPlayer}");
-
-		currentPlayer = (currentPlayer + 1) % playerCount;
-
-		if (currentPlayer == 0) {
-			// All AI players have gone, return control to user
+		if (humanPlayers.Contains(playerID)) {
 			aiThinking = false;
-			beginUserTurn();
-			Debug.Print("Returning control to user player");
-		} else {
-			// Pass turn to next AI player
-			startAITurn();
+			GD.Print($"Waiting for human player {playerID}");
+			return;
 		}
+
+		startAITurn(playerID);
 	}
 
+	private void endTurn(int playerID) {
+		executor.submit(new EndTurnCommand { actorID = playerID });
+		runCurrentTurn();
+	}
+
+	/* ==================== AI ==================== */
+
+	private void startAITurn(int playerID) {
+		aiThinking = true;
+
+		// Clone on the main thread; the worker only ever touches its own copy.
+		GameState snapshot = state.clone();
+
+		Task.Run(() => {
+			List<Command> commands;
+			try {
+				commands = AIPlanner.planTurn(snapshot, playerID);
+			} catch (Exception e) {
+				GD.PushError($"AI planner failed for player {playerID}: {e}");
+				commands = new List<Command>();
+			}
+
+			// Hop back to the main thread with the results; no shared fields needed.
+			Callable.From(() => onAIFinished(playerID, commands)).CallDeferred();
+		});
+	}
+
+	private void onAIFinished(int playerID, List<Command> commands) {
+		// The turn may have moved on (e.g. a game was loaded mid-plan); drop stale results.
+		if (state.currentPlayer != playerID) return;
+
+		GD.Print($"Applying {commands.Count} commands for player {playerID}");
+		foreach (Command cmd in commands) {
+			executor.submit(cmd);
+		}
+
+		endTurn(playerID);
+	}
 }

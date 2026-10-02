@@ -41,4 +41,11 @@ public class HexEdge
 		this.key = key;
 	}
 
+	private HexEdge(HexEdge other) {
+		this.key = other.key;
+		this.feature = other.feature;
+	}
+
+	public HexEdge clone() => new HexEdge(this);
+
 }

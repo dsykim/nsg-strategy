@@ -3,86 +3,60 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public partial class HexCell : Sprite2D
+public enum TerrainTypes
+{
+	PLAINS,
+	HILLS,
+	MOUNTAIN,
+	OCEAN,
+	EMPTY
+}
+
+public class HexCell
 {
 	public readonly Vector2I pos;
-	public int controllerID = -1;
+	public int controllerID = 0;
 	public TerrainTypes terrainType;
 
-	public NaturalDecorator naturalDecorator = null;
-	public PlayerDecorator playerDecorator = null;
-	public City city = null;
-	public List<Unit> units = new List<Unit>();
+	public int naturalDecoratorID = 0;
+	public int playerDecoratorID = 0;
+	public int unitID = 0;
 
 	public HexCell(Vector2I pos) {
 		this.pos = pos;
 		terrainType = TerrainTypes.EMPTY;
-		Name = $"Cell_{pos.X}_{pos.Y}";
 	}
 
+	public HexCell clone() {
+		return (HexCell)MemberwiseClone();
+	}
+	
 	public HexCell(Vector2I pos, TerrainTypes tType) : this(pos) {
 		terrainType = tType;
-		switch (terrainType) {
-			case TerrainTypes.OCEAN:
-				break;
-			case TerrainTypes.HILLS:
-
-			case TerrainTypes.PLAINS:
-
-			case TerrainTypes.MOUNTAIN:
-
-			case TerrainTypes.EMPTY:
-				break;
-		}
 	}
 
-	public bool hasCity() {
-		return city != null;
+	public bool hasCity(GameState state) {
+		return state.getEntity(playerDecoratorID) is City;
 	}
+
+	public void clearPlayerDecorator() => playerDecoratorID = 0;
+
+	public void setPlayerDecorator(PlayerDecorator d) => playerDecoratorID = d.id;
 
 	public bool hasUnit() {
-		return units.Count > 0;
+		return unitID != 0;
 	}
 
-	public bool hasNaturalDecorator() {
-		return naturalDecorator != null;
-	}
+	public void clearUnit() => unitID = 0;
 
-	public bool hasPlayerDecorator() {
-		return playerDecorator != null;
-	}
+	public void setUnit(Unit u) => unitID = u.id;
+	
 
 	public bool hasController() {
-		return controllerID >= 0;
+		return controllerID > 0;
 	}
 
-	public void addHexCollision() {
-		var size = Texture.GetSize();
-		float width = size.X / 2f;
-		float height = size.Y / 2f;
+	public void setController(int id) => controllerID = id;
 
-		var hexPoints = new Vector2[]
-		{
-				new Vector2(width, 0),
-				new Vector2(width / 2f, height),
-				new Vector2(-width / 2f, height),
-				new Vector2(-width, 0),
-				new Vector2(-width / 2f, -height),
-				new Vector2(width / 2f, -height),
-		};
-
-		var shape = new CollisionPolygon2D();
-		shape.Polygon = hexPoints;
-
-		var area = new Area2D();
-		area.Monitoring = true;
-		area.Monitorable = true;
-		area.AddChild(shape);
-		AddChild(area);
-	}
-
-	public override void _Draw() {
-		base._Draw();
-		
-	}
+	public void clearController() => controllerID = 0;
 }

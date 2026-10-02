@@ -2,50 +2,26 @@
 using System;
 using System.Collections.Generic;
 
-public class CityAction
+public class City : PlayerDecorator
 {
-	public string actionID;
-	public string label;
-	// public string keyBinding;
-	public bool isAvailable;
-	public Action onTrigger;
-}
-
-public partial class City : PlayerDecorator
-{
-	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>();
-	public List<CityAction> actions { get; private set; } = new List<CityAction>();
+	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>(); 
 	public int goldProduction = 5;
 	public string cityName = "City";
 	public int maxHP = 100;
 	public int currentHP;
 
-	[Signal]
-	public delegate void statsChangedEventHandler();
-
-	[Signal]
-	public delegate void actionsChangedEventHandler();
-
 	public City(int owner, Vector2I pos) : base(owner) {
-		Texture = ResourceLoader.Load<Texture2D>("res://assets/city.png");
-		float scale = (float)(MapController.instance.hexSize * Math.Sqrt(3)) / Texture.GetHeight();
-		SetScale(new Vector2(scale, scale));
 		gridPosition = pos;
-		ZIndex = 8;
-		
 		currentHP = maxHP;
 	}
 
-	public void addAction(CityAction action) {
-		actions.Add(action);
+	public override City clone() {
+		City clone = (City)MemberwiseClone();
+		clone.ownedCells = new List<Vector2I>(ownedCells);
+		return clone;
 	}
 
-	/** Updates the availability of this city's actions. */
-	public void updateAvailability(string actionID, bool available) {
-		CityAction action = actions.Find(a => a.actionID == actionID);
-		if (action != null) {
-			action.isAvailable = available;
-			EmitSignal(SignalName.actionsChanged);
-		}
-	}
+	public bool isDead() => currentHP <= 0;
+	
+	public void applyDamage(int amount) => currentHP -= amount;
 }

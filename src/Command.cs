@@ -5,23 +5,24 @@ public abstract class Command
 	public int actorID; // player issuing the com
 	public int subjectID; // acted-on entity; 0 = none (future player-level actions)
 
-	public abstract bool validate(); // re-check against LIVE state, right before applying
+	// check against state before applying
+	public abstract bool validate(GameState state);
 
-	public abstract void execute();
+	public abstract void execute(GameState state);
 }
 
 public class MoveCommand : Command
 {
 	public Vector2I target;
 
-	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectID);
-		return u != null && u.owner == actorID && MapController.instance.canMoveUnit(u, target);
+	public override bool validate(GameState state) {
+		Unit u = state.getUnit(subjectID);
+		return u != null && u.owner == actorID && MapRules.canMove(state, u, target);
 	}
 
-	public override void execute() {
-		Unit u = EntityRegistry.instance.getUnit(subjectID);
-		MapController.instance.moveUnit(u, target);
+	public override void execute(GameState state) {
+		Unit u = state.getUnit(subjectID);
+		MapRules.moveUnit(state, u, target);
 	}
 }
 
@@ -29,47 +30,54 @@ public class AttackCommand : Command
 {
 	public Vector2I target;
 
-	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectID);
+	public override bool validate(GameState state) {
+		Unit u = state.getUnit(subjectID);
 		if (u == null || u.owner != actorID) return false;
 		if (u.currentAP < u.attackCost) return false;
-		return MapController.instance.getAttackableCells(u).Contains(target);
+		return UnitRules.getAttackableCells(state, u).Contains(target);
 	}
 
-	public override void execute() {
-		Unit u = EntityRegistry.instance.getUnit(subjectID);
-		CombatController.instance.resolveCombat(u, target);
+	public override void execute(GameState state) {
+		Unit u = state.getUnit(subjectID);
+		CombatRules.resolveCombat(state, u, target);
 	}
 }
 
 public class SpawnUnitCommand : Command
 {
-	public UnitType uType; // subjectID = spawning city
+	public UnitType uType;
+	public Vector2I pos;
 
-	public override bool validate() {
-		City c = EntityRegistry.instance.getCity(subjectID);
-		if (c == null || c.owner != actorID) return false;
-		PlayerController p = TurnController.instance.getPlayer(actorID);
-		return p != null && p.canCreateUnit(uType);
+	public override bool validate(GameState state) {
+		City c = state.getCity(subjectID);
+		return c != null && c.owner == actorID && pos == c.gridPosition
+		       && UnitRules.canCreate(state, actorID, uType, pos);
 	}
 
-	public override void execute() {
-		TurnController.instance.getPlayer(actorID).executeSpawn(subjectID, uType);
+	public override void execute(GameState state) {
+		UnitRules.createUnit(state, actorID, uType, pos);
 	}
 }
 
 public class SettleCommand : Command
 {
-	// subjectID = the settler
-	public override bool validate() {
-		Unit u = EntityRegistry.instance.getUnit(subjectID);
+	public override bool validate(GameState state) {
+		Unit u = state.getUnit(subjectID);
 		return u is SettlerUnit &&
 		       u.owner == actorID &&
 		       u.currentAP > 0 &&
-		       MapController.instance.canPlaceCity(u.gridPosition);
+		       MapRules.canPlaceCity(state, u.gridPosition);
 	}
 
-	public override void execute() {
-		TurnController.instance.getPlayer(actorID).executeSettle(subjectID);
+	public override void execute(GameState state) {
+		Vector2I pos = state.getUnit(subjectID).gridPosition;
+		UnitRules.deleteUnit(state, state.getUnit(subjectID));
+		CityRules.createCity(state, actorID, pos);
 	}
+}
+
+public class EndTurnCommand : Command
+{
+	public override bool validate(GameState s) => s.currentPlayer == actorID;
+	public override void execute(GameState s) => TurnRules.endTurn(s);
 }
