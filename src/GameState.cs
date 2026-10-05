@@ -8,8 +8,13 @@ public class PlayerState
 	public bool alive = true;
 
 	public PlayerState clone() => (PlayerState)MemberwiseClone();
-	
-	
+
+	public override string ToString() {
+		return $"""
+		       Player {playerID}; Alive {alive}; Gold {gold}; Gold Rate {goldRate}; Unit Capacity {unitCapacityUsed}/{unitCapacityTotal}  
+		       """;
+	}
+
 }
 
 public class GameState
@@ -56,5 +61,31 @@ public class GameState
 		foreach (var (id, e) in entities) c.entities[id] = e.clone();
 		foreach (var (id, p) in players) c.players[id] = p.clone();
 		return c;
+	}
+
+	public override string ToString() {
+		string s = "";
+		foreach (var player in players) {
+			s += player.Value.ToString() + "\n";
+		}
+
+		foreach (var entity in entities) {
+			Type eType = entity.Value.GetType();
+			string eString = $"ID {entity.Key}; {eType.ToString()}; Pos {entity.Value.gridPosition}";
+			if (entity.Value is PlayerDecorator) {
+				PlayerDecorator d = (PlayerDecorator)entity.Value;
+				eString += $"; Owner {d.owner}";
+			}
+			if (entity.Value is Unit) {
+				Unit u = (Unit)entity.Value;
+				eString += $"; HP {u.currentHP}/{u.maxHP}";
+			} else if (entity.Value is City) {
+				City c = (City)entity.Value;
+				eString += $"; HP {c.currentHP}/{c.maxHP}";
+			}
+			
+			s += eString + "\n";
+		}
+		return s;
 	}
 }

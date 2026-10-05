@@ -1,4 +1,5 @@
-﻿using Godot;
+using Godot;
+using System.Threading;
 
 public abstract class Command
 {
@@ -9,6 +10,8 @@ public abstract class Command
 	public abstract bool validate(GameState state);
 
 	public abstract void execute(GameState state);
+
+	public abstract void print(GameState state);
 }
 
 public class MoveCommand : Command
@@ -23,6 +26,10 @@ public class MoveCommand : Command
 	public override void execute(GameState state) {
 		Unit u = state.getUnit(subjectID);
 		MapRules.moveUnit(state, u, target);
+	}
+
+	public override void print(GameState state) {
+		GD.Print($"Move {subjectID} to {target}");
 	}
 }
 
@@ -40,6 +47,11 @@ public class AttackCommand : Command
 	public override void execute(GameState state) {
 		Unit u = state.getUnit(subjectID);
 		CombatRules.resolveCombat(state, u, target);
+
+	}
+	
+	public override void print(GameState state) {
+		GD.Print($"{subjectID} attacks {target}");
 	}
 }
 
@@ -51,33 +63,50 @@ public class SpawnUnitCommand : Command
 	public override bool validate(GameState state) {
 		City c = state.getCity(subjectID);
 		return c != null && c.owner == actorID && pos == c.gridPosition
-		       && UnitRules.canCreate(state, actorID, uType, pos);
+			   && UnitRules.canCreate(state, actorID, uType, pos);
 	}
 
 	public override void execute(GameState state) {
 		UnitRules.createUnit(state, actorID, uType, pos);
 	}
+	
+	public override void print(GameState state) {
+		GD.Print($"Spawned {uType} at {pos}");
+	}
 }
 
 public class SettleCommand : Command
 {
+	private Vector2I pos;
+	
 	public override bool validate(GameState state) {
 		Unit u = state.getUnit(subjectID);
 		return u is SettlerUnit &&
-		       u.owner == actorID &&
-		       u.currentAP > 0 &&
-		       MapRules.canPlaceCity(state, u.gridPosition);
+			   u.owner == actorID &&
+			   u.currentAP > 0 &&
+			   MapRules.canPlaceCity(state, u.gridPosition);
 	}
 
 	public override void execute(GameState state) {
-		Vector2I pos = state.getUnit(subjectID).gridPosition;
+		Vector2I unitPos = state.getUnit(subjectID).gridPosition;
+		this.pos = unitPos;
 		UnitRules.deleteUnit(state, state.getUnit(subjectID));
 		CityRules.createCity(state, actorID, pos);
+	}
+	
+	public override void print(GameState state) {
+		GD.Print($"Settled at {pos}");
 	}
 }
 
 public class EndTurnCommand : Command
 {
-	public override bool validate(GameState s) => s.currentPlayer == actorID;
-	public override void execute(GameState s) => TurnRules.endTurn(s);
+	public override bool validate(GameState state) => state.currentPlayer == actorID;
+	public override void execute(GameState state) {
+		TurnRules.endTurn(state);
+	}
+	
+	public override void print(GameState state) {
+		GD.Print($"Turn ended for player {state.currentPlayer}");
+	}
 }

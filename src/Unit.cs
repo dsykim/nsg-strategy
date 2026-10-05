@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using Godot;
 
@@ -15,7 +15,7 @@ public static class UnitDefs
 	private static Dictionary<UnitType, UnitDef> defs;
 
 	public static void load() {
-		string json = FileAccess.GetFileAsString("res://src/Units/Units.json");
+		string json = FileAccess.GetFileAsString("res://src/Units.json");
 		var root = JsonNode.Parse(json)!.AsObject();
 		defs = new Dictionary<UnitType, UnitDef>();
 
@@ -42,9 +42,8 @@ public static class UnitDefs
 	public static IEnumerable<UnitDef> all() => defs.Values;
 }
 
-public abstract class Unit : CellDecorator
+public abstract class Unit : PlayerDecorator
 {
-	public readonly int owner;
 	public readonly UnitDef def;
 
 	public int currentHP { get; private set; }
@@ -63,8 +62,7 @@ public abstract class Unit : CellDecorator
 
 	public bool isDead => currentHP <= 0;
 
-	protected Unit(int owner, UnitType type) {
-		this.owner = owner;
+	protected Unit(int owner, UnitType type) : base(owner) {
 		def = UnitDefs.get(type);
 		currentHP = maxHP;
 		currentAP = maxAP;

@@ -17,6 +17,7 @@ public partial class TurnController : Node
 	private GameState state;
 	private CommandExecutor executor;
 	private readonly HashSet<int> humanPlayers = new();
+	private int turnCount = 0;
 
 	public bool aiThinking { get; private set; }
 
@@ -46,7 +47,11 @@ public partial class TurnController : Node
 
 	/* ==================== Turn loop ==================== */
 
-	private void runCurrentTurn() {
+	private async void runCurrentTurn() {
+		await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout); 
+		turnCount++;
+		GD.Print($"======== Turn {turnCount} ========");
+		GD.Print(state.ToString());
 		int playerID = state.currentPlayer;
 
 		if (humanPlayers.Contains(playerID)) {

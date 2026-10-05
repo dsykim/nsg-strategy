@@ -24,6 +24,7 @@ public class CommandExecutor
 		}
 		
 		cmd.execute(state);
+		cmd.print(state);
 		StateChanged?.Invoke();
 		return true;
 	}
