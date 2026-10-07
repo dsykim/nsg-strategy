@@ -32,7 +32,7 @@ public static class GameSetup
 	private static HexGrid generateMap(int width, int height, int seed) {
 		HexGrid grid = new HexGrid(width, height);
 		foreach (var cell in grid.grid) {
-			grid.setCell(cell.pos, TerrainTypes.PLAINS);
+			grid.setCell(cell.pos, TerrainType.PLAINS);
 		}
 
 		return grid;

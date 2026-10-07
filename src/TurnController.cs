@@ -18,6 +18,8 @@ public partial class TurnController : Node
 	private CommandExecutor executor;
 	private readonly HashSet<int> humanPlayers = new();
 	private int turnCount = 0;
+	private bool busy;
+	private readonly float aiTurnDelay = 1.0f;
 
 	public bool aiThinking { get; private set; }
 
@@ -46,21 +48,34 @@ public partial class TurnController : Node
 	}
 
 	/* ==================== Turn loop ==================== */
-
+	
 	private async void runCurrentTurn() {
-		await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout); 
-		turnCount++;
-		GD.Print($"======== Turn {turnCount} ========");
-		GD.Print(state.ToString());
-		int playerID = state.currentPlayer;
+		busy = true;
+		try {
+			int playerID = state.currentPlayer;
+			bool isHuman = humanPlayers.Contains(playerID);
 
-		if (humanPlayers.Contains(playerID)) {
-			aiThinking = false;
-			GD.Print($"Waiting for human player {playerID}");
-			return;
+			if (!isHuman && aiTurnDelay > 0) {
+				await ToSignal(GetTree().CreateTimer(aiTurnDelay), SceneTreeTimer.SignalName.Timeout);
+				if (!IsInstanceValid(this)) return;
+			}
+
+			turnCount++;
+			GD.Print($"\n======== Turn {turnCount} ========");
+			GD.Print(state.ToString());
+
+			if (isHuman) {
+				aiThinking = false;
+				GD.Print($"Waiting for human player {playerID}");
+				return;
+			}
+
+			startAITurn(playerID);
+		} catch (Exception e) {
+			GD.PushError($"Turn loop failed: {e}");
+		} finally {
+			busy = false;
 		}
-
-		startAITurn(playerID);
 	}
 
 	private void endTurn(int playerID) {

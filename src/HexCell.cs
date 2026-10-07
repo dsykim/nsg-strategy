@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public enum TerrainTypes
+public enum TerrainType
 {
 	PLAINS,
 	HILLS,
@@ -16,7 +16,7 @@ public class HexCell
 {
 	public readonly Vector2I pos;
 	public int controllerID = 0;
-	public TerrainTypes terrainType;
+	public TerrainType terrainType;
 
 	public int naturalDecoratorID = 0;
 	public int playerDecoratorID = 0;
@@ -24,14 +24,14 @@ public class HexCell
 
 	public HexCell(Vector2I pos) {
 		this.pos = pos;
-		terrainType = TerrainTypes.EMPTY;
+		terrainType = TerrainType.EMPTY;
 	}
 
 	public HexCell clone() {
 		return (HexCell)MemberwiseClone();
 	}
 	
-	public HexCell(Vector2I pos, TerrainTypes tType) : this(pos) {
+	public HexCell(Vector2I pos, TerrainType tType) : this(pos) {
 		terrainType = tType;
 	}
 

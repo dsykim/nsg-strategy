@@ -39,7 +39,7 @@ public class HexGrid
 		return pos.X >= 0 && pos.X < width && pos.Y >= 0 && pos.Y < height;
 	}
 
-	public void setCell(Vector2I pos, TerrainTypes tType = TerrainTypes.EMPTY) {
+	public void setCell(Vector2I pos, TerrainType tType = TerrainType.EMPTY) {
 		if (!indexInGrid(pos)) {
 			throw new IndexOutOfRangeException("Cell coordinates out of grid range");
 		}

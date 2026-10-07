@@ -5,8 +5,8 @@ using System.Linq;
 
 public static class MapRules
 {
-	public static readonly HashSet<TerrainTypes> impassable =
-			new() { TerrainTypes.EMPTY, TerrainTypes.OCEAN, TerrainTypes.MOUNTAIN };
+	public static readonly HashSet<TerrainType> impassable =
+			new() { TerrainType.EMPTY, TerrainType.OCEAN, TerrainType.MOUNTAIN };
 	
 	public static bool isPassable(GameState s, Vector2I pos) =>
 			!impassable.Contains(s.grid.getCell(pos).terrainType);

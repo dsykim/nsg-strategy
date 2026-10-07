@@ -8,6 +8,7 @@ public partial class GameScene : Node
 	public static GameScene instance { get; private set; }
 	
 	private TurnController turnController;
+	private BoardView boardView;
 	// private CameraController camera;
 	// private UIController uiController;
 	
@@ -24,6 +25,13 @@ public partial class GameScene : Node
 	public override void _Ready() {
 		state = GameSetup.setupGame(config);
 		CommandExecutor commandExecutor = new CommandExecutor(state);
+		
+		if (DisplayServer.GetName() != "headless") {
+			boardView = new BoardView();
+			AddChild(boardView);
+			boardView.init(state, commandExecutor);
+		}
+
 		
 		turnController = new TurnController();
 		AddChild(turnController);
