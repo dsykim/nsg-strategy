@@ -9,7 +9,7 @@ public partial class GameScene : Node
 	
 	private TurnController turnController;
 	private BoardView boardView;
-	// private CameraController camera;
+	private CameraController camera;
 	// private UIController uiController;
 	
 	public GameState state { get; private set; }
@@ -17,8 +17,8 @@ public partial class GameScene : Node
 	private readonly GameConfig config = new GameConfig
 	{
 			playerCount = 2,
-			width = 41,
-			height = 24,
+			width = 21,
+			height = 16,
 			seed = 1
 	};
 
@@ -30,6 +30,10 @@ public partial class GameScene : Node
 			boardView = new BoardView();
 			AddChild(boardView);
 			boardView.init(state, commandExecutor);
+			
+			camera = new CameraController();
+			AddChild(camera);
+			camera.init(boardView.boardSize);
 		}
 
 		
@@ -39,9 +43,7 @@ public partial class GameScene : Node
 
 		// uiController = (UIController)GetNode("UIController");
 		// uiController.init();
-
-		// camera = (CameraController)GetNode("MainCamera");
-		// camera.init();
+		
 		//
 		// InputController input = new InputController();
 		// input.init();

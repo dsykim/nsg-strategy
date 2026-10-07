@@ -14,10 +14,11 @@ public partial class CameraController : Camera2D
 	private float minZoom = 0.5f;
 	private float maxZoom = 2f;
 
-	public void init() {
-		SetPosition(GetViewport().GetVisibleRect().Size / 2);
+	public void init(Vector2 boardSize) {
+		// Vector2 origin = GetViewport().GetVisibleRect().Size / 2;
+		SetPosition(new Vector2());
 		targetZoom = Zoom.X;
-		bounds = new Rect2(0, 0, GetViewport().GetVisibleRect().Size / 2);
+		bounds = new Rect2(0, 0, boardSize);
 	}
 
 	public override void _Process(double delta) {
