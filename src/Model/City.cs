@@ -1,14 +1,16 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 
-public class City : PlayerDecorator
+public class City : PlayerDecorator, IHasHealth
 {
 	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>(); 
 	public int goldProduction = 5;
 	public string cityName = "City";
-	public int maxHP = 100;
-	public int currentHP;
+	public int maxHP { get; set; } = 100;
+	public int currentHP { get; set; }
+
+	public override string displayName => cityName;
 
 	public City(int owner, Vector2I pos) : base(owner) {
 		gridPosition = pos;

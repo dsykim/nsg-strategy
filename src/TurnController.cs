@@ -12,23 +12,23 @@ using System.Threading.Tasks;
  */
 public partial class TurnController : Node
 {
-	public static TurnController instance { get; private set; }
-
 	private GameState state;
 	private CommandExecutor executor;
 	private readonly HashSet<int> humanPlayers = new();
 	private int turnCount = 0;
-	private bool busy;
 	private readonly float aiTurnDelay = 1.0f;
 
+	/** True while the AI planner is running on a worker thread. */
 	public bool aiThinking { get; private set; }
 
-	/** True when the game is waiting for a human to act. UI can gate input on this. */
-	public bool awaitingHuman => !aiThinking && humanPlayers.Contains(state.currentPlayer);
+	/**
+	 * True when the game is waiting for a human to act. Human turns start without delay,
+	 * so this is already correct when the EndTurnCommand fires StateChanged.
+	 */
+	public bool awaitingHuman => humanPlayers.Contains(state.currentPlayer);
 
 	public TurnController() {
 		Name = "TurnController";
-		instance = this;
 	}
 
 	public void init(GameState state, CommandExecutor executor, IEnumerable<int> humanPlayerIDs) {
@@ -38,10 +38,14 @@ public partial class TurnController : Node
 		humanPlayers.UnionWith(humanPlayerIDs);
 	}
 
+	public bool isHuman(int playerID) => humanPlayers.Contains(playerID);
+
+	public IReadOnlyCollection<int> humanPlayerIDs => humanPlayers;
+
 	/** Call once after setup; the initial player's beginTurn upkeep is setup's job. */
 	public void startGame() => runCurrentTurn();
 
-	/** Called by the UI (end turn button). Ignored when it isn't a human's turn. */
+	/** Called by the UI (end turn button / hotkey). Ignored when it isn't a human's turn. */
 	public void endHumanTurn() {
 		if (!awaitingHuman) return;
 		endTurn(state.currentPlayer);
@@ -50,7 +54,6 @@ public partial class TurnController : Node
 	/* ==================== Turn loop ==================== */
 	
 	private async void runCurrentTurn() {
-		busy = true;
 		try {
 			int playerID = state.currentPlayer;
 			bool isHuman = humanPlayers.Contains(playerID);
@@ -65,7 +68,6 @@ public partial class TurnController : Node
 			GD.Print(state.ToString());
 
 			if (isHuman) {
-				aiThinking = false;
 				GD.Print($"Waiting for human player {playerID}");
 				return;
 			}
@@ -73,8 +75,6 @@ public partial class TurnController : Node
 			startAITurn(playerID);
 		} catch (Exception e) {
 			GD.PushError($"Turn loop failed: {e}");
-		} finally {
-			busy = false;
 		}
 	}
 
@@ -106,6 +106,8 @@ public partial class TurnController : Node
 	}
 
 	private void onAIFinished(int playerID, List<Command> commands) {
+		aiThinking = false;
+
 		// The turn may have moved on (e.g. a game was loaded mid-plan); drop stale results.
 		if (state.currentPlayer != playerID) return;
 

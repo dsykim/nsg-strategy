@@ -1,13 +1,18 @@
-﻿using Godot;
-using Godot.Collections;
+using Godot;
 
-public partial class ResourceBar : Control
+/** Gold, income and unit capacity for the viewing player (see HudContext.viewingPlayer). */
+public partial class ResourceBar : HudWidget
 {
+	[Export] private Label playerLabel;
 	[Export] private Label goldLabel;
 	[Export] private Label capacityLabel;
-	
-	public void handleResourceUpdateSignal(Dictionary<string, int> vals) {
-		goldLabel.Text = vals["gold"].ToString();
-		capacityLabel.Text = $"{vals["unitCapacityUsed"]} / {vals["unitCapacityTotal"]}";
+
+	protected override void refresh() {
+		PlayerState p = ctx.state.getPlayer(ctx.viewingPlayer);
+		if (p == null) return;
+
+		setText(playerLabel, $"Player {p.playerID}");
+		setText(goldLabel, $"{p.gold} (+{p.goldRate})");
+		setText(capacityLabel, $"{p.unitCapacityUsed} / {p.unitCapacityTotal}");
 	}
 }

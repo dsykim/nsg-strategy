@@ -28,6 +28,9 @@ public partial class BoardView : Node2D
 	/** Pixel size of the drawn board including margin; for a future camera to fit or clamp to. */
 	public Vector2 boardSize { get; private set; }
 
+	/** Hover / selection / target outlines. Purely visual; driven by the input layer. */
+	public BoardOverlays overlays { get; private set; }
+
 	private GameState state;
 	private CommandExecutor executor;
 
@@ -61,7 +64,16 @@ public partial class BoardView : Node2D
 
 		layout = buildLayout(s.grid);
 		terrain.bind(s, layout);
+		overlays.bind(layout);
 		syncNow();
+	}
+
+	/** The in-grid cell under the mouse, if any. */
+	public bool tryGetCellAtMouse(out Vector2I cell) {
+		cell = default;
+		if (state == null || layout == null) return false;
+		cell = layout.worldToCell(GetLocalMousePosition());
+		return state.grid.indexInGrid(cell);
 	}
 
 	public override void _Process(double delta) {
@@ -116,6 +128,10 @@ public partial class BoardView : Node2D
 			AddChild(node);
 			layers[l] = node;
 		}
+
+		// Last child: outlines draw above terrain and entities.
+		overlays = new BoardOverlays();
+		AddChild(overlays);
 	}
 
 	private Vector2 resolveCellSize() {

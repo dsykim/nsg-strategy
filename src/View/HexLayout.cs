@@ -48,6 +48,33 @@ public sealed class HexLayout
 		return origin + p;
 	}
 
+	/**
+	 * Inverse of cellToWorld: the cell containing a point in the board's local space.
+	 * May return coordinates outside the grid; callers check HexGrid.indexInGrid.
+	 *
+	 * Exact even for non-regular tiles: the layout is an affine stretch of a regular hex
+	 * lattice, so undoing the stretch and cube-rounding picks the correct cell.
+	 */
+	public Vector2I worldToCell(Vector2 point) {
+		Vector2 p = point - origin;
+		float q = p.X / (cellSize.X * 0.75f);
+		float r = p.Y / cellSize.Y - q / 2f;
+		Vector3I cube = HexUtils.cubeRound(new Vector3(q, r, -q - r));
+		return HexUtils.cubeToOffset(cube);
+	}
+
+	/**
+	 * World-space endpoints of the edge a cell shares with its neighbor in `dir`.
+	 * Corners start at 0° (east) and step clockwise in screen space (y down), so for
+	 * flat-top hexes the edge facing direction d spans corners (d+4)%6 and (d+5)%6
+	 * (N = upper-left..upper-right, NE = upper-right..east, and so on).
+	 */
+	public (Vector2 from, Vector2 to) edgeEndpoints(Vector2I cell, HexDirection dir) {
+		Vector2 c = cellToWorld(cell);
+		int d = (int)dir;
+		return (c + cornerOffsets[(d + 4) % 6], c + cornerOffsets[(d + 5) % 6]);
+	}
+
 	/** The tile's bounding box around `center`; tile textures are drawn into this. */
 	public Rect2 cellRect(Vector2 center) => new Rect2(center - cellSize / 2f, cellSize);
 

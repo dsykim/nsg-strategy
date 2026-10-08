@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,21 +69,10 @@ public class GameState
 			s += player.Value.ToString() + "\n";
 		}
 
-		foreach (var entity in entities) {
-			Type eType = entity.Value.GetType();
-			string eString = $"ID {entity.Key}; {eType.ToString()}; Pos {entity.Value.gridPosition}";
-			if (entity.Value is PlayerDecorator) {
-				PlayerDecorator d = (PlayerDecorator)entity.Value;
-				eString += $"; Owner {d.owner}";
-			}
-			if (entity.Value is Unit) {
-				Unit u = (Unit)entity.Value;
-				eString += $"; HP {u.currentHP}/{u.maxHP}";
-			} else if (entity.Value is City) {
-				City c = (City)entity.Value;
-				eString += $"; HP {c.currentHP}/{c.maxHP}";
-			}
-			
+		foreach (var (id, entity) in entities) {
+			string eString = $"ID {id}; {entity.GetType()}; Pos {entity.gridPosition}";
+			if (entity is PlayerDecorator d) eString += $"; Owner {d.owner}";
+			if (entity is IHasHealth h) eString += $"; HP {h.currentHP}/{h.maxHP}";
 			s += eString + "\n";
 		}
 		return s;

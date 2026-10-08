@@ -42,7 +42,7 @@ public static class UnitDefs
 	public static IEnumerable<UnitDef> all() => defs.Values;
 }
 
-public abstract class Unit : PlayerDecorator
+public abstract class Unit : PlayerDecorator, IHasHealth
 {
 	public readonly UnitDef def;
 
@@ -51,6 +51,7 @@ public abstract class Unit : PlayerDecorator
 
 	public UnitType type => def.type;
 	public string unitName => def.name;
+	public override string displayName => def.name;
 	public int maxHP => def.maxHP;
 	public int maxAP => def.maxAP;
 	public int minRange => def.minRange;

@@ -1,14 +1,11 @@
-﻿using Godot;
+using Godot;
 
 public class CommandExecutor
 {
-	public static CommandExecutor instance { get; private set; }
-
 	private GameState state;
 	public event System.Action StateChanged;
 
 	public CommandExecutor(GameState s) {
-		instance = this;
 		state = s;
 	}
 
