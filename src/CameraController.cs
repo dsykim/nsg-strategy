@@ -13,9 +13,9 @@ public partial class CameraController : Camera2D
 	private float targetZoom;
 	private float minZoom = 0.5f;
 	private float maxZoom = 2f;
+	private bool isDragging;
 
 	public void init(Vector2 boardSize) {
-		// Vector2 origin = GetViewport().GetVisibleRect().Size / 2;
 		SetPosition(new Vector2());
 		targetZoom = Zoom.X;
 		bounds = new Rect2(0, 0, boardSize);
@@ -44,6 +44,10 @@ public partial class CameraController : Camera2D
 
 		float zoomedSpeed = moveSpeed / Zoom.X;
 		Position += zoomedSpeed * (float)delta * movement;
+		clampToBounds();
+	}
+
+	private void clampToBounds() {
 		float x = Math.Clamp(Position.X, bounds.Position.X, bounds.End.X);
 		float y = Math.Clamp(Position.Y, bounds.Position.Y, bounds.End.Y);
 		Position = new Vector2(x, y);
@@ -59,14 +63,59 @@ public partial class CameraController : Camera2D
 		}
 	}
 
+	/* ==================== Drag to pan ==================== */
+
+	private void beginDrag() {
+		isDragging = true;
+		Input.SetDefaultCursorShape(Input.CursorShape.Drag);
+	}
+
+	private void endDrag() {
+		if (!isDragging) return;
+		isDragging = false;
+		Input.SetDefaultCursorShape(Input.CursorShape.Arrow);
+	}
+
+	/** Runs before GUI, so drag motion and release are seen even over panels. */
+	public override void _Input(InputEvent @event) {
+		if (!isDragging) return;
+
+		if (@event is InputEventMouseButton mb && mb.ButtonIndex == MouseButton.Middle && !mb.Pressed) {
+			endDrag();
+			return;
+		}
+
+		if (@event is InputEventMouseMotion mm) {
+			// Safety net: if the release was missed, the button mask tells the truth.
+			if ((mm.ButtonMask & MouseButtonMask.Middle) == 0) {
+				endDrag();
+				return;
+			}
+			// Relative is in screen pixels; divide by zoom to get world units.
+			// Subtract so the board moves with the mouse (grab-and-drag feel).
+			Position -= mm.Relative / Zoom;
+			clampToBounds();
+		}
+	}
+
 	public override void _UnhandledInput(InputEvent @event) {
-		if (@event.IsAction("ZoomIn")) {
+		if (@event is InputEventMouseButton mb && mb.ButtonIndex == MouseButton.Middle && mb.Pressed) {
+			beginDrag();
+			GetViewport().SetInputAsHandled();
+			return;
+		}
+
+		if (@event.IsActionPressed("ZoomIn")) {
 			targetZoom += zoomSpeed;
-		} else if (@event.IsAction("ZoomOut")) {
+		} else if (@event.IsActionPressed("ZoomOut")) {
 			targetZoom -= zoomSpeed;
 		}
 
 		targetZoom = Math.Clamp(targetZoom, minZoom, maxZoom);
 	}
 
+	/** Alt-tabbing mid-drag would otherwise swallow the release event. */
+	public override void _Notification(int what) {
+		if (what == NotificationWMWindowFocusOut) endDrag();
+	}
 }
