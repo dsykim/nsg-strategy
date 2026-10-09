@@ -16,8 +16,7 @@ public partial class GameScene : Node
 	private readonly GameConfig config = new GameConfig
 	{
 			playerCount = 2,
-			width = 21,
-			height = 16,
+			boardSize = 9,
 			seed = 1
 	};
 

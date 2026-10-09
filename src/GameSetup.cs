@@ -3,106 +3,74 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 public struct GameConfig
 {
-	public int playerCount, width, height, seed;
+	public int playerCount, boardSize, seed;
 }
-
 
 public static class GameSetup
 {
+	private static int MAX_PLAYERS = 2;
 	public static GameState setupGame(GameConfig config) {
 		GameState state = new GameState();
 		state.rng = new Random(config.seed);
 		UnitDefs.load();
-		state.grid = mirror(generateMap(config.width, config.height, config.seed));
+		state.grid = mirror(generateMap(config));
 		for (int i = 1; i < config.playerCount + 1; i++) {
 			PlayerState player = new PlayerState();
 			player.playerID = i;
 			player.unitCapacityTotal = 10;
 			player.gold = 20;
-			UnitRules.placeUnit(state, i, UnitType.SETTLER, getSpawnPos(state, i));
+			UnitRules.placeUnit(state, i, UnitType.SETTLER, getSpawnPos(config, i));
 			state.players.Add(i, player);
 		}
 
 		return state;
 	}
 
-	private static Vector2I getSpawnPos(GameState state, int playerID) {
-		List<HexCell> validSpawns = state.grid.grid.Where(c => MapRules.isPassable(state, c.pos)).ToList();
-		if (playerID == 1) return validSpawns[0].pos;
-		if (playerID == 2) return validSpawns[validSpawns.Count-1].pos;
+	private static Vector2I getSpawnPos(GameConfig config, int playerID) {
+		if (playerID > MAX_PLAYERS) GD.PrintErr($"Too many players. Max player count is {MAX_PLAYERS}");
+		if (playerID == 1) return new Vector2I(3, config.boardSize);
+		if (playerID == 2) return new Vector2I(2 * config.boardSize - 3, config.boardSize);
 		return new Vector2I();
 	}
 
-	// private static HexGrid generateMap(int width, int height, int seed) {
-	// 	HexGrid grid = new HexGrid(width, height);
-	// 	foreach (var cell in grid.grid) {
-	// 		grid.setCell(cell.pos, TerrainType.PLAINS);
-	// 	}
-	//
-	// 	return grid;
-	// }
-
-	private static HexGrid generateMap(int width, int height, int seed) {
-		Queue<HexCell> frontier = new Queue<HexCell>();
+	private static HexGrid generateMap(GameConfig config) {
+		int width = config.boardSize * 2 + 1;
+		int height = width;
 		HexGrid grid = new HexGrid(width, height);
-		Random rand = new Random(seed);
-	
-		Vector2I startPos = new Vector2I(width / 2, height / 2);
-		grid.setCell(startPos, TerrainType.PLAINS);
+		Random rand = new Random(config.seed);
+		int radius = (width - 2) / 2;
+		Vector2I center = new Vector2I(width, height) / 2;
 		
-		foreach (HexCell c in grid.getNeighbors(startPos)) {
-			frontier.Enqueue(c);
-		}
-	
-		while (frontier.Count > 0) {
-			HexCell next = frontier.Dequeue();
-			bool isBorder = next.pos.X == 0 ||
-							next.pos.X == width - 1 ||
-							next.pos.Y == 0 ||
-							next.pos.Y == height - 1;
-			bool isBorderAdj = next.pos.X == 1 ||
-							   next.pos.X == width - 2 ||
-							   next.pos.Y == 1 ||
-							   next.pos.Y == height - 2;
-			int distToStart = HexUtils.hexDistance(next.pos, startPos);
-			float threshold = Math.Max(0.95f - (float)Math.Pow((float)distToStart / width, 2), 0.25f);
-	
-			if (isBorderAdj) threshold = 0.2f;
-	
-			if (!isBorder && rand.NextSingle() < threshold) {
-				// Make land
-				float randVal = rand.NextSingle();
-				TerrainType lType;
-				if (randVal < 0.6) {
-					lType = TerrainType.PLAINS;
-				} else if (randVal < 0.9) {
-					lType = TerrainType.HILLS;
+		foreach (HexCell c in grid.grid) {
+			if (grid.getCellsInRadius(center, radius).Contains(c)) {
+				// Tile on board
+				float val = rand.NextSingle();
+				TerrainType tType;
+				if (val < 0.4f) {
+					tType = TerrainType.PLAINS;
+				} else if (val < 0.7f) {
+					tType = TerrainType.HILLS;
+				} else if (val < 0.85f) {
+					tType = TerrainType.MOUNTAIN;
 				} else {
-					lType = TerrainType.MOUNTAIN;
+					tType = TerrainType.OCEAN;
 				}
-	
-				grid.setCell(next.pos, lType);
-				foreach (HexCell c in grid.getNeighbors(next.pos)) {
-					if (!frontier.Contains(c) && c.terrainType == TerrainType.EMPTY) {
-						frontier.Enqueue(c);
-					}
-				}
+				grid.setCell(c.pos, tType);
+			} else if (grid.getCellsInRadius(center, radius+1).Contains(c)){
+				// Tile not on board, ocean
+				grid.setCell(c.pos, TerrainType.OCEAN);
 			} else {
-				// Make ocean
-				grid.setCell(next.pos, TerrainType.OCEAN);
+				grid.setCell(c.pos, TerrainType.EMPTY);
 			}
 		}
-	
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				Vector2I pos = new Vector2I(x, y);
-				if (grid.getCell(pos).terrainType == TerrainType.EMPTY) {
-					grid.setCell(pos, TerrainType.OCEAN);
-				}
-			}
+
+		for (int i = 1; i < MAX_PLAYERS + 1; i++) {
+			Vector2I spawnPos = getSpawnPos(config, i);
+			grid.setCell(spawnPos, TerrainType.PLAINS);
 		}
 	
 		return grid;
