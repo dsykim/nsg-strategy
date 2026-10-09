@@ -11,7 +11,7 @@ public partial class GameScene : Node
 	[Export] private UIController uiController;
 
 	/** Players controlled by a human. Ignored in headless runs (AI vs AI). */
-	private readonly int[] humanPlayerIDs = { 1 };
+	private readonly int[] humanPlayerIDs = { 1, 2 };
 
 	private readonly GameConfig config = new GameConfig
 	{

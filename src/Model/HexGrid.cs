@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 public class HexGrid
 {
@@ -117,21 +118,6 @@ public class HexGrid
 		return cells;
 	}
 	
-	public List<Vector2I> getCellsInLine(Vector2I p1, Vector2I p2) {
-		if (p1 == p2) {
-			throw new Exception("Line endpoints must be different");
-		}
-		Vector3I c1 = HexUtils.offsetToCube(p1.X, p1.Y);
-		Vector3I c2 = HexUtils.offsetToCube(p2.X, p2.Y);
-
-		int N = HexUtils.hexDistance(c1, c2);
-		List<Vector2I> results = new List<Vector2I>();
-		for (int i = 0; i < N + 1; i++) {
-			results.Add(HexUtils.cubeToOffset(HexUtils.cubeRound(HexUtils.cubeLerp(c1, c2, 1f / N * i))));
-		}
-
-		return results;
-	}
 	public HexEdge getEdge(Vector2I pos, HexDirection dir, bool create = true) {
 		var key = new EdgeKey(pos, HexUtils.neighbor(pos, dir));
 		if (edges.TryGetValue(key, out var e)) {

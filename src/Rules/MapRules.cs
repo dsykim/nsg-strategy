@@ -3,14 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
 public static class MapRules
 {
+	public static readonly Dictionary<TerrainType, int> movementCosts = new()
+	{
+			[TerrainType.EMPTY] = -1,
+			[TerrainType.OCEAN] = -1,
+			[TerrainType.MOUNTAIN] = -1,
+			[TerrainType.PLAINS] = 1,
+			[TerrainType.HILLS] = 2,
+	};
+	
 	public static readonly HashSet<TerrainType> impassable =
 			new() { TerrainType.EMPTY, TerrainType.OCEAN, TerrainType.MOUNTAIN };
+
+	public static readonly HashSet<TerrainType> obscuring =
+			new() { TerrainType.MOUNTAIN };
 	
 	public static bool isPassable(GameState s, Vector2I pos) =>
 			!impassable.Contains(s.grid.getCell(pos).terrainType);
 
+	public static bool blocksSight(GameState s, Vector2I pos) => 
+			obscuring.Contains(s.grid.getCell(pos).terrainType);
+	
 	public static bool canPlaceUnit(GameState s, Vector2I pos) =>
 			isPassable(s, pos) && !s.grid.getCell(pos).hasUnit();
 
@@ -39,8 +55,8 @@ public static class MapRules
 				bool canStop = !cell.hasUnit();
 				bool canTraverse = canStop || s.getUnit(cell.unitID).owner == unit.owner;
 
-				if (canStop) reachable.Add(n, cost + 1);
-				if (canTraverse) frontier.Enqueue((n, cost + 1));
+				if (canStop) reachable.Add(n, cost + movementCosts[cell.terrainType]);
+				if (canTraverse) frontier.Enqueue((n, cost + movementCosts[cell.terrainType]));
 			}
 		}
 		return reachable;

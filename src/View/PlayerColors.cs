@@ -5,8 +5,8 @@ public static class PlayerColors
 {
 	private static readonly Color[] palette =
 	{
-			new Color("d1495b"), // red
 			new Color("3d7dd8"), // blue
+			new Color("d1495b"), // red
 			new Color("e9a23b"), // amber
 			new Color("5aa469"), // green
 			new Color("8e6bbf"), // purple

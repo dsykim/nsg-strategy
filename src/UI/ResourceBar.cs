@@ -12,7 +12,7 @@ public partial class ResourceBar : HudWidget
 		if (p == null) return;
 
 		setText(playerLabel, $"Player {p.playerID}");
-		setText(goldLabel, $"{p.gold} (+{p.goldRate})");
-		setText(capacityLabel, $"{p.unitCapacityUsed} / {p.unitCapacityTotal}");
+		setText(goldLabel, $"Gold: {p.gold} (+{p.goldRate})");
+		setText(capacityLabel, $"Unit Capacity: {p.unitCapacityUsed} / {p.unitCapacityTotal}");
 	}
 }

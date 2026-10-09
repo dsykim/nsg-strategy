@@ -30,6 +30,7 @@ public partial class InputController : Node
 	public bool isTargeting => targetingAction != null;
 	private int targetingEntityID;
 	private readonly HashSet<Vector2I> validTargets = new();
+	private readonly HashSet<Vector2I> cellsInRange = new();
 
 	/** Fired when targeting starts or ends (e.g. so a panel can highlight the active button). */
 	public event Action ModeChanged;
@@ -198,6 +199,9 @@ public partial class InputController : Node
 	private void recomputeTargets(CellDecorator e) {
 		validTargets.Clear();
 		validTargets.UnionWith(targetingAction.validTargets(state, e));
+		cellsInRange.Clear();
+		cellsInRange.UnionWith(targetingAction.allCellsInRange(state, e));
+		board.overlays.showRangeRegion(cellsInRange);
 		board.overlays.showTargetRegion(validTargets, targetingAction.highlight);
 	}
 
@@ -213,7 +217,9 @@ public partial class InputController : Node
 		targetingAction = null;
 		targetingEntityID = 0;
 		validTargets.Clear();
+		cellsInRange.Clear();
 		board.overlays.clearTargetRegion();
+		board.overlays.clearRangeRegion();
 		ModeChanged?.Invoke();
 	}
 

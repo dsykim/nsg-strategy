@@ -20,7 +20,7 @@ public partial class TurnPanel : HudWidget
 
 		// turnNumber counts full rounds; +1 assumes setup starts it at 0. Drop it if setup starts at 1.
 		setText(turnLabel, $"Turn {ctx.state.turnNumber + 1}");
-		setText(statusLabel, myTurn ? $"Player {current} — your turn" : $"Player {current} is thinking…");
+		setText(statusLabel, myTurn ? $"Your turn player {current}" : $"Player {current} is thinking…");
 
 		if (endTurnButton != null) endTurnButton.Disabled = !myTurn;
 	}

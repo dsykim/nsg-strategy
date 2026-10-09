@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,6 +56,8 @@ public abstract class TargetedAction : PlayerAction
 
 	public abstract IEnumerable<Vector2I> validTargets(GameState s, CellDecorator e);
 
+	public abstract IEnumerable<Vector2I> allCellsInRange(GameState s, CellDecorator e);
+
 	public abstract Command build(int actorID, CellDecorator e, Vector2I target);
 
 	/** Available if there's at least one target and a command aimed at it validates. */
@@ -75,6 +78,9 @@ public sealed class MoveAction : TargetedAction
 	public override IEnumerable<Vector2I> validTargets(GameState s, CellDecorator e) =>
 			MapRules.movableCells(s, (Unit)e).Keys;
 
+	public override IEnumerable<Vector2I> allCellsInRange(GameState s, CellDecorator e) => 
+			Array.Empty<Vector2I>();
+
 	public override Command build(int actorID, CellDecorator e, Vector2I target) =>
 			new MoveCommand { actorID = actorID, subjectID = e.id, target = target };
 }
@@ -90,6 +96,16 @@ public sealed class AttackAction : TargetedAction
 		var u = (Unit)e;
 		return u.currentAP < u.attackCost ? Enumerable.Empty<Vector2I>() : UnitRules.getAttackableCells(s, u);
 	}
+
+	public override IEnumerable<Vector2I> allCellsInRange(GameState s, CellDecorator e) {
+		var u = (Unit)e;
+		return UnitRules.getCellsInAttackRange(s, u);
+	}
+
+	public override bool isAvailable(GameState s, int actorID, CellDecorator e) {
+		return true;
+	}
+
 
 	public override Command build(int actorID, CellDecorator e, Vector2I target) =>
 			new AttackCommand { actorID = actorID, subjectID = e.id, target = target };
@@ -141,6 +157,10 @@ public static class PlayerActions
 				new AttackAction(),
 				new SettleAction(),
 		};
+		
+		foreach (UnitDef def in UnitDefs.all().OrderBy(d => d.type))
+			list.Add(new SpawnAction(def, null));
+
 		
 		return list;
 	}

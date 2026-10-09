@@ -19,7 +19,7 @@ public partial class EdgeOverlay : Node2D
 
 	// Fills the tiny wedge gaps where two segments meet at a hex vertex. Cheap and
 	// makes corners look continuous without ordering the segments into a polyline.
-	public bool RoundCaps { get; set; } = true;
+	public bool RoundCaps { get; set; } = false;
 
 	public EdgeOverlay() {
 		ZIndex = 20;

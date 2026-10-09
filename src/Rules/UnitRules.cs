@@ -60,18 +60,23 @@ public static class UnitRules
 	}
 
 	public static List<Vector2I> getAttackableCells(GameState s, Unit u) {
-		// return getCellsInRadiusRange(unit.gridPosition, unit.minRange, unit.maxRange);
 		List<Vector2I> attackable = new List<Vector2I>();
 		int attackerID = u.owner;
 		foreach (var pos in s.grid.getCellsInRadiusRange(u.gridPosition, u.minRange, u.maxRange)) {
 			HexCell defenderCell = s.grid.getCell(pos);
 			bool hasEnemyCity = defenderCell.hasCity(s) && defenderCell.controllerID != attackerID;
 			bool hasEnemyUnit = defenderCell.hasUnit() && s.getUnit(defenderCell.unitID).owner != attackerID;
-			if (hasEnemyCity || hasEnemyUnit) {
+			if ((hasEnemyCity || hasEnemyUnit) && HexUtils.inLineOfSight(s, u.gridPosition, pos)) {
 				attackable.Add(pos);
 			}
 		}
 		
 		return attackable;
+	}
+
+	public static List<Vector2I> getCellsInAttackRange(GameState s, Unit u) {
+		return s.grid.getCellsInRadiusRange(u.gridPosition, u.minRange, u.maxRange)
+				.Where(pos => HexUtils.inLineOfSight(s, u.gridPosition, pos) 
+				              && MapRules.isPassable(s, pos)).ToList();
 	}
 }

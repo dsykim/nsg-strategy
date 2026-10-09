@@ -16,7 +16,7 @@ public static class ViewTextures
 			{ TerrainType.PLAINS, "res://assets/pixel-plains.png" },
 			{ TerrainType.HILLS, "res://assets/pixel-hills.png" },
 			{ TerrainType.MOUNTAIN, "res://assets/pixel-mountain.png" },
-			{ TerrainType.OCEAN, "res://assets/pixel-ocean.png" },
+			{ TerrainType.OCEAN, "res://assets/waterHex.png" },
 			// EMPTY has no texture and is not drawn.
 	};
 

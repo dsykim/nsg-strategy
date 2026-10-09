@@ -33,9 +33,17 @@ public partial class BoardOverlays : Node2D
 			LineWidth = 3f,
 	};
 
+	private readonly EdgeOverlay range = new()
+	{
+			Name = "Range",
+			LineColor = new Color(1f, 0.1f, 0.1f, 0.75f),
+			LineWidth = 1.5f,
+	};
+
 	public BoardOverlays() {
 		Name = "Overlays";
 		// Child order is draw order: selection sits on top of the target region.
+		AddChild(range);
 		AddChild(hover);
 		AddChild(target);
 		AddChild(selection);
@@ -44,6 +52,7 @@ public partial class BoardOverlays : Node2D
 	/** Called by BoardView whenever the layout is (re)built. */
 	public void bind(HexLayout l) {
 		layout = l;
+		range.Clear();
 		hover.Clear();
 		target.Clear();
 		selection.Clear();
@@ -58,7 +67,13 @@ public partial class BoardOverlays : Node2D
 		target.SetSegments(regionOutline(cells));
 	}
 
+	public void showRangeRegion(IEnumerable<Vector2I> cells) {
+		range.SetSegments(regionOutline(cells));
+	}
+
 	public void clearTargetRegion() => target.Clear();
+
+	public void clearRangeRegion() => range.Clear();
 
 	/** Edges of `region` that don't border another cell in the region. */
 	public List<(Vector2 from, Vector2 to)> regionOutline(IEnumerable<Vector2I> region) {
