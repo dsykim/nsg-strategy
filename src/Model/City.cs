@@ -13,7 +13,7 @@ public class City : PlayerDecorator, IHasHealth
 	public override string displayName => cityName;
 
 	public City(int owner, Vector2I pos) : base(owner) {
-		gridPosition = pos;
+		((CellDecorator)this).pos = pos;
 		currentHP = maxHP;
 	}
 

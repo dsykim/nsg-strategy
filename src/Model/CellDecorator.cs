@@ -2,7 +2,7 @@
 
 public abstract class CellDecorator
 {
-	public Vector2I gridPosition;
+	public Vector2I pos;
 	public int id { get; private set; } = 0;
 
 	public void assignId(int newId) {

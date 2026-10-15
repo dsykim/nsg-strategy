@@ -53,7 +53,7 @@ public static class LegalActions
 		foreach (UnitDef def in UnitDefs.all())
 			yield return new SpawnUnitCommand
 			{
-					actorID = playerID, subjectID = c.id, uType = def.type, pos = c.gridPosition
+					actorID = playerID, subjectID = c.id, uType = def.type, pos = c.pos
 			};
 	}
 

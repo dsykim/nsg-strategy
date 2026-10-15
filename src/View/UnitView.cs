@@ -5,6 +5,7 @@ public partial class UnitView : EntityView
 {
 
 	public override ViewLayer layer => ViewLayer.Units;
+	public override bool hiddenByFog => true;
 
 	private Texture2D texture;
 	private Rect2 drawRect;
@@ -15,7 +16,7 @@ public partial class UnitView : EntityView
 		if (u == null) return;
 
 		Visible = !u.isDead;
-		Position = layout.cellToWorld(u.gridPosition);
+		Position = layout.cellToWorld(u.pos);
 		texture = ViewTextures.unit(u);
 		ownerColor = PlayerColors.get(u.owner);
 		drawRect = HexLayout.fitRect(texture, layout.cellSize);

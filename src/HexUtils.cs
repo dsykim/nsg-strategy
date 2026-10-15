@@ -123,6 +123,7 @@ public static class HexUtils
 	}
 	
 	public static bool inLineOfSight(GameState s, Vector2I pos, Vector2I target) {
+		if (pos == target) return true;
 		var steps = getLineSteps(pos, target);
 
 		// Skip the endpoints: the attacker's and target's own tiles don't block.

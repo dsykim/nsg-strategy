@@ -33,24 +33,28 @@ public partial class BoardView : Node2D
 
 	private GameState state;
 	private CommandExecutor executor;
+	private TurnController turns;
 
 	private TerrainLayer terrain;
 	private readonly Dictionary<ViewLayer, Node2D> layers = new();
-	private readonly Dictionary<int, EntityView> views = new();
+	public readonly Dictionary<int, EntityView> views = new();
 	private readonly HashSet<int> seen = new();
 	private bool dirty;
+	private int viewer => turns?.viewingPlayer ?? state.currentPlayer;
 
 	public BoardView() {
 		Name = "BoardView";
 	}
 
 	/** Bind to a state and the executor that mutates it. Safe to call again (e.g. after a load). */
-	public void init(GameState s, CommandExecutor ex) {
+	public void init(GameState s, CommandExecutor ex, TurnController t) {
 		ensureLayers();
 
 		if (executor != null) executor.StateChanged -= onStateChanged;
 		executor = ex;
 		executor.StateChanged += onStateChanged;
+
+		turns = t;
 
 		rebuild(s);
 	}
@@ -91,6 +95,9 @@ public partial class BoardView : Node2D
 	private void syncNow() {
 		if (state == null) return;
 		seen.Clear();
+		
+		GD.Print($"viewing player {turns.viewingPlayer}");
+		var visible = MapRules.playerVisibleCells(state, turns.viewingPlayer);
 
 		foreach (var (id, entity) in state.entities) {
 			if (!views.TryGetValue(id, out EntityView view)) {
@@ -104,6 +111,7 @@ public partial class BoardView : Node2D
 
 			seen.Add(id);
 			view.sync(state, layout);
+			if (view.hiddenByFog) view.Visible = visible.Contains(entity.pos);
 		}
 
 		if (views.Count > seen.Count) {
@@ -115,7 +123,7 @@ public partial class BoardView : Node2D
 
 		terrain.sync();
 	}
-	
+
 	private void ensureLayers() {
 		if (terrain != null) return;
 

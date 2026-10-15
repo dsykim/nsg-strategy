@@ -182,8 +182,8 @@ public partial class InputController : Node
 	private List<int> selectableAt(Vector2I pos) {
 		HexCell cell = state.grid.getCell(pos);
 		var ids = new List<int>(2);
-		if (cell.hasUnit()) ids.Add(cell.unitID);
-		if (cell.hasCity(state)) ids.Add(cell.playerDecoratorID);
+		if (cell.hasUnit() && board.views[cell.unitID].Visible) ids.Add(cell.unitID);
+		if (cell.hasCity(state) && board.views[cell.playerDecoratorID].Visible) ids.Add(cell.playerDecoratorID);
 		return ids;
 	}
 
@@ -249,6 +249,6 @@ public partial class InputController : Node
 
 	private void refreshSelectionHighlight() {
 		CellDecorator e = selection.resolve(state);
-		board.overlays.setSelection(e?.gridPosition);
+		board.overlays.setSelection(e?.pos);
 	}
 }

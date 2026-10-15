@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 /**
@@ -17,6 +18,15 @@ public partial class TurnController : Node
 	private readonly HashSet<int> humanPlayers = new();
 	private int turnCount = 0;
 	private readonly float aiTurnDelay = 1.0f;
+	private int? lastHumanPlayer;
+	public int viewingPlayer {
+		get { 
+			int current = state.currentPlayer;
+			if (humanPlayers.Count == 0 || humanPlayers.Contains(current)) return current;
+			return lastHumanPlayer ?? humanPlayers.Min();
+			
+		}
+	}
 
 	/** True while the AI planner is running on a worker thread. */
 	public bool aiThinking { get; private set; }
@@ -36,6 +46,7 @@ public partial class TurnController : Node
 		this.executor = executor;
 		humanPlayers.Clear();
 		humanPlayers.UnionWith(humanPlayerIDs);
+		lastHumanPlayer = null;
 	}
 
 	public bool isHuman(int playerID) => humanPlayers.Contains(playerID);
@@ -48,6 +59,7 @@ public partial class TurnController : Node
 	/** Called by the UI (end turn button / hotkey). Ignored when it isn't a human's turn. */
 	public void endHumanTurn() {
 		if (!awaitingHuman) return;
+		lastHumanPlayer = state.currentPlayer;
 		endTurn(state.currentPlayer);
 	}
 

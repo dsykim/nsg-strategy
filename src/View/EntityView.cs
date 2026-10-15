@@ -19,6 +19,8 @@ public abstract partial class EntityView : Node2D
 
 	public abstract ViewLayer layer { get; }
 
+	public virtual bool hiddenByFog => false;
+
 	public void bindEntity(int id) {
 		entityID = id;
 		Name = $"{GetType().Name}_{id}";

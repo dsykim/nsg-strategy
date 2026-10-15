@@ -9,6 +9,7 @@
 	"maxRange": 1,
 	"damage": 2,
 	"attackCost": 1,
+	"viewRange": 2,
 	"texture" : "res://assets/settlerUnit.png",
 	"enemyTexture" : "res://assets/settlerUnitEnemy.png"
   },
@@ -22,6 +23,7 @@
 	"maxRange": 1,
 	"damage" : 15,
 	"attackCost": 1,
+	"viewRange": 2,
 	"texture" : "res://assets/meleeUnit.png",
 	"enemyTexture" : "res://assets/meleeUnitEnemy.png"
   },
@@ -35,6 +37,7 @@
 	"maxRange": 2,
 	"damage" : 12,
 	"attackCost": 1,
+	"viewRange": 3,
 	"texture" : "res://assets/rangedUnit.png",
 	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
   },
@@ -48,6 +51,7 @@
 	"maxRange": 3,
 	"damage" : 20,
 	"attackCost": 2,
+	"viewRange": 4,
 	"texture" : "res://assets/rangedUnit.png",
 	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
   }

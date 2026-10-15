@@ -49,6 +49,10 @@ public class GameState
 	public IEnumerable<City> allCities() => entities.Values.OfType<City>();
 	public PlayerState getPlayer(int id) => players.TryGetValue(id, out var p) ? p : null;
 
+	public List<Unit> playerUnits(int playerID) => allUnits().Where(u => u.owner == playerID).ToList();
+	public List<City> playerCities(int playerID) => allCities().Where(u => u.owner == playerID).ToList();
+
+
 	public GameState clone() {
 		var c = new GameState
 		{
@@ -70,7 +74,7 @@ public class GameState
 		}
 
 		foreach (var (id, entity) in entities) {
-			string eString = $"ID {id}; {entity.GetType()}; Pos {entity.gridPosition}";
+			string eString = $"ID {id}; {entity.GetType()}; Pos {entity.pos}";
 			if (entity is PlayerDecorator d) eString += $"; Owner {d.owner}";
 			if (entity is IHasHealth h) eString += $"; HP {h.currentHP}/{h.maxHP}";
 			s += eString + "\n";

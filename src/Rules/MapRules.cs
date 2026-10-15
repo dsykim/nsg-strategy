@@ -40,9 +40,9 @@ public static class MapRules
 
 	public static Dictionary<Vector2I, int> movableCells(GameState s, Unit unit) {
 		var reachable = new Dictionary<Vector2I, int>();
-		var visited = new HashSet<Vector2I> { unit.gridPosition };
+		var visited = new HashSet<Vector2I> { unit.pos };
 		var frontier = new Queue<(Vector2I pos, int cost)>();
-		frontier.Enqueue((unit.gridPosition, 0));
+		frontier.Enqueue((unit.pos, 0));
 
 		while (frontier.Count > 0) {
 			var (pos, cost) = frontier.Dequeue();
@@ -60,6 +60,13 @@ public static class MapRules
 			}
 		}
 		return reachable;
+	}
+
+	public static List<Vector2I> playerVisibleCells(GameState s, int playerID) {
+		List<Vector2I> visible = new List<Vector2I>();
+		foreach (var unit in s.playerUnits(playerID)) visible = visible.Union(UnitRules.getVisibleCells(s, unit)).ToList();
+		foreach (var city in s.playerCities(playerID)) visible = visible.Union(CityRules.getVisibleCells(s, city)).ToList();
+		return visible;
 	}
 
 	public static bool canMove(GameState s, Unit unit, Vector2I target) =>
@@ -99,8 +106,8 @@ public static class MapRules
 	public static void moveUnit(GameState s, Unit unit, Vector2I target) {
 		var costs = movableCells(s, unit);
 		int cost = costs[target];
-		s.grid.getCell(unit.gridPosition).clearUnit();
-		unit.gridPosition = target;
+		s.grid.getCell(unit.pos).clearUnit();
+		unit.pos = target;
 		s.grid.getCell(target).setUnit(unit);
 		unit.spendAP(cost);
 	}

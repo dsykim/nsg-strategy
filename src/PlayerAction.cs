@@ -135,7 +135,7 @@ public sealed class SpawnAction : InstantAction
 	public override bool appliesTo(CellDecorator e) => e is City;
 
 	public override Command build(GameState s, int actorID, CellDecorator e) =>
-			new SpawnUnitCommand { actorID = actorID, subjectID = e.id, uType = def.type, pos = e.gridPosition };
+			new SpawnUnitCommand { actorID = actorID, subjectID = e.id, uType = def.type, pos = e.pos };
 }
 
 /* ==================== Registry ==================== */

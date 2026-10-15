@@ -62,7 +62,7 @@ public class SpawnUnitCommand : Command
 
 	public override bool validate(GameState state) {
 		City c = state.getCity(subjectID);
-		return c != null && c.owner == actorID && pos == c.gridPosition
+		return c != null && c.owner == actorID && pos == c.pos
 			   && UnitRules.canCreate(state, actorID, uType, pos);
 	}
 
@@ -84,11 +84,11 @@ public class SettleCommand : Command
 		return u is SettlerUnit &&
 			   u.owner == actorID &&
 			   u.currentAP > 0 &&
-			   MapRules.canPlaceCity(state, u.gridPosition);
+			   MapRules.canPlaceCity(state, u.pos);
 	}
 
 	public override void execute(GameState state) {
-		Vector2I unitPos = state.getUnit(subjectID).gridPosition;
+		Vector2I unitPos = state.getUnit(subjectID).pos;
 		this.pos = unitPos;
 		UnitRules.deleteUnit(state, state.getUnit(subjectID));
 		CityRules.createCity(state, actorID, pos);

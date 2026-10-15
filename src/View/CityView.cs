@@ -17,7 +17,7 @@ public partial class CityView : EntityView
 		if (c == null) return;
 
 		Visible = !c.isDead();
-		Position = layout.cellToWorld(c.gridPosition);
+		Position = layout.cellToWorld(c.pos);
 
 		texture = ViewTextures.city(c);
 		ownerColor = PlayerColors.get(c.owner);

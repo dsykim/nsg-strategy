@@ -6,7 +6,7 @@ public sealed class UnitDef
 {
 	public UnitType type;
 	public string name;
-	public int maxHP, maxAP, minRange, maxRange, damage, attackCost, goldCost, capacityCost;
+	public int maxHP, maxAP, minRange, maxRange, damage, attackCost, goldCost, capacityCost, viewRange;
 }
 
 /** Static unit data. Load once on the main thread at startup; read-only (and thread-safe) afterwards. */
@@ -32,6 +32,7 @@ public static class UnitDefs
 					attackCost = d["attackCost"]!.GetValue<int>(),
 					goldCost = d["goldCost"]!.GetValue<int>(),
 					capacityCost = d["capacityCost"]!.GetValue<int>(),
+					viewRange = d["viewRange"]!.GetValue<int>(),
 			};
 			def.type = System.Enum.Parse<UnitType>(def.name, ignoreCase: true);
 			defs[def.type] = def;
@@ -60,6 +61,7 @@ public abstract class Unit : PlayerDecorator, IHasHealth
 	public int attackCost => def.attackCost;
 	public int goldCost => def.goldCost;
 	public int capacityCost => def.capacityCost;
+	public int viewRange => def.viewRange;
 
 	public bool isDead => currentHP <= 0;
 

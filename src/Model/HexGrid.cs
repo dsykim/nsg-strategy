@@ -80,7 +80,7 @@ public class HexGrid
 		return neighbors;
 	}
 	
-	public List<HexCell> getCellsInRadius(Vector2I center, int radius) {
+	public List<HexCell> getCellsInRadius(Vector2I center, int radius, bool includeCenter = true) {
 		List<HexCell> cells = new List<HexCell>();
 		Vector3I cubeCenter = HexUtils.offsetToCube(center.X, center.Y);
 
@@ -95,6 +95,8 @@ public class HexGrid
 				}
 			}
 		}
+
+		if (!includeCenter) cells.Remove(getCell(center));
 
 		return cells;
 	}
@@ -114,7 +116,7 @@ public class HexGrid
 				}
 			}
 		}
-
+		
 		return cells;
 	}
 	

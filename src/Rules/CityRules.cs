@@ -19,7 +19,7 @@ public static class CityRules
 	}
 
 	public static void deleteCity(GameState s, City c) {
-		s.grid.getCell(c.gridPosition).clearPlayerDecorator();
+		s.grid.getCell(c.pos).clearPlayerDecorator();
 		s.getPlayer(c.owner).goldRate -= c.goldProduction;
 		foreach (var cellPos in c.ownedCells) {
 			s.grid.getCell(cellPos).clearController();
@@ -28,7 +28,7 @@ public static class CityRules
 	}
 
 	public static void claimCell(GameState s, City c, int radius) {
-		var inRangeCells = s.grid.getCellsInRadius(c.gridPosition, radius);
+		var inRangeCells = s.grid.getCellsInRadius(c.pos, radius);
 		foreach (var cell in inRangeCells) {
 			if (!cell.hasController()) {
 				c.ownedCells.Add(cell.pos);
@@ -37,4 +37,9 @@ public static class CityRules
 		}
 	}
 
+	public static IEnumerable<Vector2I> getVisibleCells(GameState s, City c) {
+		return s.grid.getCellsPosInRadius(c.pos, 3).Where(
+				cell => HexUtils.inLineOfSight(s, c.pos, cell) || 
+				        s.grid.getCell(cell).terrainType == TerrainType.MOUNTAIN);
+	}
 }
