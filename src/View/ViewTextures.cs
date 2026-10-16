@@ -26,6 +26,7 @@ public static class ViewTextures
 			{ UnitType.MELEE, "res://assets/meleeUnit.png" },
 			{ UnitType.RANGED, "res://assets/rangedUnit.png" },
 			{ UnitType.SNIPER, "res://assets/rangedUnit.png" },
+			{ UnitType.SCOUT,  "res://assets/meleeUnit.png"}
 	};
 
 	/** Unit types missing from unitPaths fall back to this pattern, so new types only need a file. */

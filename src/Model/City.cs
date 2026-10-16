@@ -13,7 +13,7 @@ public class City : PlayerDecorator, IHasHealth
 	public override string displayName => cityName;
 
 	public City(int owner, Vector2I pos) : base(owner) {
-		((CellDecorator)this).pos = pos;
+		this.pos = pos;
 		currentHP = maxHP;
 	}
 
@@ -26,4 +26,14 @@ public class City : PlayerDecorator, IHasHealth
 	public bool isDead() => currentHP <= 0;
 	
 	public void applyDamage(int amount) => currentHP -= amount;
+}
+
+public class Capital : City
+{
+	public Capital(int owner, Vector2I pos) : base(owner, pos) {
+		cityName = "Capital";
+		maxHP = 5;
+		currentHP = maxHP;
+		goldProduction = 5;
+	}
 }

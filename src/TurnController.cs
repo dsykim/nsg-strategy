@@ -18,7 +18,6 @@ public partial class TurnController : Node
 	private GameState state;
 	private CommandExecutor executor;
 	private readonly HashSet<int> humanPlayers = new();
-	private int turnCount = 0;
 	private readonly float aiTurnDelay = 1.0f;
 	private int? lastHumanPlayer;
 	public int viewingPlayer {
@@ -69,6 +68,8 @@ public partial class TurnController : Node
 	/* ==================== Turn loop ==================== */
 	
 	private async void runCurrentTurn() {
+		if (state.gameOver) return;
+		
 		try {
 			int playerID = state.currentPlayer;
 			bool isHuman = humanPlayers.Contains(playerID);
@@ -77,9 +78,8 @@ public partial class TurnController : Node
 				await ToSignal(GetTree().CreateTimer(aiTurnDelay), SceneTreeTimer.SignalName.Timeout);
 				if (!IsInstanceValid(this)) return;
 			}
-
-			turnCount++;
-			GD.Print($"\n======== Turn {turnCount} ========");
+			
+			GD.Print($"\n======== Turn {state.turnNumber} ========");
 			GD.Print(state.ToString());
 
 			if (isHuman) {

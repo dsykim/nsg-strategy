@@ -11,7 +11,14 @@ public static class CityRules
 			Debug.Print("Cannot place city at " + pos);
 			return;
 		}
-		City city = new City(playerID, pos);
+		City city;
+		if (s.playerCities(playerID).Count == 0) {
+			city = new Capital(playerID, pos);
+			s.getPlayer(playerID).hasSettled = true;
+		} else {
+			city = new City(playerID, pos);
+		}
+		
 		s.register(city);
 		s.grid.getCell(pos).setPlayerDecorator(city);
 		s.getPlayer(playerID).goldRate += city.goldProduction;

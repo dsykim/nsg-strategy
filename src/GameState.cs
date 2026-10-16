@@ -7,6 +7,7 @@ public class PlayerState
 {
 	public int playerID, gold, goldRate, unitCapacityTotal, unitCapacityUsed;
 	public bool alive = true;
+	public bool hasSettled = false;
 	public List<Vector2I> visibleCells = new List<Vector2I>();
 
 	public PlayerState clone() {
@@ -31,8 +32,9 @@ public class GameState
 	public int currentPlayer = 1;
 	public int turnNumber;
 	public Random rng = new();
-	public bool fogOfWar = false;
-
+	public bool fogOfWar = true;
+	public bool gameOver = false;
+	
 	public int register(CellDecorator e) {
 		int id = nextId++;
 		e.assignId(id);
@@ -57,12 +59,6 @@ public class GameState
 
 	public List<Unit> playerUnits(int playerID) => allUnits().Where(u => u.owner == playerID).ToList();
 	public List<City> playerCities(int playerID) => allCities().Where(u => u.owner == playerID).ToList();
-
-	public void updateVisibility() {
-		foreach (var p in players) {
-			p.Value.visibleCells = MapRules.playerVisibleCells(this, p.Key);
-		}
-	}
 	
 	public GameState clone() {
 		var c = new GameState
@@ -73,6 +69,7 @@ public class GameState
 				currentPlayer = currentPlayer,
 				turnNumber = turnNumber,
 				fogOfWar = fogOfWar,
+				gameOver = gameOver,
 		};
 		foreach (var (id, e) in entities) c.entities[id] = e.clone();
 		foreach (var (id, p) in players) c.players[id] = p.clone();

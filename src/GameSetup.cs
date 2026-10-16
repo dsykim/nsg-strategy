@@ -1,9 +1,5 @@
-
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 
 public struct GameConfig
 {
@@ -27,7 +23,7 @@ public static class GameSetup
 			state.players.Add(i, player);
 		}
 
-		state.updateVisibility();
+		MapRules.updateVisibility(state);
 		return state;
 	}
 

@@ -8,7 +8,6 @@ public static class CombatRules
 		attacker.spendAP(attacker.attackCost);
 		(Unit u, City c) defenders = MapRules.getCellDefenders(state, defenderPos);
 
-		// TODO: currently only handle combat with units
 		if (defenders.u != null) {
 			defenders.u.applyDamage(attacker.damage);
 			if (defenders.u.isDead) {
@@ -18,10 +17,10 @@ public static class CombatRules
 			int defenderID = defenders.c.owner;
 			defenders.c.applyDamage(attacker.damage);
 			if (defenders.c.isDead()) {
+				CityRules.deleteCity(state, defenders.c);
 				if (!isPlayerAlive(state, defenderID)) {
 					state.getPlayer(defenderID).alive = false;
 				}
-				CityRules.deleteCity(state, defenders.c);
 			}
 		}
 		
@@ -29,6 +28,7 @@ public static class CombatRules
 	}
 
 	public static bool isPlayerAlive(GameState s, int pid) {
-		return s.allCities().Any(u => u.owner == pid);
+		if (s.getPlayer(pid).hasSettled) return s.playerCities(pid).Exists(c => c is Capital);
+		return s.playerUnits(pid).Exists(u => u is SettlerUnit);
 	}
 }

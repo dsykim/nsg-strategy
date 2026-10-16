@@ -111,4 +111,9 @@ public static class MapRules
 		s.grid.getCell(target).setUnit(unit);
 		unit.spendAP(cost);
 	}
+	public static void updateVisibility(GameState s) {
+		foreach (var p in s.players) {
+			p.Value.visibleCells = MapRules.playerVisibleCells(s, p.Key);
+		}
+	}
 }

@@ -10,6 +10,12 @@ public static class TurnRules
 	}
 
 	public static void endTurn(GameState s) {
+		if (s.players.Count(p => p.Value.alive) <= 1) {
+			GD.Print("Game Over!");
+			s.gameOver = true;
+			return;
+		}
+		
 		int n = s.players.Count;
 		for (int i = 0; i < n; i++) {
 			s.currentPlayer = s.currentPlayer % n + 1;
@@ -18,10 +24,6 @@ public static class TurnRules
 				beginTurn(s, s.currentPlayer);
 				return;
 			}
-		}
-
-		if (s.players.Count(p => p.Value.alive) <= 1) {
-			GD.Print("Game Over!");
 		}
 	}
 }
