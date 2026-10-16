@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://csin17fwnju6m"
-path="res://.godot/imported/settlerUnit.png-a653f19b51c4fdb53129d732e4335855.ctex"
+uid="uid://cwirhhkenn00t"
+path="res://.godot/imported/sniper_red.png-f9b9c96391a97cfc87a1a960a8f79873.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/settlerUnit.png"
-dest_files=["res://.godot/imported/settlerUnit.png-a653f19b51c4fdb53129d732e4335855.ctex"]
+source_file="res://assets/sniper_red.png"
+dest_files=["res://.godot/imported/sniper_red.png-f9b9c96391a97cfc87a1a960a8f79873.ctex"]
 
 [params]
 

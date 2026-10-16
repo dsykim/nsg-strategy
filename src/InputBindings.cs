@@ -12,12 +12,7 @@ public static class InputBindings
 	public const string UnitMove = "UnitMove";
 	public const string UnitAttack = "UnitAttack";
 	public const string UnitSettle = "UnitSettle";
-
-	private const int maxSpawnHotkeys = 9;
-
-	/** "CitySpawn1".."CitySpawn9" for the first nine unit types; null beyond that (button-only). */
-	public static string spawnAction(int index) =>
-			index < maxSpawnHotkeys ? $"CitySpawn{index + 1}" : null;
+	
 
 	/** "Hotkey: M" for tooltips, or "" if the action is unbound. */
 	public static string hint(string action) {
@@ -29,10 +24,8 @@ public static class InputBindings
 	public static void ensureDefaults() {
 		ensure(EndTurn, Key.Enter);
 		ensure(UnitMove, Key.M);
-		ensure(UnitAttack, Key.F);
-		ensure(UnitSettle, Key.B);
-		for (int i = 0; i < maxSpawnHotkeys; i++)
-			ensure(spawnAction(i), (Key)((long)Key.Key1 + i));
+		ensure(UnitAttack, Key.E);
+		ensure(UnitSettle, Key.F);
 	}
 
 	private static void ensure(string action, Key key) {

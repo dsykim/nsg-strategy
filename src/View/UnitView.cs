@@ -9,7 +9,6 @@ public partial class UnitView : EntityView
 
 	private Texture2D texture;
 	private Rect2 drawRect;
-	private Color ownerColor;
 
 	public override void sync(GameState s, HexLayout layout) {
 		Unit u = s.getUnit(entityID);
@@ -18,13 +17,12 @@ public partial class UnitView : EntityView
 		Visible = !u.isDead;
 		Position = layout.cellToWorld(u.pos);
 		texture = ViewTextures.unit(u);
-		ownerColor = PlayerColors.get(u.owner);
 		drawRect = HexLayout.fitRect(texture, layout.cellSize);
 
 		QueueRedraw();
 	}
 
 	public override void _Draw() {
-		if (texture != null) DrawTextureRect(texture, drawRect, false, ownerColor);
+		if (texture != null) DrawTextureRect(texture, drawRect, false);
 	}
 }

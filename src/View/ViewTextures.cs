@@ -20,31 +20,23 @@ public static class ViewTextures
 			// EMPTY has no texture and is not drawn.
 	};
 
-	private static readonly Dictionary<UnitType, string> unitPaths = new()
-	{
-			{ UnitType.SETTLER, "res://assets/settlerUnit.png" },
-			{ UnitType.MELEE, "res://assets/meleeUnit.png" },
-			{ UnitType.RANGED, "res://assets/rangedUnit.png" },
-			{ UnitType.SNIPER, "res://assets/rangedUnit.png" },
-			{ UnitType.SCOUT,  "res://assets/meleeUnit.png"}
-	};
-
-	/** Unit types missing from unitPaths fall back to this pattern, so new types only need a file. */
-	private const string UnitPathPattern = "res://assets/units/{0}.png";
-
-	private const string CityPath = "res://assets/city.png";
-
 	private static readonly Dictionary<string, Texture2D> cache = new();
 
 	public static Texture2D terrain(TerrainType t) =>
 			terrainPaths.TryGetValue(t, out string path) ? load(path) : null;
 
-	public static Texture2D unit(Unit u) =>
-			load(unitPaths.TryGetValue(u.type, out string path)
-					? path
-					: string.Format(UnitPathPattern, u.unitName.ToLowerInvariant()));
+	public static Texture2D unit(Unit u) {
+		string playerColor = u.owner == 1 ? "blue" : "red";
+		string path = "res://assets/" + u.unitName.ToLowerInvariant() + "_" + playerColor + ".png";
+		return load(path);
+	}
 
-	public static Texture2D city(City c) => load(CityPath);
+	public static Texture2D city(City c) {
+		string playerColor = c.owner == 1 ? "blue" : "red";
+		string cityName = c is Capital ? "capital" : "city";
+		string path = "res://assets/" + cityName + "_" + playerColor + ".png";
+		return load(path);
+	}
 
 	private static Texture2D load(string path) {
 		if (cache.TryGetValue(path, out Texture2D tex)) return tex;

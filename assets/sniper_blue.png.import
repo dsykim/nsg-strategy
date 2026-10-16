@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0vwva4a1yjkc"
-path="res://.godot/imported/rangedUnitEnemy.png-f8e500d49afc802add5612bdf189beab.ctex"
+uid="uid://lm455abay8xg"
+path="res://.godot/imported/sniper_blue.png-7b28e2a9589c4ae5b0ffd82cdbc66028.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/rangedUnitEnemy.png"
-dest_files=["res://.godot/imported/rangedUnitEnemy.png-f8e500d49afc802add5612bdf189beab.ctex"]
+source_file="res://assets/sniper_blue.png"
+dest_files=["res://.godot/imported/sniper_blue.png-7b28e2a9589c4ae5b0ffd82cdbc66028.ctex"]
 
 [params]
 

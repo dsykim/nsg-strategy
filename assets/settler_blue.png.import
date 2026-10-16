@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://daby046lnpkkv"
-path="res://.godot/imported/city.png-02b383d5b5b6aa591b88e70ba700cd66.ctex"
+uid="uid://bjdgi1a1e4u6p"
+path="res://.godot/imported/settler_blue.png-7bd4a9d84ea3e7beb9d43b8bec54cb02.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/city.png"
-dest_files=["res://.godot/imported/city.png-02b383d5b5b6aa591b88e70ba700cd66.ctex"]
+source_file="res://assets/settler_blue.png"
+dest_files=["res://.godot/imported/settler_blue.png-7bd4a9d84ea3e7beb9d43b8bec54cb02.ctex"]
 
 [params]
 

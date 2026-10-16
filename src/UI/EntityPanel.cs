@@ -50,7 +50,7 @@ public abstract partial class EntityPanel : HudWidget
 			setText(ownerLabel, $"Player {pd.owner}");
 		}
 		if (e is IHasHealth h) {
-			setText(hpLabel, $"{h.currentHP} / {h.maxHP} HP");
+			setText(hpLabel, $"{h.currentHP} / {h.maxHP}");
 			setBar(hpBar, h.currentHP, h.maxHP);
 		}
 
@@ -95,6 +95,7 @@ public abstract partial class EntityPanel : HudWidget
 					ToggleMode = a is TargetedAction,   // shows "pressed" while waiting for a target
 					FocusMode = FocusModeEnum.None,     // never steal hotkeys or Enter (end turn)
 			};
+			button.AddThemeFontSizeOverride("font_size", 24);
 			button.Pressed += () => {
 				ctx.input.invoke(a);
 				refreshButtons(); // undo the toggle if the invoke was rejected

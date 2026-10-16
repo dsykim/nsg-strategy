@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmcigb03kdkls"
-path="res://.godot/imported/meleeUnitEnemy.png-3a44314a0d684937c418d1e2cb9f2a62.ctex"
+uid="uid://dki3wbjx8d8gc"
+path="res://.godot/imported/ranged_blue.png-882120f4203e4b9c955077ace39e2160.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/meleeUnitEnemy.png"
-dest_files=["res://.godot/imported/meleeUnitEnemy.png-3a44314a0d684937c418d1e2cb9f2a62.ctex"]
+source_file="res://assets/ranged_blue.png"
+dest_files=["res://.godot/imported/ranged_blue.png-882120f4203e4b9c955077ace39e2160.ctex"]
 
 [params]
 

@@ -1,21 +1,21 @@
 {
   "settler": {
 	"name": "Settler",
-	"maxHP" : 20,
+	"maxHP" : 1,
 	"maxAP" : 3,
 	"capacityCost" : 0,
 	"goldCost" : 10,
 	"minRange": 1,
 	"maxRange": 1,
-	"damage": 2,
+	"damage": 1,
 	"attackCost": 1,
 	"viewRange": 2,
-	"texture" : "res://assets/settlerUnit.png",
-	"enemyTexture" : "res://assets/settlerUnitEnemy.png"
+	"texture" : "res://assets/settler_blue.png",
+	"enemyTexture" : "res://assets/settler_red.png"
   },
   "melee": {
 	"name": "Melee",
-	"maxHP" : 80,
+	"maxHP" : 3,
 	"maxAP" : 3,
 	"capacityCost" : 2,
 	"goldCost" : 5,
@@ -24,36 +24,36 @@
 	"damage" : 15,
 	"attackCost": 1,
 	"viewRange": 2,
-	"texture" : "res://assets/meleeUnit.png",
-	"enemyTexture" : "res://assets/meleeUnitEnemy.png"
+	"texture" : "res://assets/melee_blue.png",
+	"enemyTexture" : "res://assets/melee_red.png"
   },
   "ranged": {
 	"name": "Ranged",
-	"maxHP" : 40,
+	"maxHP" : 1,
 	"maxAP" : 3,
 	"capacityCost" : 2,
 	"goldCost" : 5,
 	"minRange": 1,
 	"maxRange": 2,
-	"damage" : 12,
+	"damage" : 2,
 	"attackCost": 1,
 	"viewRange": 3,
-	"texture" : "res://assets/rangedUnit.png",
-	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
+	"texture" : "res://assets/ranged_blue.png",
+	"enemyTexture" : "res://assets/ranged_red.png"
   },
   "sniper": {
 	"name": "Sniper",
-	"maxHP" : 40,
-	"maxAP" : 3,
+	"maxHP" : 1,
+	"maxAP" : 2,
 	"capacityCost" : 2,
 	"goldCost" : 5,
 	"minRange": 3,
 	"maxRange": 3,
-	"damage" : 20,
+	"damage" : 3,
 	"attackCost": 2,
-	"viewRange": 4,
-	"texture" : "res://assets/rangedUnit.png",
-	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
+	"viewRange": 3,
+	"texture" : "res://assets/sniper_blue.png",
+	"enemyTexture" : "res://assets/sniper_red.png"
   },
  "scout": {
 	"name": "Scout",
@@ -66,7 +66,7 @@
 	"damage" : 1,
 	"attackCost": 2,
 	"viewRange": 4,
-	"texture" : "res://assets/rangedUnit.png",
-	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
+	"texture" : "res://assets/scout_blue.png",
+	"enemyTexture" : "res://assets/scout_red.png"
 }
 }
