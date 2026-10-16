@@ -1,3 +1,4 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,19 @@ public class PlayerState
 {
 	public int playerID, gold, goldRate, unitCapacityTotal, unitCapacityUsed;
 	public bool alive = true;
+	public List<Vector2I> visibleCells = new List<Vector2I>();
 
-	public PlayerState clone() => (PlayerState)MemberwiseClone();
+	public PlayerState clone() {
+		PlayerState clone = (PlayerState)MemberwiseClone();
+		clone.visibleCells = new List<Vector2I>(visibleCells);
+		return clone;
+	}
 
 	public override string ToString() {
 		return $"""
 		       Player {playerID}; Alive {alive}; Gold {gold}; Gold Rate {goldRate}; Unit Capacity {unitCapacityUsed}/{unitCapacityTotal}  
 		       """;
 	}
-
 }
 
 public class GameState
@@ -26,6 +31,7 @@ public class GameState
 	public int currentPlayer = 1;
 	public int turnNumber;
 	public Random rng = new();
+	public bool fogOfWar = false;
 
 	public int register(CellDecorator e) {
 		int id = nextId++;
@@ -52,7 +58,12 @@ public class GameState
 	public List<Unit> playerUnits(int playerID) => allUnits().Where(u => u.owner == playerID).ToList();
 	public List<City> playerCities(int playerID) => allCities().Where(u => u.owner == playerID).ToList();
 
-
+	public void updateVisibility() {
+		foreach (var p in players) {
+			p.Value.visibleCells = MapRules.playerVisibleCells(this, p.Key);
+		}
+	}
+	
 	public GameState clone() {
 		var c = new GameState
 		{
@@ -61,6 +72,7 @@ public class GameState
 				rng = new Random(rng.Next()),
 				currentPlayer = currentPlayer,
 				turnNumber = turnNumber,
+				fogOfWar = fogOfWar,
 		};
 		foreach (var (id, e) in entities) c.entities[id] = e.clone();
 		foreach (var (id, p) in players) c.players[id] = p.clone();

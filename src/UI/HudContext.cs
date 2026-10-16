@@ -10,15 +10,13 @@ public sealed class HudContext
 	public readonly CommandExecutor executor;
 	public readonly Selection selection;
 	public readonly InputController input;
-	public readonly TurnController turns;
 	
 	public HudContext(GameState state, CommandExecutor executor, Selection selection,
-					  InputController input, TurnController turns) {
+					  InputController input) {
 		this.state = state;
 		this.executor = executor;
 		this.selection = selection;
 		this.input = input;
-		this.turns = turns;
 	}
 
 	/**
@@ -27,5 +25,5 @@ public sealed class HudContext
 	 * human who played, so your gold doesn't flicker to the AI's. Hotseat: switches per human.
 	 * With no human players (spectating), it follows the current player.
 	 */
-	public int viewingPlayer => turns.viewingPlayer;
+	public int viewingPlayer => TurnController.instance.viewingPlayer;
 }

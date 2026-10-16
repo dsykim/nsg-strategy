@@ -27,6 +27,7 @@ public static class GameSetup
 			state.players.Add(i, player);
 		}
 
+		state.updateVisibility();
 		return state;
 	}
 

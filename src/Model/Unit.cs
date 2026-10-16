@@ -85,3 +85,5 @@ public class MeleeUnit : Unit { public MeleeUnit(int owner) : base(owner, UnitTy
 public class RangedUnit : Unit { public RangedUnit(int owner) : base(owner, UnitType.RANGED) { } }
 
 public class SniperUnit : Unit { public SniperUnit(int owner) : base(owner, UnitType.SNIPER) { } }
+
+public class ScoutUnit : Unit {public ScoutUnit(int owner) : base(owner, UnitType.SCOUT) { } }

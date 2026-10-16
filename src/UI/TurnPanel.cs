@@ -16,7 +16,7 @@ public partial class TurnPanel : HudWidget
 
 	protected override void refresh() {
 		int current = ctx.state.currentPlayer;
-		bool myTurn = ctx.turns.awaitingHuman;
+		bool myTurn = TurnController.instance.awaitingHuman;
 
 		// turnNumber counts full rounds; +1 assumes setup starts it at 0. Drop it if setup starts at 1.
 		setText(turnLabel, $"Turn {ctx.state.turnNumber + 1}");

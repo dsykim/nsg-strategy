@@ -47,15 +47,15 @@ public partial class BoardView : Node2D
 	}
 
 	/** Bind to a state and the executor that mutates it. Safe to call again (e.g. after a load). */
-	public void init(GameState s, CommandExecutor ex, TurnController t) {
+	public void init(GameState s, CommandExecutor ex) {
 		ensureLayers();
 
 		if (executor != null) executor.StateChanged -= onStateChanged;
 		executor = ex;
 		executor.StateChanged += onStateChanged;
 
-		turns = t;
-
+		turns = TurnController.instance;
+		
 		rebuild(s);
 	}
 
@@ -96,8 +96,7 @@ public partial class BoardView : Node2D
 		if (state == null) return;
 		seen.Clear();
 		
-		GD.Print($"viewing player {turns.viewingPlayer}");
-		var visible = MapRules.playerVisibleCells(state, turns.viewingPlayer);
+		var visible = state.getPlayer(turns.viewingPlayer).visibleCells;
 
 		foreach (var (id, entity) in state.entities) {
 			if (!views.TryGetValue(id, out EntityView view)) {
@@ -111,7 +110,7 @@ public partial class BoardView : Node2D
 
 			seen.Add(id);
 			view.sync(state, layout);
-			if (view.hiddenByFog) view.Visible = visible.Contains(entity.pos);
+			if (state.fogOfWar && view.hiddenByFog) view.Visible = visible.Contains(entity.pos);
 		}
 
 		if (views.Count > seen.Count) {

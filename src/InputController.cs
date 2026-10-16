@@ -39,7 +39,7 @@ public partial class InputController : Node
 		Name = "InputController";
 	}
 
-	public void init(GameState s, CommandExecutor ex, BoardView b, Selection sel, TurnController t) {
+	public void init(GameState s, CommandExecutor ex, BoardView b, Selection sel) {
 		unsubscribe();
 		InputBindings.ensureDefaults();
 
@@ -47,7 +47,7 @@ public partial class InputController : Node
 		executor = ex;
 		board = b;
 		selection = sel;
-		turns = t;
+		turns = TurnController.instance;
 
 		executor.StateChanged += onStateChanged;
 		selection.Changed += onSelectionChanged;

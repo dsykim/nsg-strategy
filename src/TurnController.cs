@@ -13,6 +13,8 @@ using System.Threading.Tasks;
  */
 public partial class TurnController : Node
 {
+	public static TurnController instance { get; private set; }
+	
 	private GameState state;
 	private CommandExecutor executor;
 	private readonly HashSet<int> humanPlayers = new();
@@ -38,6 +40,7 @@ public partial class TurnController : Node
 	public bool awaitingHuman => humanPlayers.Contains(state.currentPlayer);
 
 	public TurnController() {
+		instance = this;
 		Name = "TurnController";
 	}
 

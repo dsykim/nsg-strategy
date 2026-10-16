@@ -43,7 +43,7 @@ public partial class GameScene : Node
 
 		var boardView = new BoardView();
 		AddChild(boardView);
-		boardView.init(state, executor, turnController);
+		boardView.init(state, executor);
 
 		var camera = new CameraController();
 		AddChild(camera);
@@ -51,8 +51,8 @@ public partial class GameScene : Node
 
 		var input = new InputController();
 		AddChild(input);
-		input.init(state, executor, boardView, selection, turnController);
+		input.init(state, executor, boardView, selection);
 
-		uiController?.init(new HudContext(state, executor, selection, input, turnController));
+		uiController?.init(new HudContext(state, executor, selection, input));
 	}
 }

@@ -85,7 +85,7 @@ public abstract partial class EntityPanel : HudWidget
 		if (actionButtonContainer == null) return;
 
 		// Only entities owned by a human get buttons; AI entities are view-only.
-		if (e is not PlayerDecorator pd || !ctx.turns.isHuman(pd.owner)) return;
+		if (e is not PlayerDecorator pd || !TurnController.instance.isHuman(pd.owner)) return;
 
 		foreach (PlayerAction a in PlayerActions.forEntity(e)) {
 			var button = new Button

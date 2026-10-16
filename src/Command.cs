@@ -26,6 +26,7 @@ public class MoveCommand : Command
 	public override void execute(GameState state) {
 		Unit u = state.getUnit(subjectID);
 		MapRules.moveUnit(state, u, target);
+		state.updateVisibility();
 	}
 
 	public override void print(GameState state) {
@@ -47,7 +48,7 @@ public class AttackCommand : Command
 	public override void execute(GameState state) {
 		Unit u = state.getUnit(subjectID);
 		CombatRules.resolveCombat(state, u, target);
-
+		state.updateVisibility();
 	}
 	
 	public override void print(GameState state) {
@@ -68,6 +69,7 @@ public class SpawnUnitCommand : Command
 
 	public override void execute(GameState state) {
 		UnitRules.createUnit(state, actorID, uType, pos);
+		state.updateVisibility();
 	}
 	
 	public override void print(GameState state) {
@@ -92,6 +94,7 @@ public class SettleCommand : Command
 		this.pos = unitPos;
 		UnitRules.deleteUnit(state, state.getUnit(subjectID));
 		CityRules.createCity(state, actorID, pos);
+		state.updateVisibility();
 	}
 	
 	public override void print(GameState state) {
@@ -104,6 +107,7 @@ public class EndTurnCommand : Command
 	public override bool validate(GameState state) => state.currentPlayer == actorID;
 	public override void execute(GameState state) {
 		TurnRules.endTurn(state);
+		state.updateVisibility();
 	}
 	
 	public override void print(GameState state) {

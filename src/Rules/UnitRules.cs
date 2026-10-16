@@ -9,7 +9,8 @@ public enum UnitType
 	SETTLER,
 	MELEE,
 	RANGED,
-	SNIPER
+	SNIPER,
+	SCOUT
 }
 
 public static class UnitRules
@@ -41,6 +42,7 @@ public static class UnitRules
 				UnitType.MELEE => new MeleeUnit(playerID),
 				UnitType.RANGED => new RangedUnit(playerID),
 				UnitType.SNIPER => new SniperUnit(playerID),
+				UnitType.SCOUT => new ScoutUnit(playerID),
 				_ => throw new ArgumentException($"Unknown unit type {type}"),
 		};
 		u.pos = pos;

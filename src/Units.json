@@ -54,5 +54,19 @@
 	"viewRange": 4,
 	"texture" : "res://assets/rangedUnit.png",
 	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
-  }
+  },
+ "scout": {
+	"name": "Scout",
+	"maxHP" : 2,
+	"maxAP" : 4,
+	"capacityCost" : 2,
+	"goldCost" : 5,
+	"minRange": 1,
+	"maxRange": 1,
+	"damage" : 1,
+	"attackCost": 2,
+	"viewRange": 4,
+	"texture" : "res://assets/rangedUnit.png",
+	"enemyTexture" : "res://assets/rangedUnitEnemy.png"
+}
 }
