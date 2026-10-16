@@ -45,8 +45,6 @@ public static class CityRules
 	}
 
 	public static IEnumerable<Vector2I> getVisibleCells(GameState s, City c) {
-		return s.grid.getCellsPosInRadius(c.pos, 3).Where(
-				cell => HexUtils.inLineOfSight(s, c.pos, cell) || 
-				        s.grid.getCell(cell).terrainType == TerrainType.MOUNTAIN);
+		return s.grid.getCellsPosInRadius(c.pos, 3);
 	}
 }

@@ -7,7 +7,7 @@ public class City : PlayerDecorator, IHasHealth
 	public List<Vector2I> ownedCells { get; private set; } = new List<Vector2I>(); 
 	public int goldProduction = 1;
 	public string cityName = "City";
-	public int maxHP { get; set; } = 1;
+	public int maxHP { get; set; } = 2;
 	public int currentHP { get; set; }
 
 	public override string displayName => cityName;

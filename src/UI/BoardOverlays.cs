@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /**
  * View-only outlines drawn over the board: hovered cell, selected cell, and the
@@ -40,9 +41,25 @@ public partial class BoardOverlays : Node2D
 			LineWidth = 1.5f,
 	};
 
+	private readonly EdgeOverlay p1Borders = new()
+	{
+		Name = "P1Borders",
+		LineColor = new Color(0.3f, 0.3f, 0.9f, 1f),
+		LineWidth = 2f,
+	};
+	
+	private readonly EdgeOverlay p2Borders = new()
+	{
+			Name = "P2Borders",
+			LineColor = new Color(0.9f, 0.3f, 0.3f, 1f),
+			LineWidth = 2f,
+	};
+
 	public BoardOverlays() {
 		Name = "Overlays";
 		// Child order is draw order: selection sits on top of the target region.
+		AddChild(p1Borders);
+		AddChild(p2Borders);
 		AddChild(range);
 		AddChild(hover);
 		AddChild(target);
@@ -52,6 +69,8 @@ public partial class BoardOverlays : Node2D
 	/** Called by BoardView whenever the layout is (re)built. */
 	public void bind(HexLayout l) {
 		layout = l;
+		p1Borders.Clear();
+		p2Borders.Clear();
 		range.Clear();
 		hover.Clear();
 		target.Clear();
@@ -74,6 +93,15 @@ public partial class BoardOverlays : Node2D
 	public void clearTargetRegion() => target.Clear();
 
 	public void clearRangeRegion() => range.Clear();
+
+	public void setBorderRegion(GameState s) {
+		var visibleCells = s.getPlayer(TurnController.instance.viewingPlayer).visibleCells;
+		var p1Region = s.playerCells(1).Select(c => c.pos).Intersect(visibleCells);
+		var p2Region = s.playerCells(2).Select(c => c.pos).Intersect(visibleCells);
+
+		p1Borders.SetSegments(regionOutline(p1Region));
+		p2Borders.SetSegments(regionOutline(p2Region));
+	}
 
 	/** Edges of `region` that don't border another cell in the region. */
 	public List<(Vector2 from, Vector2 to)> regionOutline(IEnumerable<Vector2I> region) {

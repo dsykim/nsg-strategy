@@ -11,13 +11,13 @@ public partial class CameraController : Camera2D
 	private float zoomSpeed = 0.1f;
 	/** Zoom value to which the camera is currently interpolating. */
 	private float targetZoom;
-	private float minZoom = 0.5f;
-	private float maxZoom = 2f;
+	private float minZoom = 1f;
+	private float maxZoom = 4f;
 	private bool isDragging;
 
 	public void init(Vector2 boardSize) {
 		SetPosition(new Vector2());
-		targetZoom = Zoom.X;
+		targetZoom = 1.5f;
 		bounds = new Rect2(0, 0, boardSize);
 	}
 
@@ -42,7 +42,7 @@ public partial class CameraController : Camera2D
 			movement.X -= 1;
 		}
 
-		float zoomedSpeed = moveSpeed / Zoom.X;
+		float zoomedSpeed = moveSpeed;
 		Position += zoomedSpeed * (float)delta * movement;
 		clampToBounds();
 	}

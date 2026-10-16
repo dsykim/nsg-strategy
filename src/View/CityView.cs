@@ -11,6 +11,7 @@ public partial class CityView : EntityView
 	private Texture2D texture;
 	private Color ownerColor;
 	private Rect2 drawRect;
+	public override bool hiddenByFog => true;
 
 	public override void sync(GameState s, HexLayout layout) {
 		City c = s.getCity(entityID);

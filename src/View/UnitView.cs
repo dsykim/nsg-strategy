@@ -23,6 +23,8 @@ public partial class UnitView : EntityView
 	}
 
 	public override void _Draw() {
-		if (texture != null) DrawTextureRect(texture, drawRect, false);
+		if (texture != null) {
+			DrawTextureRect(texture, drawRect, false);
+		}
 	}
 }

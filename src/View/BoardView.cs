@@ -119,6 +119,8 @@ public partial class BoardView : Node2D
 				views.Remove(id);
 			}
 		}
+		
+		overlays.setBorderRegion(state);
 
 		terrain.sync();
 	}

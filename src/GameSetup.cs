@@ -18,7 +18,7 @@ public static class GameSetup
 			PlayerState player = new PlayerState();
 			player.playerID = i;
 			player.unitCapacityTotal = 10;
-			player.gold = 20;
+			player.gold = 5;
 			UnitRules.placeUnit(state, i, UnitType.SETTLER, getSpawnPos(config, i));
 			state.players.Add(i, player);
 		}

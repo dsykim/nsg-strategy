@@ -59,6 +59,9 @@ public class GameState
 
 	public List<Unit> playerUnits(int playerID) => allUnits().Where(u => u.owner == playerID).ToList();
 	public List<City> playerCities(int playerID) => allCities().Where(u => u.owner == playerID).ToList();
+
+	public List<HexCell> playerCells(int playerID) => grid.grid.Where(
+			c=>c.hasController() && c.controllerID == playerID).ToList();
 	
 	public GameState clone() {
 		var c = new GameState
