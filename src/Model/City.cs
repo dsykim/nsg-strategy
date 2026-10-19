@@ -34,6 +34,6 @@ public class Capital : City
 		cityName = "Capital";
 		maxHP = 5;
 		currentHP = maxHP;
-		goldProduction = 5;
+		goldProduction = 3;
 	}
 }

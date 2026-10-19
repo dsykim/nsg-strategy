@@ -94,6 +94,8 @@ public partial class BoardOverlays : Node2D
 
 	public void clearRangeRegion() => range.Clear();
 
+	public void clearSelectionRegion() => selection.Clear();
+
 	public void setBorderRegion(GameState s) {
 		var visibleCells = s.getPlayer(TurnController.instance.viewingPlayer).visibleCells;
 		var p1Region = s.playerCells(1).Select(c => c.pos).Intersect(visibleCells);

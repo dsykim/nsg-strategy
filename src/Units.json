@@ -21,7 +21,7 @@
 	"goldCost" : 5,
 	"minRange": 1,
 	"maxRange": 1,
-	"damage" : 15,
+	"damage" : 2,
 	"attackCost": 1,
 	"viewRange": 2,
 	"texture" : "res://assets/melee_blue.png",

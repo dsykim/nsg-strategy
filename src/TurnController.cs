@@ -93,7 +93,8 @@ public partial class TurnController : Node
 		}
 	}
 
-	private void endTurn(int playerID) {
+	private async void endTurn(int playerID) {
+		await ToSignal(GetTree().CreateTimer(3.0f), SceneTreeTimer.SignalName.Timeout);
 		executor.submit(new EndTurnCommand { actorID = playerID });
 		runCurrentTurn();
 	}

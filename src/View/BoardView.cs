@@ -121,7 +121,7 @@ public partial class BoardView : Node2D
 		}
 		
 		overlays.setBorderRegion(state);
-
+		overlays.clearSelectionRegion();
 		terrain.sync();
 	}
 
