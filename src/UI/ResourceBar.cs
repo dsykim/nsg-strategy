@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 
 /** Gold, income and unit capacity for the viewing player (see HudContext.viewingPlayer). */
 public partial class ResourceBar : HudWidget
@@ -10,12 +10,12 @@ public partial class ResourceBar : HudWidget
 
 	protected override void refresh() {
 		PlayerState p = ctx.state.getPlayer(ctx.viewingPlayer);
-		TurnController turns = TurnController.instance;
+		GameState s = ctx.state;
 		if (p == null) return;
 
 		setText(playerLabel, $"Player {p.playerID}");
 		setText(goldLabel, $"Gold: {p.gold} (+{p.goldRate})");
 		setText(capacityLabel, $"Unit Capacity: {p.unitCapacityUsed} / {p.unitCapacityTotal}");
-		setText(actionCountLabel, $"Actions Remaining: {turns.MAX_ACTIONS - turns.actionCount} / {turns.MAX_ACTIONS}");
+		setText(actionCountLabel, $"Actions Remaining: {s.MAX_ACTIONS - s.actionCount} / {s.MAX_ACTIONS}");
 	}
 }

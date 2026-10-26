@@ -42,7 +42,7 @@ public static class LegalActions
 
 	private static IEnumerable<Command> attacks(GameState s, int playerID) {
 		foreach (Unit u in activeUnits(s, playerID)) {
-			if (u.currentAP < u.attackCost) continue;
+			if (!u.hasAttacked) continue;
 			foreach (var target in UnitRules.getAttackableCells(s, u))
 				yield return new AttackCommand { actorID = playerID, subjectID = u.id, target = target };
 		}
@@ -68,6 +68,7 @@ public static class AIPlanner
 	/** Test planner: takes one random legal action, then the turn loop ends the turn. */
 	public static List<Command> planTurn(GameState snapshot, int playerID) {
 		var plan = new List<Command>();
+		// snapshot.actionCount = 0;
 		List<Command> legal = LegalActions.forPlayer(snapshot, playerID);
 		if (legal.Count == 0) return plan;
 

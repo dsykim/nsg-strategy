@@ -5,6 +5,8 @@ public static class TurnRules
 {
 	public static void beginTurn(GameState s, int playerID) {
 		PlayerState p = s.getPlayer(playerID);
+		GD.Print($"max actions: {s.MAX_ACTIONS}");
+		s.actionCount = 0;
 		p.gold = System.Math.Max(0, p.gold + p.goldRate);
 		UnitRules.upkeep(s, playerID);
 	}

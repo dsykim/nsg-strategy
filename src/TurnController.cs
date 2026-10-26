@@ -20,8 +20,6 @@ public partial class TurnController : Node
 	private readonly HashSet<int> humanPlayers = new();
 	private readonly float aiTurnDelay = 1.0f;
 	private int? lastHumanPlayer;
-	public int actionCount = 0;
-	public readonly int MAX_ACTIONS = 3;
 	public int viewingPlayer {
 		get { 
 			int current = state.currentPlayer;
@@ -75,7 +73,6 @@ public partial class TurnController : Node
 		try {
 			int playerID = state.currentPlayer;
 			bool isHuman = humanPlayers.Contains(playerID);
-			actionCount = 0;
 
 			if (!isHuman && aiTurnDelay > 0) {
 				await ToSignal(GetTree().CreateTimer(aiTurnDelay), SceneTreeTimer.SignalName.Timeout);

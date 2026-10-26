@@ -17,9 +17,7 @@ public class PlayerState
 	}
 
 	public override string ToString() {
-		return $"""
-		       Player {playerID}; Alive {alive}; Gold {gold}; Gold Rate {goldRate}; Unit Capacity {unitCapacityUsed}/{unitCapacityTotal}  
-		       """;
+		return $"""Player {playerID}; Alive {alive}; Gold {gold}; Gold Rate {goldRate}; Unit Capacity {unitCapacityUsed}/{unitCapacityTotal}  """;
 	}
 }
 
@@ -32,8 +30,9 @@ public class GameState
 	public int currentPlayer = 1;
 	public int turnNumber;
 	public Random rng = new();
-	public bool fogOfWar = true;
 	public bool gameOver = false;
+	public readonly int MAX_ACTIONS = 3;
+	public int actionCount = 0;
 	
 	public int register(CellDecorator e) {
 		int id = nextId++;
@@ -71,8 +70,8 @@ public class GameState
 				rng = new Random(rng.Next()),
 				currentPlayer = currentPlayer,
 				turnNumber = turnNumber,
-				fogOfWar = fogOfWar,
 				gameOver = gameOver,
+				actionCount = actionCount,
 		};
 		foreach (var (id, e) in entities) c.entities[id] = e.clone();
 		foreach (var (id, p) in players) c.players[id] = p.clone();

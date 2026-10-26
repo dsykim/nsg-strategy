@@ -10,8 +10,8 @@ public partial class GameScene : Node
 	/** HUD root from the scene file; optional (missing in headless or bare test scenes). */
 	[Export] private UIController uiController;
 
-	/** Players controlled by a human. Ignored in headless runs (AI vs AI). */
-	private readonly int[] humanPlayerIDs = { 1, 2 };
+	/** Players controlled by a human. Ignored in headless runs. */
+	private readonly int[] humanPlayerIDs = { 1 };
 
 	private readonly GameConfig config = new GameConfig
 	{

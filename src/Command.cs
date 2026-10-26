@@ -19,8 +19,7 @@ public class MoveCommand : Command
 	public Vector2I target;
 
 	public override bool validate(GameState state) {
-		TurnController turns = TurnController.instance;
-		if (turns.actionCount >= turns.MAX_ACTIONS) return false;
+		if (state.actionCount >= state.MAX_ACTIONS) return false;
 		Unit u = state.getUnit(subjectID);
 		// if (u.hasMoved) return false;
 		return u.owner == actorID && u.currentAP > 0 && MapRules.canMove(state, u, target);
@@ -30,7 +29,7 @@ public class MoveCommand : Command
 		Unit u = state.getUnit(subjectID);
 		MapRules.moveUnit(state, u, target);
 		MapRules.updateVisibility(state);
-		TurnController.instance.actionCount++;
+		state.actionCount++;
 	}
 
 	public override void print(GameState state) {
@@ -43,8 +42,7 @@ public class AttackCommand : Command
 	public Vector2I target;
 
 	public override bool validate(GameState state) {
-		TurnController turns = TurnController.instance;
-		if (turns.actionCount >= turns.MAX_ACTIONS) return false;
+		if (state.actionCount >= state.MAX_ACTIONS) return false;
 		Unit u = state.getUnit(subjectID);
 		if (u == null || u.owner != actorID || u.hasAttacked) return false;
 		return UnitRules.getAttackableCells(state, u).Contains(target);
@@ -54,7 +52,7 @@ public class AttackCommand : Command
 		Unit u = state.getUnit(subjectID);
 		CombatRules.resolveCombat(state, u, target);
 		MapRules.updateVisibility(state);
-		TurnController.instance.actionCount++;
+		state.actionCount++;
 	}
 	
 	public override void print(GameState state) {
@@ -68,8 +66,7 @@ public class SpawnUnitCommand : Command
 	public Vector2I pos;
 
 	public override bool validate(GameState state) {
-		TurnController turns = TurnController.instance;
-		if (turns.actionCount >= turns.MAX_ACTIONS) return false;
+		if (state.actionCount >= state.MAX_ACTIONS) return false;
 		City c = state.getCity(subjectID);
 		return c != null && c.owner == actorID && pos == c.pos
 			   && UnitRules.canCreate(state, actorID, uType, pos);
@@ -78,7 +75,7 @@ public class SpawnUnitCommand : Command
 	public override void execute(GameState state) {
 		UnitRules.createUnit(state, actorID, uType, pos);
 		MapRules.updateVisibility(state);
-		TurnController.instance.actionCount++;
+		state.actionCount++;
 	}
 	
 	public override void print(GameState state) {
@@ -91,8 +88,7 @@ public class SettleCommand : Command
 	private Vector2I pos;
 	
 	public override bool validate(GameState state) {
-		TurnController turns = TurnController.instance;
-		if (turns.actionCount >= turns.MAX_ACTIONS) return false;
+		if (state.actionCount >= state.MAX_ACTIONS) return false;
 		Unit u = state.getUnit(subjectID);
 		return u is SettlerUnit &&
 			   u.owner == actorID &&
@@ -105,7 +101,7 @@ public class SettleCommand : Command
 		UnitRules.deleteUnit(state, state.getUnit(subjectID));
 		CityRules.createCity(state, actorID, pos);
 		MapRules.updateVisibility(state);
-		TurnController.instance.actionCount++;
+		state.actionCount++;
 	}
 	
 	public override void print(GameState state) {
