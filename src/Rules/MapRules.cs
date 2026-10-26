@@ -69,8 +69,10 @@ public static class MapRules
 		return visible;
 	}
 
-	public static bool canMove(GameState s, Unit unit, Vector2I target) =>
-			movableCells(s, unit).ContainsKey(target);
+	public static bool canMove(GameState s, Unit unit, Vector2I target) {
+		return movableCells(s, unit).ContainsKey(target);
+	}
+			
 
 	public static (Unit, City) getCellDefenders(GameState s, Vector2I pos) {
 		HexCell cell = s.grid.getCell(pos);
@@ -110,6 +112,7 @@ public static class MapRules
 		unit.pos = target;
 		s.grid.getCell(target).setUnit(unit);
 		unit.spendAP(cost);
+		unit.hasMoved = true;
 	}
 	public static void updateVisibility(GameState s) {
 		foreach (var p in s.players) {

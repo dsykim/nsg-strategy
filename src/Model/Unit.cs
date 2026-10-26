@@ -62,6 +62,8 @@ public abstract class Unit : PlayerDecorator, IHasHealth
 	public int goldCost => def.goldCost;
 	public int capacityCost => def.capacityCost;
 	public int viewRange => def.viewRange;
+	public bool hasMoved = false;
+	public bool hasAttacked = false;
 
 	public bool isDead => currentHP <= 0;
 

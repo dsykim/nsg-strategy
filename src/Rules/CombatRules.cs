@@ -23,7 +23,8 @@ public static class CombatRules
 				}
 			}
 		}
-		
+
+		attacker.hasAttacked = true;
 		Debug.Print("Combat resolved");
 	}
 

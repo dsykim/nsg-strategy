@@ -5,6 +5,7 @@ public partial class UnitPanel : EntityPanel
 {
 	[Export] private Label apLabel;
 	[Export] private Range apBar;
+	[Export] private Label damageLabel;
 
 	protected override bool shows(CellDecorator e) => e is Unit;
 
@@ -12,5 +13,6 @@ public partial class UnitPanel : EntityPanel
 		var u = (Unit)e;
 		setText(apLabel, $"{u.currentAP} / {u.maxAP} AP");
 		setBar(apBar, u.currentAP, u.maxAP);
+		setText(damageLabel, $"Attack: {u.damage} damage");
 	}
 }

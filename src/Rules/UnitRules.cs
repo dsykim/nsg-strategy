@@ -59,7 +59,11 @@ public static class UnitRules
 	}
 
 	public static void upkeep(GameState s, int playerID) {
-		foreach (Unit u in unitsOf(s, playerID)) u.restoreAP();
+		foreach (Unit u in unitsOf(s, playerID)) {
+			u.restoreAP();
+			u.hasAttacked = false;
+			u.hasMoved = false;
+		}
 	}
 
 	public static List<Vector2I> getAttackableCells(GameState s, Unit u) {
