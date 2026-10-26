@@ -79,7 +79,7 @@ public class SpawnUnitCommand : Command
 	}
 	
 	public override void print(GameState state) {
-		GD.Print($"Spawned {uType} at {pos}");
+		GD.Print($"Spawn {uType} at {pos}");
 	}
 }
 
@@ -105,7 +105,7 @@ public class SettleCommand : Command
 	}
 	
 	public override void print(GameState state) {
-		GD.Print($"Settled at {pos}");
+		GD.Print($"Settle at {pos}");
 	}
 }
 

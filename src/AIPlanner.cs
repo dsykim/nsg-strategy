@@ -1,8 +1,9 @@
-﻿
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Sequence = System.Collections.Generic.List<Command>;
 
 public static class LegalActions
 {
@@ -21,8 +22,8 @@ public static class LegalActions
 				if (cmd.validate(s)) {
 					legal.Add(cmd);
 				} else {
-					Debug.Print($"Generated command failed validation: {cmd.GetType().Name} " +
-					            $"(actor {cmd.actorID}, subject {cmd.subjectID})");
+					// Debug.Print($"Generated command failed validation: {cmd.GetType().Name} " +
+					//             $"(actor {cmd.actorID}, subject {cmd.subjectID})");
 				}
 			}
 		}
@@ -65,33 +66,60 @@ public static class LegalActions
 
 public static class AIPlanner
 {
-	/** Test planner: takes one random legal action, then the turn loop ends the turn. */
-	public static List<Command> planTurn(GameState snapshot, int playerID) {
-		var plan = new List<Command>();
-		// snapshot.actionCount = 0;
-		List<Command> legal = LegalActions.forPlayer(snapshot, playerID);
-		if (legal.Count == 0) return plan;
+	private static GameState applySequence(GameState state, Sequence seq) {
+		foreach (Command c in seq) c.execute(state);
+		return state;
+	}
 
-		List<Command> settles = legal.Where(c => c is SettleCommand).ToList();
-		List<Command> spawn = legal.Where(c => c is SpawnUnitCommand).ToList();
-		List<Command> attack = legal.Where(c => c is AttackCommand).ToList();
+	private static float evaluateState(GameState state) {
+		return 1f;
+	}
 
-		Command pick;
-		
-		if (settles.Count > 0) {
-			pick = settles[0];
-		} else if (spawn.Count > 0) {
-			pick = spawn[0];
-		} else if (attack.Count > 0) {
-			pick = attack[0];
-		} else {
-			pick = legal[snapshot.rng.Next(legal.Count)];
+	private static float evaluateDelta(GameState begin, GameState end) {
+		// We shouldn't use an absolute metric to evaluate a plan or else all plans starting from poor states
+		// will be rejected, and bad plans from good states will be accepted
+		// return evaluateState(end) - evaluateState(begin);
+		return 1f;
+	}
+	
+	public static List<Command> planTurn(GameState state, int playerID) {
+		state.actionCount = 0;
+		List<Command> legal = LegalActions.forPlayer(state, playerID);
+		if (legal.Count == 0) return new Sequence();
+
+		List<Sequence> sequencesToEvaluate = new List<Sequence>();
+		List<Sequence> successfulSequences = new List<Sequence>();
+		List<Sequence> temp = new List<Sequence>();
+		foreach (var c in legal) sequencesToEvaluate.Add(new Sequence {c});
+
+		float threshold = 0f;
+		int stepsEvaluated = 0;
+		while (stepsEvaluated < state.MAX_ACTIONS) {
+			foreach (Sequence seq in sequencesToEvaluate) {
+				GameState newState = applySequence(state.clone(), seq);
+				float score = evaluateDelta(newState, state);
+				if (score > threshold) {
+					if (stepsEvaluated < state.MAX_ACTIONS - 1) {
+						// Forward sim
+						foreach (Command c in LegalActions.forPlayer(newState, playerID)) {
+							Sequence newSequence = new Sequence(seq);
+							newSequence.Add(c);
+							temp.Add(newSequence);
+						}
+					} else {
+						// No forward sim needed on last step
+						successfulSequences.Add(seq);
+					}
+				}
+			}
+			
+			sequencesToEvaluate = new List<Sequence>(temp);
+			temp.Clear();
+			stepsEvaluated++;
 		}
-		
-		// Apply to the snapshot so a multi-action planner sees its own earlier choices.
-		pick.execute(snapshot);
-		plan.Add(pick);
-		return plan;
+
+		if (successfulSequences.Count == 0) return new Sequence();
+		return successfulSequences[0];
 	}
 }
 

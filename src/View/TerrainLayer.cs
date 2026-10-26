@@ -31,7 +31,7 @@ public partial class TerrainLayer : Node2D
 			if (tex != null) DrawTextureRect(tex, layout.cellRect(center), false);
 
 			int viewingPlayer = TurnController.instance.viewingPlayer;
-			if (!state.getPlayer(viewingPlayer).visibleCells.Contains(cell.pos)) {
+			if (state.fogOfWar && !state.getPlayer(viewingPlayer).visibleCells.Contains(cell.pos)) {
 				// Fog of war
 				DrawColoredPolygon(layout.corners(center), hiddenColor);
 			} else if (cell.hasController()) {

@@ -20,8 +20,8 @@ public class CommandExecutor
 			return false;
 		}
 		
-		cmd.execute(state);
 		cmd.print(state);
+		cmd.execute(state);
 		StateChanged?.Invoke();
 		return true;
 	}

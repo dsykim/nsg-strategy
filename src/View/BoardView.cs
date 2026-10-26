@@ -110,7 +110,7 @@ public partial class BoardView : Node2D
 
 			seen.Add(id);
 			view.sync(state, layout);
-			if (view.hiddenByFog) view.Visible = visible.Contains(entity.pos);
+			if (state.fogOfWar && view.hiddenByFog) view.Visible = visible.Contains(entity.pos);
 		}
 
 		if (views.Count > seen.Count) {

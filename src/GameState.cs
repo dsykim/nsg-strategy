@@ -33,6 +33,7 @@ public class GameState
 	public bool gameOver = false;
 	public readonly int MAX_ACTIONS = 3;
 	public int actionCount = 0;
+	public bool fogOfWar = false;
 	
 	public int register(CellDecorator e) {
 		int id = nextId++;
@@ -72,6 +73,7 @@ public class GameState
 				turnNumber = turnNumber,
 				gameOver = gameOver,
 				actionCount = actionCount,
+				fogOfWar = fogOfWar,
 		};
 		foreach (var (id, e) in entities) c.entities[id] = e.clone();
 		foreach (var (id, p) in players) c.players[id] = p.clone();
