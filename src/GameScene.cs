@@ -1,43 +1,58 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
+/**
+ * Composition root: builds the model, then the view/input/UI layers, and hands each
+ * one its dependencies through init. Nothing is reached through static instances.
+ */
 public partial class GameScene : Node
 {
-	private TurnController turnController;
-	private CombatController combatController;
-	private CameraController camera;
-	private UIController uiController;
+	/** HUD root from the scene file; optional (missing in headless or bare test scenes). */
+	[Export] private UIController uiController;
 
-	private readonly int width = 20;
-	private readonly int height = 12;
-	private readonly float hexSize = 40f;
+	/** Players controlled by a human. Ignored in headless runs (AI vs AI). */
+	private readonly int[] humanPlayerIDs = { 1, 2 };
+
+	private readonly GameConfig config = new GameConfig
+	{
+			playerCount = 2,
+			boardSize = 9,
+			seed = 1
+	};
+
+	private GameState state;
+	private TurnController turnController;
 
 	public override void _Ready() {
-		MapController mapController = new MapController(width, height, hexSize);
-		AddChild(mapController);
-		mapController.generateMap();
+		state = GameSetup.setupGame(config);
+		var executor = new CommandExecutor(state);
+		bool headless = DisplayServer.GetName() == "headless";
 
-		InputController input = new InputController();
-		input.init();
-		AddChild(input);
-
-		combatController = new CombatController();
-		AddChild(combatController);
-		
 		turnController = new TurnController();
 		AddChild(turnController);
-		turnController.init(4);
+		turnController.init(state, executor, headless ? Array.Empty<int>() : humanPlayerIDs);
 
-		uiController = (UIController)GetNode("UIController");
-		uiController.init();
+		if (!headless) buildPresentation(executor);
 
-		camera = (CameraController)GetNode("MainCamera");
-		camera.init();
+		turnController.startGame();
 	}
 
-	public override void _Process(double delta) {
+	private void buildPresentation(CommandExecutor executor) {
+		// Selection first: it must revalidate before any other StateChanged listener reads it.
+		var selection = new Selection(state, executor);
 
+		var boardView = new BoardView();
+		AddChild(boardView);
+		boardView.init(state, executor);
+
+		var camera = new CameraController();
+		AddChild(camera);
+		camera.init(boardView.boardSize);
+
+		var input = new InputController();
+		AddChild(input);
+		input.init(state, executor, boardView, selection);
+
+		uiController?.init(new HudContext(state, executor, selection, input));
 	}
 }

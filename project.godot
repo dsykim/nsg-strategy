@@ -11,14 +11,15 @@ config_version=5
 [application]
 
 config/name="nsg-strategy"
-run/main_scene="uid://bn1eteu33ytkc"
+run/main_scene="uid://dbgc5rba2ub2a"
 config/features=PackedStringArray("4.5", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1600
-window/size/viewport_height=900
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=3
 
 [dotnet]
 
@@ -65,3 +66,4 @@ ZoomOut={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.30093744, 0.5731039, 0.87495893, 1)
