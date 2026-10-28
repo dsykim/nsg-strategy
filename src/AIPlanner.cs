@@ -43,7 +43,7 @@ public static class LegalActions
 
 	private static IEnumerable<Command> attacks(GameState s, int playerID) {
 		foreach (Unit u in activeUnits(s, playerID)) {
-			if (!u.hasAttacked) continue;
+			if (u.hasAttacked) continue;
 			foreach (var target in UnitRules.getAttackableCells(s, u))
 				yield return new AttackCommand { actorID = playerID, subjectID = u.id, target = target };
 		}
@@ -81,45 +81,65 @@ public static class AIPlanner
 		// return evaluateState(end) - evaluateState(begin);
 		return 1f;
 	}
+
+	private static bool isScoreGood(float score, Dictionary<Sequence, (float, GameState)> scoreDict, int maxEntries) {
+		return scoreDict.Count < maxEntries || score > scoreDict.Min(p => p.Value.Item1);
+	}
 	
-	public static List<Command> planTurn(GameState state, int playerID) {
-		state.actionCount = 0;
-		List<Command> legal = LegalActions.forPlayer(state, playerID);
+	public static List<Command> planTurn(GameState snapshot, int playerID) {
+		snapshot.actionCount = 0;
+		List<Command> legal = LegalActions.forPlayer(snapshot, playerID);
 		if (legal.Count == 0) return new Sequence();
 
 		List<Sequence> sequencesToEvaluate = new List<Sequence>();
-		List<Sequence> successfulSequences = new List<Sequence>();
-		List<Sequence> temp = new List<Sequence>();
+		Dictionary<Sequence, (float, GameState)> scoreDict = new Dictionary<Sequence, (float, GameState)>();
 		foreach (var c in legal) sequencesToEvaluate.Add(new Sequence {c});
 
-		float threshold = 0f;
 		int stepsEvaluated = 0;
-		while (stepsEvaluated < state.MAX_ACTIONS) {
+		int MAX_FORWARD_SEQUENCES = 5;
+		
+		while (stepsEvaluated < snapshot.MAX_ACTIONS) {
+			if (sequencesToEvaluate.Count == 0) break;
+			scoreDict.Clear();
+
 			foreach (Sequence seq in sequencesToEvaluate) {
-				GameState newState = applySequence(state.clone(), seq);
-				float score = evaluateDelta(newState, state);
-				if (score > threshold) {
-					if (stepsEvaluated < state.MAX_ACTIONS - 1) {
-						// Forward sim
-						foreach (Command c in LegalActions.forPlayer(newState, playerID)) {
-							Sequence newSequence = new Sequence(seq);
-							newSequence.Add(c);
-							temp.Add(newSequence);
-						}
-					} else {
-						// No forward sim needed on last step
-						successfulSequences.Add(seq);
+				GameState newState = applySequence(snapshot.clone(), seq);
+				float score = evaluateDelta(snapshot, newState);
+				if (isScoreGood(score, scoreDict, MAX_FORWARD_SEQUENCES)) {
+					// Evaluate incoming sequences, prune down to best M before forward sim
+					scoreDict[seq] = (score, newState);
+					if (scoreDict.Count > MAX_FORWARD_SEQUENCES) {
+						scoreDict.Remove(scoreDict.MinBy(p=>p.Value.Item1).Key);
 					}
 				}
 			}
+			sequencesToEvaluate.Clear();
+			if (stepsEvaluated < snapshot.MAX_ACTIONS - 1) {
+				bool anyExpanded = false;
+				// if not last step, forward sim on best M sequences
+				foreach (var p in scoreDict) {
+					Sequence seq = p.Key;
+					GameState state = p.Value.Item2;
+					List<Command> next = LegalActions.forPlayer(state, playerID);
+					if (next.Count == 0) {
+						// Terminal sequence, pass forward for evaluation
+						sequencesToEvaluate.Add(seq);
+						continue;
+					}
+					anyExpanded = true;
+					foreach (Command c in next) {
+						Sequence newSequence = new Sequence(seq);
+						newSequence.Add(c);
+						sequencesToEvaluate.Add(newSequence);
+					}
+				}
+				if (!anyExpanded) break; // every plan is terminal
+			}
 			
-			sequencesToEvaluate = new List<Sequence>(temp);
-			temp.Clear();
 			stepsEvaluated++;
 		}
-
-		if (successfulSequences.Count == 0) return new Sequence();
-		return successfulSequences[0];
+		// last step, take the best evaluated sequence or empty if none found
+		return scoreDict.Count > 0 ? scoreDict.MaxBy(p => p.Value.Item1).Key : new Sequence();
 	}
 }
 
